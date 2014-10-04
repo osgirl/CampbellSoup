@@ -140,7 +140,6 @@ class Question (db.Model):
     text = db.Column(db.Text)
     answer = db.Column(db.Text)
     bibliography = db.Column(db.Text)
-    weight = db.Column(db.Integer)
     difficulty = db.Column(db.Enum('low', 'average', 'high'))
     quality = db.Column(db.Enum('low', 'average', 'high'))
     source_code = db.Column(db.Text)
@@ -249,6 +248,7 @@ class GroupQuestionBinding (db.Model):
     question_id = db.Column(db.ForeignKey('question.id'), primary_key = True)
     # might also need a reverse index
     order = db.Column(db.Integer, nullable = False)
+    weight = db.Column(db.Integer)
     
     group = db.relationship('Group', backref = 'question_bindings')
     question = db.relationship('Question', backref = 'group_bindings')
