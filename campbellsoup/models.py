@@ -8,6 +8,7 @@
 """
 
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.ext.declarative import declared_attr
 import flask.ext.sqlalchemy as fsqla
 
 from .utilities import append_to
@@ -16,12 +17,23 @@ __all__ = []
 
 db = fsqla.SQLAlchemy()
 
-@append_to(__all__)
-class UserRole (db.Model):
-    """ Category of user, e.g. admin or inactive user. """
-    id = db.Column(db.Integer, primary_key = True)
-    title = db.Column(db.String(30), nullable = False, unique = True)
+class Category (object):
+    """
+        Common pattern for models that divide something else into categories.
+    """
+    
+    @declared_attr
+    def __tablename__(cls):
+        return cls.__name__.lower()
 
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(30), nullable = False, unique = True)
+    
+@append_to(__all__)
+class UserRole (Category, db.Model):
+    """ Category of user, e.g. admin or inactive user. """
+    pass
+    
 @append_to(__all__)
 class Person (db.Model):
     """ Person, which may be both an application user and a question author. """
@@ -74,10 +86,9 @@ class TopicBookBinding (db.Model):
     book = db.relationship('Book', backref = 'topic_bindings')
     
 @append_to(__all__)
-class FigureKind (db.Model):
+class FigureKind (Category, db.Model):
     """ Category of use for figures, such as answerfigure. """
-    id = db.Column(db.Integer, primary_key = True)
-    name = db.Column(db.String(20), nullable = False, unique = True)
+    pass
     
 @append_to(__all__)
 class Figure (db.Model):
@@ -120,16 +131,14 @@ class IntroductionFigureBinding (db.Model):
     figure = db.relationship('Figure', backref = 'intro_bindings')
     
 @append_to(__all__)
-class QuestionCategory (db.Model):
+class QuestionKind (Category, db.Model):
     """ Type of question: multiple choice, pairing, etcetera. """
-    id = db.Column(db.Integer, primary_key = True)
-    name = db.Column(db.String(10))
+    pass
     
 @append_to(__all__)
-class QuestionStatus (db.Model):
+class QuestionStatus (Category, db.Model):
     """ Status of progress of a Question: stub, draft, complete, etcetera. """
-    id = db.Column(db.Integer, primary_key = True)
-    name = db.Column(db.String(20))
+    pass
     
 @append_to(__all__)
 class Question (db.Model):
@@ -142,7 +151,7 @@ class Question (db.Model):
     id = db.Column(db.Integer, primary_key = True)
     date = db.Column(db.DateTime, nullable = False)
     author_id = db.Column(db.ForeignKey('person.id'))
-    category_id = db.Column(db.ForeignKey('question_category.id'))
+    kind_id = db.Column(db.ForeignKey('question_kind.id'))
     status_id = db.Column(db.ForeignKey('question_status.id'), nullable = False)
     text = db.Column(db.Text)
     answer = db.Column(db.Text)
@@ -153,7 +162,7 @@ class Question (db.Model):
     source_code = db.Column(db.Text)
     
     author = db.relationship('Person', backref = 'questions')
-    category = db.relationship('QuestionCategory', backref = 'questions')
+    kind = db.relationship('QuestionKind', backref = 'questions')
     status = db.relationship('QuestionStatus', backref = 'questions')
     topics = association_proxy('topic_bindings', 'topic')
     figures = association_proxy('figure_bindings', 'figure')
@@ -199,10 +208,9 @@ class QuestionFigureBinding (db.Model):
     figure = db.relationship('Figure', backref = 'question_bindings')
     
 @append_to(__all__)
-class Format (db.Model):
+class Format (Category, db.Model):
     """ File format for question source code, e.g. LaTeXWriter. """
-    id = db.Column(db.Integer, primary_key = True)
-    name = db.Column(db.String(20), nullable = False)
+    pass
     
 @append_to(__all__)
 class Group (db.Model):
