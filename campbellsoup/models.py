@@ -7,11 +7,15 @@
     the ORM classes double as table definitions.
 """
 
+import re
+
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 import flask.ext.sqlalchemy as fsqla
 
 from .utilities import append_to
+
+camelcase_regex = re.compile(r'[A-Z][a-z0-9]*')
 
 __all__ = []
 
@@ -24,7 +28,7 @@ class Category (object):
     
     @declared_attr
     def __tablename__(cls):
-        return cls.__name__.lower()
+        return '_'.join(camelcase_regex.findall(cls.__name__)).lower()
 
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(30), nullable = False, unique = True)
