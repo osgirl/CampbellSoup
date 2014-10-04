@@ -126,6 +126,12 @@ class QuestionCategory (db.Model):
     name = db.Column(db.String(10))
     
 @append_to(__all__)
+class QuestionStatus (db.Model):
+    """ Status of progress of a Question: stub, draft, complete, etcetera. """
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(20))
+    
+@append_to(__all__)
 class Question (db.Model):
     """
         Single version of a question.
@@ -137,6 +143,7 @@ class Question (db.Model):
     date = db.Column(db.DateTime, nullable = False)
     author_id = db.Column(db.ForeignKey('person.id'))
     category_id = db.Column(db.ForeignKey('question_category.id'))
+    status_id = db.Column(db.ForeignKey('question_status.id'), nullable = False)
     text = db.Column(db.Text)
     answer = db.Column(db.Text)
     notes = db.Column(db.Text)  # by the author, not discussion
@@ -147,6 +154,7 @@ class Question (db.Model):
     
     author = db.relationship('Person', backref = 'questions')
     category = db.relationship('QuestionCategory', backref = 'questions')
+    status = db.relationship('QuestionStatus', backref = 'questions')
     topics = association_proxy('topic_bindings', 'topic')
     figures = association_proxy('figure_bindings', 'figure')
     groups = association_proxy('group_bindings', 'group')
