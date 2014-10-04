@@ -17,15 +17,23 @@ __all__ = []
 db = fsqla.SQLAlchemy()
 
 @append_to(__all__)
+class UserRole (db.Model):
+    """ Category of user, e.g. admin or inactive user. """
+    id = db.Column(db.Integer, primary_key = True)
+    title = db.Column(db.String(30), nullable = False, unique = True)
+
+@append_to(__all__)
 class Person (db.Model):
     """ Person, which may be both an application user and a question author. """
+    
     id = db.Column(db.Integer, primary_key = True)
     short_name = db.Column(db.String(15), nullable = False)
     full_name = db.Column(db.String(40), nullable = False)
+    role_id = db.Column(db.ForeignKey('user_role.id'), nullable = False)
     email_address = db.Column(db.String(30))
     password_hash = db.Column(db.String(30))
-    is_admin = db.Column(db.Boolean, nullable = False)
-    is_active = db.Column(db.Boolean, nullable = False)
+    
+    role = db.relationship('UserRole', backref = 'users')
     
 @append_to(__all__)
 class Book (db.Model):
