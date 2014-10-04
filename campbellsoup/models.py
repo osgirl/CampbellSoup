@@ -27,7 +27,7 @@ class Person (db.Model):
     """ Person, which may be both an application user and a question author. """
     
     id = db.Column(db.Integer, primary_key = True)
-    short_name = db.Column(db.String(15), nullable = False)
+    short_name = db.Column(db.String(15), nullable = False, unique = True)
     full_name = db.Column(db.String(40), nullable = False)
     role_id = db.Column(db.ForeignKey('user_role.id'), nullable = False)
     email_address = db.Column(db.String(30))
