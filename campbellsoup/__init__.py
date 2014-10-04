@@ -21,5 +21,6 @@ def create_application (config):
     app = flask.Flask(__name__)
     app.config.from_object(config)
     models.db.init_app(app)
+    db.create_all(app = app)  # passing application because of context
     app.register_blueprint(api)
     return app
