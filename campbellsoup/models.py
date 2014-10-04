@@ -139,6 +139,7 @@ class Question (db.Model):
     category_id = db.Column(db.ForeignKey('question_category.id'))
     text = db.Column(db.Text)
     answer = db.Column(db.Text)
+    notes = db.Column(db.Text)  # by the author, not discussion
     bibliography = db.Column(db.Text)
     difficulty = db.Column(db.Enum('low', 'average', 'high'))
     quality = db.Column(db.Enum('low', 'average', 'high'))
