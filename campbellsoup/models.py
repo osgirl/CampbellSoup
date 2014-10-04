@@ -85,7 +85,7 @@ class Introduction (db.Model):
     """ Piece of introductory text that may precede questions. """
     
     id = db.Column(db.Integer, primary_key = True)
-    text = db.Column(db.String(300), nullable = False)
+    text = db.Column(db.Text, nullable = False)
     source_code = db.Column(db.Text)
     
     groups = association_proxy('group_bindings', 'group')
@@ -120,9 +120,9 @@ class Question (db.Model):
     date = db.Column(db.DateTime, nullable = False)
     author_id = db.Column(db.ForeignKey('person.id'))
     category_id = db.Column(db.ForeignKey('question_category.id'))
-    text = db.Column(db.String(300))
-    answer = db.Column(db.String(300))
-    bibliography = db.Column(db.String(300))
+    text = db.Column(db.Text)
+    answer = db.Column(db.Text)
+    bibliography = db.Column(db.Text)
     weight = db.Column(db.Integer)
     difficulty = db.Column(db.Enum('low', 'average', 'high'))
     quality = db.Column(db.Enum('low', 'average', 'high'))
