@@ -177,7 +177,7 @@ class QuestionFigureBinding (db.Model):
 class Format (db.Model):
     """ File format for question source code, e.g. LaTeXWriter. """
     id = db.Column(db.Integer, primary_key = True)
-    name = db.Column(db.Integer, nullable = False)
+    name = db.Column(db.String(20), nullable = False)
     
 @append_to(__all__)
 class Group (db.Model):
