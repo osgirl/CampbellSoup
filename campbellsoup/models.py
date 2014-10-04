@@ -283,7 +283,7 @@ class Test (db.Model):
     
 @append_to(__all__)
 class TestTopicBinding (db.Model):
-    """ Association of a topic with a test. """
+    """ Associates a test with a topic that is supposed to be covered. """
     
     test_id = db.Column(db.ForeignKey('test.id'), primary_key = True)
     topic_id = db.Column(db.ForeignKey('topic.id'), primary_key = True)
