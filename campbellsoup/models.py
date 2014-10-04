@@ -32,7 +32,6 @@ class Category (object):
 @append_to(__all__)
 class UserRole (Category, db.Model):
     """ Category of user, e.g. admin or inactive user. """
-    pass
     
 @append_to(__all__)
 class Person (db.Model):
@@ -88,7 +87,6 @@ class TopicBookBinding (db.Model):
 @append_to(__all__)
 class FigureKind (Category, db.Model):
     """ Category of use for figures, such as answerfigure. """
-    pass
     
 @append_to(__all__)
 class Figure (db.Model):
@@ -133,12 +131,10 @@ class IntroductionFigureBinding (db.Model):
 @append_to(__all__)
 class QuestionKind (Category, db.Model):
     """ Type of question: multiple choice, pairing, etcetera. """
-    pass
     
 @append_to(__all__)
 class QuestionStatus (Category, db.Model):
     """ Status of progress of a Question: stub, draft, complete, etcetera. """
-    pass
     
 @append_to(__all__)
 class Question (db.Model):
@@ -210,7 +206,6 @@ class QuestionFigureBinding (db.Model):
 @append_to(__all__)
 class Format (Category, db.Model):
     """ File format for question source code, e.g. LaTeXWriter. """
-    pass
     
 @append_to(__all__)
 class Group (db.Model):
