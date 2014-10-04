@@ -74,6 +74,12 @@ class TopicBookBinding (db.Model):
     book = db.relationship('Book', backref = 'topic_bindings')
     
 @append_to(__all__)
+class FigureKind (db.Model):
+    """ Category of use for figures, such as answerfigure. """
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(20), nullable = False, unique = True)
+    
+@append_to(__all__)
 class Figure (db.Model):
     """ Figure that may appear anywhere in the test. """
     
@@ -82,10 +88,11 @@ class Figure (db.Model):
     author_id = db.Column(db.ForeignKey('person.id'))
     filename = db.Column(db.String(30), nullable = False)
     mimetype = db.Column(db.String(30), nullable = False)
-    is_answerfigure = db.Column(db.Boolean)
+    kind_id = db.Column(db.ForeignKey('figure_kind.id'), nullable = False)
     ancestor_id = db.Column(db.ForeignKey('figure.id'))
     contents = db.Column(db.BLOB, nullable = False)
     
+    kind = db.relationship('FigureKind', backref = 'figures')
     ancestor = db.relationship('Figure', backref = 'descendants')
     introductions = association_proxy('intro_bindings', 'introduction')
     questions = association_proxy('question_bindings', 'question')
