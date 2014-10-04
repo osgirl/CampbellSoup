@@ -70,6 +70,8 @@ class Figure (db.Model):
     """ Figure that may appear anywhere in the test. """
     
     id = db.Column(db.Integer, primary_key = True)
+    date = db.Column(db.DateTime)
+    author_id = db.Column(db.ForeignKey('person.id'))
     filename = db.Column(db.String(30), nullable = False)
     mimetype = db.Column(db.String(30), nullable = False)
     is_answerfigure = db.Column(db.Boolean)
