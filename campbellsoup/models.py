@@ -34,7 +34,7 @@ class Book (db.Model):
     id = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(40), nullable = False)
     author = db.Column(db.String(40), nullable = False)
-    edition = db.Column(db.Integer)
+    edition = db.Column(db.String(20))
     year = db.Column(db.Integer)
     
     topics = association_proxy('topic_bindings', 'topic')
