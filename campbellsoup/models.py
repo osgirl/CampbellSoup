@@ -32,6 +32,27 @@ class Category (object):
     id = _integer_pkey()
     name = db.Column(db.String(30), nullable = False, unique = True)
     
+class Family (object):
+    """
+        Common pattern for networks of parent-child relations.
+        
+        A family relation is the transitive symmetric reflexive
+        closure of a parent-child relation. A subclass of Family
+        represents the partition into equivalence classes of such a
+        family relation. An instance of such a subclass represents a
+        single equivalence class.
+        
+        if A parent B: A family B and B family A
+        if A family B and B family C: A family C
+        A family B <--> A.family_id == B.family_id
+    """
+    
+    @declared_attr
+    def __tablename__(cls):
+        return un_camelcase(cls.__name__)
+
+    id = _integer_pkey()
+    
 @append_to(__all__)
 class UserRole (db.Model, Category):
     """ Category of user, e.g. admin or inactive user. """
@@ -103,12 +124,17 @@ class FigureKind (db.Model, Category):
     """ Category of use for figures, such as answerfigure. """
     
 @append_to(__all__)
+class FigureTree (db.Model, Family):
+    """ Set of all versions of a figure. """
+    
+@append_to(__all__)
 class Figure (db.Model):
     """ Figure that may appear anywhere in the test. """
     
     id = _integer_pkey()
     revision_id = db.Column(db.ForeignKey('revision.id'), nullable = False)
     kind_id = db.Column(db.ForeignKey('figure_kind.id'), nullable = False)
+    tree_id = db.Column(db.ForeignKey('figure_tree.id'), nullable = False)
     ancestor_id = db.Column(db.ForeignKey('figure.id'))
     filename = db.Column(db.String(30), nullable = False)
     mimetype = db.Column(db.String(30), nullable = False)
@@ -116,6 +142,7 @@ class Figure (db.Model):
     
     revision = db.relationship('Revision', backref = 'figures')
     kind = db.relationship('FigureKind', backref = 'figures')
+    tree = db.relationship('FigureTree', backref = 'figures')
     ancestor = db.relationship('Figure', backref = 'descendants')
     introductions = association_proxy('intro_bindings', 'introduction')
     questions = association_proxy('question_bindings', 'question')
@@ -153,6 +180,10 @@ class QuestionStatus (db.Model, Category):
     """ Status of progress of a Question: stub, draft, complete, etcetera. """
     
 @append_to(__all__)
+class QuestionNetwork (db.Model, Family):
+    """ Set of all versions and variants of a question. """
+    
+@append_to(__all__)
 class Question (db.Model):
     """
         Single version of a question.
@@ -164,6 +195,9 @@ class Question (db.Model):
     revision_id = db.Column(db.ForeignKey('revision.id'), nullable = False)
     status_id = db.Column(db.ForeignKey('question_status.id'), nullable = False)
     kind_id = db.Column(db.ForeignKey('question_kind.id'))
+    network_id = db.Column(
+        db.ForeignKey('question_network.id'),
+        nullable = False )
     text = db.Column(db.Text)
     answer = db.Column(db.Text)
     notes = db.Column(db.Text)  # by the author, not discussion
@@ -175,6 +209,7 @@ class Question (db.Model):
     revision = db.relationship('Revision', backref = 'questions')
     status = db.relationship('QuestionStatus', backref = 'questions')
     kind = db.relationship('QuestionKind', backref = 'questions')
+    network = db.relationship('QuestionNetwork', backref = 'questions')
     topics = association_proxy('topic_bindings', 'topic')
     figures = association_proxy('figure_bindings', 'figure')
     groups = association_proxy('group_bindings', 'group')
@@ -223,6 +258,10 @@ class Format (db.Model, Category):
     """ File format for question source code, e.g. LaTeXWriter. """
     
 @append_to(__all__)
+class GroupNetwork (db.Model, Family):
+    """ Set of all versions and variants of a question group. """
+    
+@append_to(__all__)
 class Group (db.Model):
     """
         Singe version of a question group.
@@ -233,10 +272,12 @@ class Group (db.Model):
     id = _integer_pkey()
     revision_id = db.Column(db.ForeignKey('revision.id'), nullable = False)
     format_id = db.Column(db.ForeignKey('format.id'))
+    network_id = db.Column(db.ForeignKey('group_network.id'), nullable = False)
     title = db.Column(db.Text)
     
     revision = db.relationship('Revision', backref = 'groups')
     format = db.relationship('Format', backref = 'groups')
+    network = db.relationship('GroupNetwork', backref = 'groups')
     introductions = association_proxy('intro_bindings', 'introduction')
     questions = association_proxy('question_bindings', 'question')
     tests = association_proxy('test_bindings', 'test')
