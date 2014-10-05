@@ -45,8 +45,8 @@ class Person (db.Model):
     """ Person, which may be both an application user and a question author. """
     
     id = _integer_pkey()
-    short_name = db.Column(db.String(15), nullable = False, unique = True)
-    full_name = db.Column(db.String(40), nullable = False)
+    short_name = db.Column(db.String(30), nullable = False, unique = True)
+    full_name = db.Column(db.String(60), nullable = False)
     role_id = db.Column(db.ForeignKey('user_role.id'), nullable = False)
     email_address = db.Column(db.String(30))
     password_hash = db.Column(db.String(30))
@@ -69,9 +69,9 @@ class Book (db.Model):
     """ Possible container of knowledge that may be tested. """
 
     id = _integer_pkey()
-    title = db.Column(db.String(40), nullable = False)
-    author = db.Column(db.String(40), nullable = False)
-    edition = db.Column(db.String(20))
+    title = db.Column(db.Text, nullable = False)
+    author = db.Column(db.Text, nullable = False)
+    edition = db.Column(db.String(30))
     year = db.Column(db.Integer)
     
     topics = association_proxy('topic_bindings', 'topic')
@@ -81,7 +81,7 @@ class Topic (db.Model):
     """ Possible topic for questions, independent of Book. """
 
     id = _integer_pkey()
-    name = db.Column(db.String(30), nullable = False, unique = True)
+    name = db.Column(db.String(60), nullable = False, unique = True)
     
     books = association_proxy('book_bindings', 'book')
     questions = association_proxy('question_bindings', 'question')
@@ -93,11 +93,11 @@ class TopicBookBinding (db.Model):
     
     topic_id = db.Column(db.ForeignKey('topic.id'), primary_key = True)
     book_id = db.Column(db.ForeignKey('book.id'), primary_key = True)
-    chapter = db.Column(db.String(10))
-    section = db.Column(db.String(10))
-    figure = db.Column(db.String(10))
-    table = db.Column(db.String(10))
-    page = db.Column(db.String(20))
+    chapter = db.Column(db.String(30))
+    section = db.Column(db.String(30))
+    figure = db.Column(db.String(30))
+    table = db.Column(db.String(30))
+    page = db.Column(db.String(30))
     
     topic = db.relationship('Topic', backref = 'book_bindings')
     book = db.relationship('Book', backref = 'topic_bindings')
@@ -237,7 +237,7 @@ class Group (db.Model):
     id = _integer_pkey()
     revision_id = db.Column(db.ForeignKey('revision.id'), nullable = False)
     format_id = db.Column(db.ForeignKey('format.id'))
-    title = db.Column(db.String(30))
+    title = db.Column(db.Text)
     
     revision = db.relationship('Revision', backref = 'groups')
     format = db.relationship('Format', backref = 'groups')
@@ -288,7 +288,7 @@ class Test (db.Model):
     """ A series of question groups, as presented to olympiad participants. """
     
     id = _integer_pkey()
-    title = db.Column(db.String(30), nullable = False)
+    title = db.Column(db.Text, nullable = False)
     date = db.Column(db.Date, nullable = False)
     
     topics = association_proxy('topic_bindings', 'topic')
