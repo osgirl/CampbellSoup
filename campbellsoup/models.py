@@ -51,6 +51,17 @@ class Person (db.Model):
     role = db.relationship('UserRole', backref = 'users')
     
 @append_to(__all__)
+class Revision (db.Model):
+    """ Changeset to the database with author and date. """
+    
+    id = db.Column(db.Integer, primary_key = True)
+    author_id = db.Column(db.ForeignKey('person.id'), nullable = False)
+    date = db.Column(db.DateTime, nullable = False)
+    commit_msg = db.Column(db.Text)
+    
+    author = db.relationship('Person', backref = 'revisions')
+    
+@append_to(__all__)
 class Book (db.Model):
     """ Possible container of knowledge that may be tested. """
 
@@ -97,14 +108,14 @@ class Figure (db.Model):
     """ Figure that may appear anywhere in the test. """
     
     id = db.Column(db.Integer, primary_key = True)
-    date = db.Column(db.DateTime)
-    author_id = db.Column(db.ForeignKey('person.id'))
-    filename = db.Column(db.String(30), nullable = False)
-    mimetype = db.Column(db.String(30), nullable = False)
+    revision_id = db.Column(db.ForeignKey('revision.id'), nullable = False)
     kind_id = db.Column(db.ForeignKey('figure_kind.id'), nullable = False)
     ancestor_id = db.Column(db.ForeignKey('figure.id'))
+    filename = db.Column(db.String(30), nullable = False)
+    mimetype = db.Column(db.String(30), nullable = False)
     contents = db.Column(db.BLOB, nullable = False)
     
+    revision = db.relationship('Revision', backref = 'figures')
     kind = db.relationship('FigureKind', backref = 'figures')
     ancestor = db.relationship('Figure', backref = 'descendants')
     introductions = association_proxy('intro_bindings', 'introduction')
@@ -115,9 +126,11 @@ class Introduction (db.Model):
     """ Piece of introductory text that may precede questions. """
     
     id = db.Column(db.Integer, primary_key = True)
+    revision_id = db.Column(db.ForeignKey('revision.id'), nullable = False)
     text = db.Column(db.Text, nullable = False)
     source_code = db.Column(db.Text)
     
+    revision = db.relationship('Revision', backref = 'introductions')
     groups = association_proxy('group_bindings', 'group')
     figures = association_proxy('figure_bindings', 'figure')
     
@@ -149,10 +162,9 @@ class Question (db.Model):
     """
     
     id = db.Column(db.Integer, primary_key = True)
-    date = db.Column(db.DateTime, nullable = False)
-    author_id = db.Column(db.ForeignKey('person.id'))
-    kind_id = db.Column(db.ForeignKey('question_kind.id'))
+    revision_id = db.Column(db.ForeignKey('revision.id'), nullable = False)
     status_id = db.Column(db.ForeignKey('question_status.id'), nullable = False)
+    kind_id = db.Column(db.ForeignKey('question_kind.id'))
     text = db.Column(db.Text)
     answer = db.Column(db.Text)
     notes = db.Column(db.Text)  # by the author, not discussion
@@ -161,9 +173,9 @@ class Question (db.Model):
     quality = db.Column(db.Enum('low', 'average', 'high'))
     source_code = db.Column(db.Text)
     
-    author = db.relationship('Person', backref = 'questions')
-    kind = db.relationship('QuestionKind', backref = 'questions')
+    revision = db.relationship('Revision', backref = 'questions')
     status = db.relationship('QuestionStatus', backref = 'questions')
+    kind = db.relationship('QuestionKind', backref = 'questions')
     topics = association_proxy('topic_bindings', 'topic')
     figures = association_proxy('figure_bindings', 'figure')
     groups = association_proxy('group_bindings', 'group')
@@ -220,12 +232,11 @@ class Group (db.Model):
     """
 
     id = db.Column(db.Integer, primary_key = True)
-    date = db.Column(db.DateTime, nullable = False)
-    author_id = db.Column(db.ForeignKey('person.id'))
-    title = db.Column(db.String(30))
+    revision_id = db.Column(db.ForeignKey('revision.id'), nullable = False)
     format_id = db.Column(db.ForeignKey('format.id'))
+    title = db.Column(db.String(30))
     
-    author = db.relationship('Person', backref = 'groups')
+    revision = db.relationship('Revision', backref = 'groups')
     format = db.relationship('Format', backref = 'groups')
     introductions = association_proxy('intro_bindings', 'introduction')
     questions = association_proxy('question_bindings', 'question')
