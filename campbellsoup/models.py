@@ -321,6 +321,44 @@ class GroupQuestionBinding (db.Model):
     question = db.relationship('Question', backref = 'group_bindings')
     
 @append_to(__all__)
+class Issue (db.Model):
+    """ Ticket for any type of issue with any piece of content. """
+    
+    id = _integer_pkey()
+    raised_id = db.Column(db.ForeignKey('revision.id'), nullable = False)
+    resolved_id = db.Column(db.ForeignKey('revision.id'))  # null means open
+    test_id = db.Column(db.ForeignKey('test.id'))
+    groupnet_id = db.Column(db.ForeignKey('group_network.id'))
+    questionnet_id = db.Column(db.ForeignKey('question_network.id'))
+    figuretree_id = db.Column(db.ForeignKey('figure_tree.id'))
+    assignee_id = db.Column(db.ForeignKey('person.id'))
+    deadline = db.Column(db.DateTime)
+    title = db.Column(db.Text, nullable = False)
+    
+    raised = db.relationship('Revision', backref = 'raised_issues')
+    resolved = db.relationship('Revision', backref = 'resolved_issues')
+    test = db.relationship('Test', backref = 'issues')
+    groupnet = db.relationship('GroupNetwork', backref = 'issues')
+    questionnet = db.relationship('QuestionNetwork', backref = 'issues')
+    figuretree = db.relationship('FigureTree', backref = 'issues')
+    assignee = db.relationship('Person', backref = 'assigned_issues')
+    
+@append_to(__all__)
+class IssuePost (db.Model):
+    """ Opening post of, or reply to, an issue. """
+    
+    id = _integer_pkey()
+    issue_id = db.Column(db.ForeignKey('issue.id'), nullable = False)
+    author_id = db.Column(db.ForeignKey('person.id'), nullable = False)
+    date = db.Column(db.DateTime, nullable = False)
+    revision_id = db.Column(db.ForeignKey('revision.id'))  # optional reference
+    message = db.Column(db.Text, nullable = False)
+    
+    issue = db.relationship('Issue', backref = 'posts')
+    author = db.relationship('Person', backref = 'posts')
+    revision = db.relationship('Revision', backref = 'revisions')
+    
+@append_to(__all__)
 class Test (db.Model):
     """ A series of question groups, as presented to olympiad participants. """
     
