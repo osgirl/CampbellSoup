@@ -21,6 +21,9 @@ __all__ = []
 
 db = fsqla.SQLAlchemy()
 
+def _integer_pkey ( ):
+    return db.Column(db.Integer, primary_key = True)
+
 class Category (object):
     """
         Common pattern for models that divide something else into categories.
@@ -30,7 +33,7 @@ class Category (object):
     def __tablename__(cls):
         return '_'.join(camelcase_regex.findall(cls.__name__)).lower()
 
-    id = db.Column(db.Integer, primary_key = True)
+    id = _integer_pkey()
     name = db.Column(db.String(30), nullable = False, unique = True)
     
 @append_to(__all__)
@@ -41,7 +44,7 @@ class UserRole (Category, db.Model):
 class Person (db.Model):
     """ Person, which may be both an application user and a question author. """
     
-    id = db.Column(db.Integer, primary_key = True)
+    id = _integer_pkey()
     short_name = db.Column(db.String(15), nullable = False, unique = True)
     full_name = db.Column(db.String(40), nullable = False)
     role_id = db.Column(db.ForeignKey('user_role.id'), nullable = False)
@@ -54,7 +57,7 @@ class Person (db.Model):
 class Revision (db.Model):
     """ Changeset to the database with author and date. """
     
-    id = db.Column(db.Integer, primary_key = True)
+    id = _integer_pkey()
     author_id = db.Column(db.ForeignKey('person.id'), nullable = False)
     date = db.Column(db.DateTime, nullable = False)
     commit_msg = db.Column(db.Text)
@@ -65,7 +68,7 @@ class Revision (db.Model):
 class Book (db.Model):
     """ Possible container of knowledge that may be tested. """
 
-    id = db.Column(db.Integer, primary_key = True)
+    id = _integer_pkey()
     title = db.Column(db.String(40), nullable = False)
     author = db.Column(db.String(40), nullable = False)
     edition = db.Column(db.String(20))
@@ -77,7 +80,7 @@ class Book (db.Model):
 class Topic (db.Model):
     """ Possible topic for questions, independent of Book. """
 
-    id = db.Column(db.Integer, primary_key = True)
+    id = _integer_pkey()
     name = db.Column(db.String(30), nullable = False, unique = True)
     
     books = association_proxy('book_bindings', 'book')
@@ -107,7 +110,7 @@ class FigureKind (Category, db.Model):
 class Figure (db.Model):
     """ Figure that may appear anywhere in the test. """
     
-    id = db.Column(db.Integer, primary_key = True)
+    id = _integer_pkey()
     revision_id = db.Column(db.ForeignKey('revision.id'), nullable = False)
     kind_id = db.Column(db.ForeignKey('figure_kind.id'), nullable = False)
     ancestor_id = db.Column(db.ForeignKey('figure.id'))
@@ -125,7 +128,7 @@ class Figure (db.Model):
 class Introduction (db.Model):
     """ Piece of introductory text that may precede questions. """
     
-    id = db.Column(db.Integer, primary_key = True)
+    id = _integer_pkey()
     revision_id = db.Column(db.ForeignKey('revision.id'), nullable = False)
     text = db.Column(db.Text, nullable = False)
     source_code = db.Column(db.Text)
@@ -161,7 +164,7 @@ class Question (db.Model):
         Linked to previous and subsequent versions in a Git-like way.
     """
     
-    id = db.Column(db.Integer, primary_key = True)
+    id = _integer_pkey()
     revision_id = db.Column(db.ForeignKey('revision.id'), nullable = False)
     status_id = db.Column(db.ForeignKey('question_status.id'), nullable = False)
     kind_id = db.Column(db.ForeignKey('question_kind.id'))
@@ -231,7 +234,7 @@ class Group (db.Model):
         Linked to previous and subsequent versions in a Git-like way.
     """
 
-    id = db.Column(db.Integer, primary_key = True)
+    id = _integer_pkey()
     revision_id = db.Column(db.ForeignKey('revision.id'), nullable = False)
     format_id = db.Column(db.ForeignKey('format.id'))
     title = db.Column(db.String(30))
@@ -284,7 +287,7 @@ class GroupQuestionBinding (db.Model):
 class Test (db.Model):
     """ A series of question groups, as presented to olympiad participants. """
     
-    id = db.Column(db.Integer, primary_key = True)
+    id = _integer_pkey()
     title = db.Column(db.String(30), nullable = False)
     date = db.Column(db.Date, nullable = False)
     
