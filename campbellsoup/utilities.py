@@ -4,6 +4,13 @@
     Useful abstractions that don't belong anywhere else.
 """
 
+import re
+
+camelcase_regex = re.compile(r'[A-Z][a-z0-9]*')
+
+def un_camelcase (name):
+    return '_'.join(camelcase_regex.findall(name)).lower()
+
 def append_to (__all__):
     """
         Class and function decorator to include the name in __all__.
