@@ -37,7 +37,7 @@ class Category (object):
     name = db.Column(db.String(30), nullable = False, unique = True)
     
 @append_to(__all__)
-class UserRole (Category, db.Model):
+class UserRole (db.Model, Category):
     """ Category of user, e.g. admin or inactive user. """
     
 @append_to(__all__)
@@ -103,7 +103,7 @@ class TopicBookBinding (db.Model):
     book = db.relationship('Book', backref = 'topic_bindings')
     
 @append_to(__all__)
-class FigureKind (Category, db.Model):
+class FigureKind (db.Model, Category):
     """ Category of use for figures, such as answerfigure. """
     
 @append_to(__all__)
@@ -149,11 +149,11 @@ class IntroductionFigureBinding (db.Model):
     figure = db.relationship('Figure', backref = 'intro_bindings')
     
 @append_to(__all__)
-class QuestionKind (Category, db.Model):
+class QuestionKind (db.Model, Category):
     """ Type of question: multiple choice, pairing, etcetera. """
     
 @append_to(__all__)
-class QuestionStatus (Category, db.Model):
+class QuestionStatus (db.Model, Category):
     """ Status of progress of a Question: stub, draft, complete, etcetera. """
     
 @append_to(__all__)
@@ -223,7 +223,7 @@ class QuestionFigureBinding (db.Model):
     figure = db.relationship('Figure', backref = 'question_bindings')
     
 @append_to(__all__)
-class Format (Category, db.Model):
+class Format (db.Model, Category):
     """ File format for question source code, e.g. LaTeXWriter. """
     
 @append_to(__all__)
