@@ -4,6 +4,21 @@
     Useful abstractions that don't belong anywhere else.
 """
 
+import re
+
+camelcase_regex = re.compile(r'[A-Z][a-z0-9]*')
+
+def un_camelcase (name):
+    """
+        Turn a camelcased name into a lowercase name with underscore separators.
+        
+        >>> un_camelcase('CampbellSoupX')
+        'campbell_soup_x'
+        >>> un_camelcase('NBOCampbellToets')
+        'n_b_o_campbell_toets'
+    """
+    return '_'.join(camelcase_regex.findall(name)).lower()
+
 def append_to (__all__):
     """
         Class and function decorator to include the name in __all__.
