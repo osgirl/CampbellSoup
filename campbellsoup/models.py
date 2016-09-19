@@ -13,14 +13,17 @@ import flask.ext.sqlalchemy as fsqla
 
 from .utilities import append_to, un_camelcase
 
+
 __all__ = []
 
 db = fsqla.SQLAlchemy()
 
-def _integer_pkey ( ):
+
+def _integer_pkey():
     return db.Column(db.Integer, primary_key = True)
 
-class Category (object):
+
+class Category(object):
     """
         Common pattern for models that divide something else into categories.
     """
@@ -31,8 +34,9 @@ class Category (object):
 
     id = _integer_pkey()
     name = db.Column(db.String(30), nullable = False, unique = True)
-    
-class Family (object):
+
+
+class Family(object):
     """
         Common pattern for networks of parent-child relations.
         
@@ -52,13 +56,15 @@ class Family (object):
         return un_camelcase(cls.__name__)
 
     id = _integer_pkey()
-    
+
+
 @append_to(__all__)
-class UserRole (db.Model, Category):
+class UserRole(db.Model, Category):
     """ Category of user, e.g. admin or inactive user. """
-    
+
+
 @append_to(__all__)
-class Person (db.Model):
+class Person(db.Model):
     """ Person, which may be both an application user and a question author. """
     
     id = _integer_pkey()
@@ -69,9 +75,10 @@ class Person (db.Model):
     password_hash = db.Column(db.String(30))
     
     role = db.relationship('UserRole', backref = 'users')
-    
+
+
 @append_to(__all__)
-class Revision (db.Model):
+class Revision(db.Model):
     """ Changeset to the database with author and date. """
     
     id = _integer_pkey()
@@ -80,9 +87,10 @@ class Revision (db.Model):
     commit_msg = db.Column(db.Text)
     
     author = db.relationship('Person', backref = 'revisions')
-    
+
+
 @append_to(__all__)
-class Book (db.Model):
+class Book(db.Model):
     """ Possible container of knowledge that may be tested. """
 
     id = _integer_pkey()
@@ -92,9 +100,10 @@ class Book (db.Model):
     year = db.Column(db.Integer)
     
     topics = association_proxy('topic_bindings', 'topic')
-    
+
+
 @append_to(__all__)
-class Topic (db.Model):
+class Topic(db.Model):
     """ Possible topic for questions, independent of Book. """
 
     id = _integer_pkey()
@@ -103,9 +112,10 @@ class Topic (db.Model):
     books = association_proxy('book_bindings', 'book')
     questions = association_proxy('question_bindings', 'question')
     tests = association_proxy('test_bindings', 'test')
-    
+
+
 @append_to(__all__)
-class TopicBookBinding (db.Model):
+class TopicBookBinding(db.Model):
     """ Where in a particular book, a particular topic is addressed. """
     
     topic_id = db.Column(db.ForeignKey('topic.id'), primary_key = True)
@@ -118,17 +128,20 @@ class TopicBookBinding (db.Model):
     
     topic = db.relationship('Topic', backref = 'book_bindings')
     book = db.relationship('Book', backref = 'topic_bindings')
-    
+
+
 @append_to(__all__)
-class FigureKind (db.Model, Category):
+class FigureKind(db.Model, Category):
     """ Category of use for figures, such as answerfigure. """
-    
+
+
 @append_to(__all__)
-class FigureTree (db.Model, Family):
+class FigureTree(db.Model, Family):
     """ Set of all versions of a figure. """
-    
+
+
 @append_to(__all__)
-class Figure (db.Model):
+class Figure(db.Model):
     """ Figure that may appear anywhere in the test. """
     
     id = _integer_pkey()
@@ -146,9 +159,10 @@ class Figure (db.Model):
     ancestor = db.relationship('Figure', backref = 'descendants')
     introductions = association_proxy('intro_bindings', 'introduction')
     questions = association_proxy('question_bindings', 'question')
-    
+
+
 @append_to(__all__)
-class Introduction (db.Model):
+class Introduction(db.Model):
     """ Piece of introductory text that may precede questions. """
     
     id = _integer_pkey()
@@ -159,9 +173,10 @@ class Introduction (db.Model):
     revision = db.relationship('Revision', backref = 'introductions')
     groups = association_proxy('group_bindings', 'group')
     figures = association_proxy('figure_bindings', 'figure')
-    
+
+
 @append_to(__all__)
-class IntroductionFigureBinding (db.Model):
+class IntroductionFigureBinding(db.Model):
     """ Association between a figure and an introductory text. """
     
     intro_id = db.Column(db.ForeignKey('introduction.id'), primary_key = True)
@@ -170,21 +185,25 @@ class IntroductionFigureBinding (db.Model):
     
     introduction = db.relationship('Introduction', backref = 'figure_bindings')
     figure = db.relationship('Figure', backref = 'intro_bindings')
-    
+
+
 @append_to(__all__)
-class QuestionKind (db.Model, Category):
+class QuestionKind(db.Model, Category):
     """ Type of question: multiple choice, pairing, etcetera. """
-    
+
+
 @append_to(__all__)
-class QuestionStatus (db.Model, Category):
+class QuestionStatus(db.Model, Category):
     """ Status of progress of a Question: stub, draft, complete, etcetera. """
-    
+
+
 @append_to(__all__)
-class QuestionNetwork (db.Model, Family):
+class QuestionNetwork(db.Model, Family):
     """ Set of all versions and variants of a question. """
-    
+
+
 @append_to(__all__)
-class Question (db.Model):
+class Question(db.Model):
     """
         Single version of a question.
         
@@ -215,9 +234,10 @@ class Question (db.Model):
     groups = association_proxy('group_bindings', 'group')
     ancestors = association_proxy('parent_bindings', 'parent')
     descendants = association_proxy('child_bindings', 'child')
-    
+
+
 @append_to(__all__)
-class QuestionHistory (db.Model):
+class QuestionHistory(db.Model):
     """
         Graph edge of the ancestry network of single questions.
         
@@ -230,9 +250,10 @@ class QuestionHistory (db.Model):
     
     parent = db.relationship('Question', backref = 'child_bindings')
     child = db.relationship('Question', backref = 'parent_bindings')
-    
+
+
 @append_to(__all__)
-class QuestionTopicBinding (db.Model):
+class QuestionTopicBinding(db.Model):
     """ Association between a question and a topic. """
     
     question_id = db.Column(db.ForeignKey('question.id'), primary_key = True)
@@ -241,9 +262,10 @@ class QuestionTopicBinding (db.Model):
     
     question = db.relationship('Question', backref = 'topic_bindings')
     topic = db.relationship('Topic', backref = 'question_bindings')
-    
+
+
 @append_to(__all__)
-class QuestionFigureBinding (db.Model):
+class QuestionFigureBinding(db.Model):
     """ Association between a question and a figure. """
     
     question_id = db.Column(db.ForeignKey('question.id'), primary_key = True)
@@ -252,17 +274,20 @@ class QuestionFigureBinding (db.Model):
     
     question = db.relationship('Question', backref = 'figure_bindings')
     figure = db.relationship('Figure', backref = 'question_bindings')
-    
+
+
 @append_to(__all__)
-class Format (db.Model, Category):
+class Format(db.Model, Category):
     """ File format for question source code, e.g. LaTeXWriter. """
-    
+
+
 @append_to(__all__)
-class GroupNetwork (db.Model, Family):
+class GroupNetwork(db.Model, Family):
     """ Set of all versions and variants of a question group. """
-    
+
+
 @append_to(__all__)
-class Group (db.Model):
+class Group(db.Model):
     """
         Singe version of a question group.
         
@@ -284,8 +309,9 @@ class Group (db.Model):
     ancestors = association_proxy('parent_bindings', 'parent')
     descendants = association_proxy('child_bindings', 'child')
 
+
 @append_to(__all__)
-class GroupHistory (db.Model):
+class GroupHistory(db.Model):
     """ Graph edge of the ancestry network of question groups. """
     
     parent_id = db.Column(db.ForeignKey('group.id'), primary_key = True)
@@ -294,9 +320,10 @@ class GroupHistory (db.Model):
     
     parent = db.relationship('Group', backref = 'child_bindings')
     child = db.relationship('Group', backref = 'parent_bindings')
-    
+
+
 @append_to(__all__)
-class GroupIntroductionBinding (db.Model):
+class GroupIntroductionBinding(db.Model):
     """ Position of an introduction paragraph in a group. """
     
     group_id = db.Column(db.ForeignKey('group.id'), primary_key = True)
@@ -306,9 +333,10 @@ class GroupIntroductionBinding (db.Model):
     
     group = db.relationship('Group', backref = 'intro_bindings')
     introduction = db.relationship('Introduction', backref = 'group_bindings')
-    
+
+
 @append_to(__all__)
-class GroupQuestionBinding (db.Model):
+class GroupQuestionBinding(db.Model):
     """ Clustering of single questions into question groups. """
     
     group_id = db.Column(db.ForeignKey('group.id'), primary_key = True)
@@ -319,9 +347,10 @@ class GroupQuestionBinding (db.Model):
     
     group = db.relationship('Group', backref = 'question_bindings')
     question = db.relationship('Question', backref = 'group_bindings')
-    
+
+
 @append_to(__all__)
-class Issue (db.Model):
+class Issue(db.Model):
     """ Ticket for any type of issue with any piece of content. """
     
     id = _integer_pkey()
@@ -342,9 +371,10 @@ class Issue (db.Model):
     questionnet = db.relationship('QuestionNetwork', backref = 'issues')
     figuretree = db.relationship('FigureTree', backref = 'issues')
     assignee = db.relationship('Person', backref = 'assigned_issues')
-    
+
+
 @append_to(__all__)
-class IssuePost (db.Model):
+class IssuePost(db.Model):
     """ Opening post of, or reply to, an issue. """
     
     id = _integer_pkey()
@@ -357,9 +387,10 @@ class IssuePost (db.Model):
     issue = db.relationship('Issue', backref = 'posts')
     author = db.relationship('Person', backref = 'posts')
     revision = db.relationship('Revision', backref = 'revisions')
-    
+
+
 @append_to(__all__)
-class Test (db.Model):
+class Test(db.Model):
     """ A series of question groups, as presented to olympiad participants. """
     
     id = _integer_pkey()
@@ -368,9 +399,10 @@ class Test (db.Model):
     
     topics = association_proxy('topic_bindings', 'topic')
     groups = association_proxy('group_bindings', 'group')
-    
+
+
 @append_to(__all__)
-class TestTopicBinding (db.Model):
+class TestTopicBinding(db.Model):
     """ Associates a test with a topic that is supposed to be covered. """
     
     test_id = db.Column(db.ForeignKey('test.id'), primary_key = True)
@@ -379,9 +411,10 @@ class TestTopicBinding (db.Model):
     
     test = db.relationship('Test', backref = 'topic_bindings')
     topic = db.relationship('Topic', backref = 'test_bindings')
-    
+
+
 @append_to(__all__)
-class TestGroupBinding (db.Model):
+class TestGroupBinding(db.Model):
     """ Order of a question group within a test. """
     
     test_id = db.Column(db.ForeignKey('test.id'), primary_key = True)
@@ -390,4 +423,4 @@ class TestGroupBinding (db.Model):
     
     test = db.relationship('Test', backref = 'group_bindings')
     group = db.relationship('Group', backref = 'test_bindings')
-    
+

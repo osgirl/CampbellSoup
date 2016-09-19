@@ -11,6 +11,7 @@ from .queries import *
 
 api = flask.Blueprint('API', __name__)
 
+
 @api.route('/')
 def index ( ):
     return 'Hello, World!'

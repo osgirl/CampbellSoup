@@ -9,9 +9,11 @@
 
 import campbellsoup
 
+
 class Config:
     SECRET_KEY = '1234567890qwertyuiopasdfghjkl'
     SQLALCHEMY_DATABASE_URI = 'sqlite:///debug.db'
+
 
 if __name__ == '__main__':
     app = campbellsoup.create_application(Config)

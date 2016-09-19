@@ -16,7 +16,8 @@ import flask
 from .models import db
 from .api import api
 
-def create_application (config):
+
+def create_application(config):
     """ Return a Werkzeug-flavoured WSGI application. """
     app = flask.Flask(__name__)
     app.config.from_object(config)

@@ -9,6 +9,7 @@ from doctest import testmod
 
 import campbellsoup as cs
 
+
 if __name__ == '__main__':
     testmod(cs)
     testmod(cs.models)

@@ -8,7 +8,8 @@ import re
 
 camelcase_regex = re.compile(r'[A-Z][a-z0-9]*')
 
-def un_camelcase (name):
+
+def un_camelcase(name):
     """
         Turn a camelcased name into a lowercase name with underscore separators.
         
@@ -19,7 +20,8 @@ def un_camelcase (name):
     """
     return '_'.join(camelcase_regex.findall(name)).lower()
 
-def append_to (__all__):
+
+def append_to(__all__):
     """
         Class and function decorator to include the name in __all__.
         
@@ -54,7 +56,7 @@ def append_to (__all__):
         >>> # To import everything from this module, do
         >>> # from wild import Example, bar, *
     """
-    def wrap (obj):
+    def wrap(obj):
         assert hasattr(obj, '__name__'), "Decorated object must have a __name__."
         __all__.append(obj.__name__)
         return obj
