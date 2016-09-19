@@ -6,6 +6,10 @@ Configuration
 -------------
 The CampbellSoup application requires you to pass a `Configuration` object at app creation time that provides a small number of configuration values. Refer to `run.py` for an example and further documentation.
 
+Testing
+-------
+Install the `pytest` package using `pip` and run `py.test` from the root directory in order to run all Python unittests.
+
 Running
 -------
 You are advised to run CampbellSoup as a WSGI application from your favourite HTTP server.

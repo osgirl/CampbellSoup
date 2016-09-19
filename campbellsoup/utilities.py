@@ -12,11 +12,6 @@ camelcase_regex = re.compile(r'[A-Z][a-z0-9]*')
 def un_camelcase(name):
     """
         Turn a camelcased name into a lowercase name with underscore separators.
-        
-        >>> un_camelcase('CampbellSoupX')
-        'campbell_soup_x'
-        >>> un_camelcase('NBOCampbellToets')
-        'n_b_o_campbell_toets'
     """
     return '_'.join(camelcase_regex.findall(name)).lower()
 
@@ -49,8 +44,6 @@ def append_to(__all__):
         ...     pass
         >>> def bar ( ):
         ...     pass
-        >>> __all__
-        ['Illustration', 'foo']
         >>> # from wild import *
         >>> # will only import Illustration and foo.
         >>> # To import everything from this module, do
