@@ -11,13 +11,17 @@
 """
 
 import flask
+from flask_migrate import Migrate
 
 from .models import db
 from .api import api
 from . import defaults
 
 
-def create_application(config=defaults):
+migrate = Migrate()
+
+
+def create_application(config=defaults, create_db=False):
     """ Return a Werkzeug-flavoured WSGI application. """
     app = flask.Flask(__name__)
     if type(config) in (str, bytes):
@@ -25,6 +29,8 @@ def create_application(config=defaults):
     else:
         app.config.from_object(config)
     models.db.init_app(app)
-    db.create_all(app = app)  # passing application because of context
+    if create_db:
+        db.create_all(app = app)  # passing application because of context
+    migrate.init_app(app, db)
     app.register_blueprint(api)
     return app
