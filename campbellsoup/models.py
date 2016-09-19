@@ -9,7 +9,7 @@
 
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
-import flask.ext.sqlalchemy as fsqla
+import flask_sqlalchemy as fsqla
 
 from .utilities import append_to, un_camelcase
 
