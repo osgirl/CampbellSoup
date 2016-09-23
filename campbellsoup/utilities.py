@@ -40,9 +40,9 @@ def append_to(__all__):
         ... class Illustration (object):
         ...     pass
         >>> @append_to(__all__)
-        ... def foo ( ):
+        ... def foo():
         ...     pass
-        >>> def bar ( ):
+        >>> def bar():
         ...     pass
         >>> # from wild import *
         >>> # will only import Illustration and foo.

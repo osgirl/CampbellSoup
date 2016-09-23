@@ -13,5 +13,5 @@ api = flask.Blueprint('API', __name__)
 
 
 @api.route('/')
-def index ( ):
+def index():
     return 'Hello, World!'

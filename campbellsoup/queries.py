@@ -28,7 +28,7 @@ def lastused(question):
 # 2. Er kunnen vragen gezocht worden die als inspiratiebron voor
 # nieuwe vragen kunnen dienen. (zoeken op: thema, niveau, auteur)
 
-def question_filter_query(final_only = False, initial_only = False, **kwargs):
+def question_filter_query(final_only=False, initial_only=False, **kwargs):
     q = Question.query
     if 'topics' in kwargs:
         q = q.filter(Question.topics.any(Topic.in_(kwargs['topics'])))
@@ -42,13 +42,13 @@ def question_filter_query(final_only = False, initial_only = False, **kwargs):
         q = q.filter(Question.category.in_(kwargs['categories']))
     if final_only:
         q = (
-            q.outer_join(*Question.descendants.attr, aliased = True)
+            q.outer_join(*Question.descendants.attr, aliased=True)
             .filter(Question.id == None)  # no descendants
             .reset_joinpoint()
         )
     if initial_only:
         q = (
-            q.outer_join(*Questions.ancestors.attr, aliased = True)
+            q.outer_join(*Questions.ancestors.attr, aliased=True)
             .filter(Question.id == None)  # no descendants
             .reset_joinpoint()
         )

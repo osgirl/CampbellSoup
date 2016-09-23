@@ -30,7 +30,7 @@ def create_application(config=defaults, create_db=False):
         app.config.from_object(config)
     models.db.init_app(app)
     if create_db:
-        db.create_all(app = app)  # passing application because of context
+        db.create_all(app=app)  # passing application because of context
     migrate.init_app(app, db)
     app.register_blueprint(api)
     return app
