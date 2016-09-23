@@ -151,7 +151,7 @@ class Figure(db.Model):
     ancestor_id = db.Column(db.ForeignKey('figure.id'))
     filename = db.Column(db.String(30), nullable = False)
     mimetype = db.Column(db.String(30), nullable = False)
-    contents = db.Column(db.BLOB, nullable = False)
+    contents = db.Column(db.LargeBinary, nullable = False)
     
     revision = db.relationship('Revision', backref = 'figures')
     kind = db.relationship('FigureKind', backref = 'figures')
@@ -221,8 +221,8 @@ class Question(db.Model):
     answer = db.Column(db.Text)
     notes = db.Column(db.Text)  # by the author, not discussion
     bibliography = db.Column(db.Text)
-    difficulty = db.Column(db.Enum('low', 'average', 'high'))
-    quality = db.Column(db.Enum('low', 'average', 'high'))
+    difficulty = db.Column(db.Enum('low', 'average', 'high', name='difficulty'))
+    quality = db.Column(db.Enum('low', 'average', 'high', name='quality'))
     source_code = db.Column(db.Text)
     
     revision = db.relationship('Revision', backref = 'questions')
