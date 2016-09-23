@@ -35,6 +35,7 @@ You are advised to run CampbellSoup as a WSGI application from your favourite HT
 
 
 (c) 2014 Julian Gonggrijp & Bert Massop
+(c) 2016 Julian Gonggrijp
 
 
 [1]: http://flask.pocoo.org/docs/0.11/config/

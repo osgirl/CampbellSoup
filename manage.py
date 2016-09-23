@@ -1,3 +1,5 @@
+# (c) 2016 Julian Gonggrijp
+
 from flask_script import Manager
 from flask_migrate import MigrateCommand
 

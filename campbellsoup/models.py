@@ -1,4 +1,4 @@
-# (c) 2014 Julian Gonggrijp (j.gonggrijp@gmail.com)
+# (c) 2014, 2016 Julian Gonggrijp
 
 """
     ORM classes for all objects stored in the database.

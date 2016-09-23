@@ -1,3 +1,5 @@
+# (c) 2016 Julian Gonggrijp
+
 from .utilities import *
 
 

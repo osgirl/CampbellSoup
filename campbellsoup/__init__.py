@@ -1,4 +1,4 @@
-# (c) 2014 Julian Gonggrijp (j.gonggrijp@gmail.com)
+# (c) 2014, 2016 Julian Gonggrijp
 
 """
     CampbellSoup, the web-based archive of Campbell test questions.
