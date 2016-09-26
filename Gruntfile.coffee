@@ -11,6 +11,7 @@ module.exports = (grunt) ->
 	grunt.initConfig
 		source: 'client'
 		script: 'script'
+		style: 'style'
 		template: 'template'
 		templateSrc: '<%= source %>/<%= template %>'
 		stage: '.tmp'
@@ -38,8 +39,16 @@ module.exports = (grunt) ->
 				src: ['**/*.coffee']
 				dest: '<%= stage %>/<%= script %>/'
 				ext: '.js'
+		
+		compass:
+			options:
+				sassDir: '<%= source %>/<%= style %>'
+			compile:
+				options:
+					cssDir: '<%= stage %>/<%= style %>'
 	
 	grunt.loadNpmTasks 'grunt-contrib-handlebars'
 	grunt.loadNpmTasks 'grunt-contrib-coffee'
+	grunt.loadNpmTasks 'grunt-contrib-compass'
 	
 	# grunt.registerTask 'default', ['develop']
