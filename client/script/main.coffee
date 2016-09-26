@@ -2,8 +2,6 @@
 	(c) 2016 Julian Gonggrijp
 ###
 
-'use strict'
-
 require.config
 	shim:
 		handlebars:
@@ -18,6 +16,7 @@ require [
 	'backbone'
 	'router/main'
 ], (bb, MainRouter) ->
+	'use strict'
 	new MainRouter()
 	bb.history.start
 		pushState: true
