@@ -4,3 +4,4 @@
 /settings.py
 /node_modules
 /client/bower_components
+.tmp
