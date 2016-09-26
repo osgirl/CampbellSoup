@@ -28,7 +28,18 @@ module.exports = (grunt) ->
 			templates:
 				src: ['<%= source %>/<%= template %>/**.mustache']
 				dest: '<%= stage %>/<%= script %>/templates.js'
+		
+		coffee:
+			options:
+				bare: true
+			scripts:
+				expand: true
+				cwd: '<%= source %>/<%= script %>'
+				src: ['**/*.coffee']
+				dest: '<%= stage %>/<%= script %>/'
+				ext: '.js'
 	
 	grunt.loadNpmTasks 'grunt-contrib-handlebars'
+	grunt.loadNpmTasks 'grunt-contrib-coffee'
 	
 	# grunt.registerTask 'default', ['develop']
