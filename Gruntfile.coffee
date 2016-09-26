@@ -6,21 +6,21 @@
 
 module.exports = (grunt) ->
 	
-	stripRegExp = (path, extension) -> new RegExp "^#{path}/|\\.extension$", 'g'
+	stripRegExp = (path, ext) -> new RegExp "^#{path}/|\\.#{ext}$", 'g'
 	
 	grunt.initConfig
 		source: 'client'
 		script: 'script'
 		template: 'template'
 		templateSrc: '<%= source %>/<%= template %>'
-		templatePattern: stripRegExp grunt.config('templateSrc'), 'mustache'
 		stage: '.tmp'
 		
 		handlebars:
 			options:
 				amd: true
 				processName: (path) ->
-					pattern = grunt.config 'templatePattern'
+					src = grunt.config('templateSrc')
+					pattern = stripRegExp src, 'mustache'
 					path.replace pattern, ''
 				compilerOptions:
 					knownHelpers: {}
