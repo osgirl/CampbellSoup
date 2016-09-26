@@ -25,14 +25,14 @@ module.exports = (grunt) ->
 				compilerOptions:
 					knownHelpers: {}
 					knownHelpersOnly: true
-			templates:
+			compile:
 				src: ['<%= source %>/<%= template %>/**.mustache']
 				dest: '<%= stage %>/<%= script %>/templates.js'
 		
 		coffee:
 			options:
 				bare: true
-			scripts:
+			compile:
 				expand: true
 				cwd: '<%= source %>/<%= script %>'
 				src: ['**/*.coffee']
