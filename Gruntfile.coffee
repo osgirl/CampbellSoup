@@ -16,14 +16,9 @@ module.exports = (grunt) ->
 			options:
 				amd: true
 				processName: (path) ->
-					prefixPieces = grunt.config('templates').split '/'
-					pieces = path.split '/'
-					pieces.shift() for piece in prefixPieces
-					fileNameParts = pieces.pop().split '.'
-					fileNameParts.pop()
-					newFileName = fileNameParts.join '.'
-					pieces.push newFileName
-					pieces.join '/'
+					templateSource = grunt.config('templates')
+					pattern = new RegExp "^#{templateSource}/|\\.mustache$", 'g'
+					path.replace pattern, ''
 				compilerOptions:
 					knownHelpers: {}
 					knownHelpersOnly: true
