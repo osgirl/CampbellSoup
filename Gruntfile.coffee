@@ -6,25 +6,28 @@
 
 module.exports = (grunt) ->
 	
+	stripRegExp = (path, extension) -> new RegExp "^#{path}/|\\.extension$", 'g'
+	
 	grunt.initConfig
-		prefix: 'client'
-		scripts: '<%= prefix %>/script'
-		templates: '<%= prefix %>/template'
+		source: 'client'
+		script: 'script'
+		template: 'template'
+		templateSrc: '<%= source %>/<%= template %>'
+		templatePattern: stripRegExp grunt.config('templateSrc'), 'mustache'
 		stage: '.tmp'
 		
 		handlebars:
 			options:
 				amd: true
 				processName: (path) ->
-					templateSource = grunt.config('templates')
-					pattern = new RegExp "^#{templateSource}/|\\.mustache$", 'g'
+					pattern = grunt.config 'templatePattern'
 					path.replace pattern, ''
 				compilerOptions:
 					knownHelpers: {}
 					knownHelpersOnly: true
 			templates:
-				src: ['<%= templates %>/**.mustache']
-				dest: '<%= stage %>/<%= scripts %>/templates.js'
+				src: ['<%= source %>/<%= template %>/**.mustache']
+				dest: '<%= stage %>/<%= script %>/templates.js'
 	
 	grunt.loadNpmTasks 'grunt-contrib-handlebars'
 	
