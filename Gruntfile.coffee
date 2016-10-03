@@ -46,9 +46,29 @@ module.exports = (grunt) ->
 			compile:
 				options:
 					cssDir: '<%= stage %>/<%= style %>'
+		
+		copy:
+			compile:
+				expand: true
+				cwd: '<%= source %>'
+				src: [
+					'index.html'
+				]
+				dest: '<%= stage %>'
+		
+		symlink:
+			compile:
+				expand: true
+				cwd: '<%= source %>'
+				src: [
+					'bower_components'
+				]
+				dest: '<%= stage %>'
 	
 	grunt.loadNpmTasks 'grunt-contrib-handlebars'
 	grunt.loadNpmTasks 'grunt-contrib-coffee'
 	grunt.loadNpmTasks 'grunt-contrib-compass'
+	grunt.loadNpmTasks 'grunt-contrib-copy'
+	grunt.loadNpmTasks 'grunt-contrib-symlink'
 	
 	# grunt.registerTask 'default', ['develop']
