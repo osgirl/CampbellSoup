@@ -15,6 +15,7 @@ module.exports = (grunt) ->
 		template: 'template'
 		templateSrc: '<%= source %>/<%= template %>'
 		stage: '.tmp'
+		dist: 'dist'
 		
 		handlebars:
 			options:
@@ -64,11 +65,20 @@ module.exports = (grunt) ->
 					'bower_components'
 				]
 				dest: '<%= stage %>'
+		
+		requirejs:
+			dist:
+				options:
+					baseUrl: '<%= stage %>/<%= script %>'
+					mainConfigFile: '<%= stage %>/<%= script %>/main.js'
+					include: ['main.js']
+					out: '<%= dist %>/campbellsoup.js'
 	
 	grunt.loadNpmTasks 'grunt-contrib-handlebars'
 	grunt.loadNpmTasks 'grunt-contrib-coffee'
 	grunt.loadNpmTasks 'grunt-contrib-compass'
 	grunt.loadNpmTasks 'grunt-contrib-copy'
 	grunt.loadNpmTasks 'grunt-contrib-symlink'
+	grunt.loadNpmTasks 'grunt-contrib-requirejs'
 	
 	# grunt.registerTask 'default', ['develop']
