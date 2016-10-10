@@ -7,6 +7,8 @@
 module.exports = (grunt) ->
 	
 	stripRegExp = (path, ext) -> new RegExp "^#{path}/|\\.#{ext}$", 'g'
+	httpProxy = require 'http-proxy'
+	proxy = httpProxy.createProxyServer {}
 	
 	grunt.initConfig
 		source: 'client'
@@ -66,6 +68,20 @@ module.exports = (grunt) ->
 				]
 				dest: '<%= stage %>'
 		
+		connect:
+			server:
+				options:
+					hostname: 'localhost'
+					base: '.tmp'
+					middleware: (connect, options, middlewares) ->
+						middlewares.unshift (req, res, next) ->
+							return next() unless req.url.startsWith '/api/'
+							req.url = req.url.slice 4
+							proxy.web req, res, {
+								target: 'http://localhost:5000'
+							}
+						middlewares
+		
 		requirejs:
 			dist:
 				options:
@@ -79,6 +95,7 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-contrib-compass'
 	grunt.loadNpmTasks 'grunt-contrib-copy'
 	grunt.loadNpmTasks 'grunt-contrib-symlink'
+	grunt.loadNpmTasks 'grunt-contrib-connect'
 	grunt.loadNpmTasks 'grunt-contrib-requirejs'
 	
 	# grunt.registerTask 'default', ['develop']
