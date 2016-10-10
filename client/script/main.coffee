@@ -10,11 +10,13 @@ require.config
 		handlebars: '../bower_components/handlebars/handlebars.amd'
 
 require [
+	'jquery'
 	'backbone'
 	'router/main'
-], (bb, MainRouter) ->
+], ($, bb, MainRouter) ->
 	'use strict'
-	new MainRouter()
-	bb.history.start
-		pushState: true
-		hashChange: false
+	$ ->
+		new MainRouter()
+		bb.history.start
+			pushState: true
+			hashChange: false
