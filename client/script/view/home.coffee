@@ -10,5 +10,7 @@ define [
 	
 	class HomeView extends bb.View
 		template: JST['home']
-		el: 'body'
-		render: -> @$el.html @template {}
+		el: 'main'
+		render: ->
+			@$el.html @template {}
+			@
