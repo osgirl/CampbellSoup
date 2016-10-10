@@ -82,6 +82,18 @@ module.exports = (grunt) ->
 							}
 						middlewares
 		
+		shell:
+			backend:
+				command: (filename) ->
+					filename ?= 'config.py'
+					"$VIRTUAL_ENV/bin/python manage.py -c ../#{filename} runserver -rd"
+		
+		concurrent:
+			server:
+				tasks: ['shell:backend', 'connect:server:keepalive']
+				options:
+					logConcurrentOutput: true
+		
 		requirejs:
 			dist:
 				options:
@@ -96,6 +108,8 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-contrib-copy'
 	grunt.loadNpmTasks 'grunt-contrib-symlink'
 	grunt.loadNpmTasks 'grunt-contrib-connect'
+	grunt.loadNpmTasks 'grunt-shell'
+	grunt.loadNpmTasks 'grunt-concurrent'
 	grunt.loadNpmTasks 'grunt-contrib-requirejs'
 	
 	# grunt.registerTask 'default', ['develop']

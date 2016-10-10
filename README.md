@@ -6,7 +6,7 @@ Configuration
 -------------
 There are default settings in `campbellsoup.defaults`. You can use those for local debugging purposes, although overriding them is recommended. For production use, you should certainly override them.
 
-You can override the defaults with your own settings by copying `campbellsoup/defaults.py` to some other location and changing the values in the file. For documentation, see the [Flask documentation][1]. Some clarifications can also be found in `campbellsoup.__doc__`. You pass either the imported module or the module path (as a string) to `campbellsoup.create_application` in order to use your custom settings. Note that module paths are relative to the `campbellsoup` package.
+You can override the defaults with your own settings by copying `campbellsoup/defaults.py` to a file named `config.py` in the project root and changing the values in the file. For documentation, see the [Flask documentation][1]. Some clarifications can also be found in `campbellsoup.__doc__`. You pass either the imported module or the module path (as a string) to `campbellsoup.create_application` in order to use your custom settings. Note that module paths are relative to the `campbellsoup` package.
 
 Dependencies
 ------------
@@ -25,9 +25,21 @@ Install the `pytest` package using `pip` and run `py.test` from the root directo
 Local development server
 ------------------
 
+Make sure that your virtual environment is activated. Then, the following command serves the frontend files from `.tmp` while also proxying requests to `/api/*` to the Flask backend server:
+
+    grunt concurrent:server
+
+If you wish to only serve the frontend files, use
+
+    grunt connect:server
+
+When using one of the above commands, the frontend will be available from localhost on port 8000.
+
+If you wish to only run the backend, use
+
     python manage.py runserver -?
 
-Use the `-c` option to pass the path to your custom settings module. The server runs at localhost on port 5000.
+Use the `-c` option to pass the path to your custom settings module (this is `../config.py` if you followed the instructions in the Configuration section). The server runs at localhost on port 5000.
 
 Production server
 -------
