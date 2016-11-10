@@ -94,6 +94,26 @@ module.exports = (grunt) ->
 				options:
 					logConcurrentOutput: true
 		
+		jasmine:
+			test:
+				src: [
+					'<%= stage %>/<%= script %>/**/*.js'
+					'!<%= stage %>/<%= script %>/**/*_test.js'
+				]
+				options:
+					specs: '<%= stage %>/<%= script %>/**/*_test.js'
+					helpers: [
+						'<%= source %>/bower_components/jquery/dist/jquery'
+						'<%= source %>/bower_components/jasmine-jquery/lib/jasmine-jquery.js'
+					]
+					# host: 'http://localhost:8000/'
+					template: require 'grunt-template-jasmine-requirejs'
+					templateOptions:
+						requireConfigFile: '<%= stage %>/<%= script %>/main.js'
+						requireConfig:
+							baseUrl: '<%= stage %>/<%= script %>'
+					# outfile: '<%= stage %>/_SpecRunner.html'
+		
 		requirejs:
 			dist:
 				options:
@@ -110,6 +130,7 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-contrib-connect'
 	grunt.loadNpmTasks 'grunt-shell'
 	grunt.loadNpmTasks 'grunt-concurrent'
+	grunt.loadNpmTasks 'grunt-contrib-jasmine'
 	grunt.loadNpmTasks 'grunt-contrib-requirejs'
 	
 	# grunt.registerTask 'default', ['develop']

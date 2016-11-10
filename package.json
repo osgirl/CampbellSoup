@@ -18,6 +18,7 @@
     "grunt-contrib-requirejs": "^1.0.0",
     "grunt-contrib-symlink": "^1.0.0",
     "grunt-shell": "^2.0.0",
+    "grunt-template-jasmine-requirejs": "^0.2.3",
     "http-proxy": "^1.15.1"
   }
 }

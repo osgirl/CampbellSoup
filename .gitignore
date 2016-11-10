@@ -8,3 +8,5 @@
 .sass-cache
 /dist
 .cache
+.grunt
+_SpecRunner.html
