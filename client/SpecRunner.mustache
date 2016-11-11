@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+{{! Inspired on the grunt-template-jasmine-requirejs template. }}
+<html>
+	<head>
+		<meta charset="utf-8">
+		{{#css}}
+			<link rel=stylesheet href="{{{.}}}">
+		{{/css}}
+		{{#scripts}}
+			{{#polyfills}}
+				<script src="{{{.}}}"></script>
+			{{/polyfills}}
+			{{#vendor}}
+				<script src="{{{.}}}"></script>
+			{{/vendor}}
+			<script src="bower_components/requirejs/require.js"></script>
+			{{#jasmine}}
+				<script src="{{{.}}}"></script>
+			{{/jasmine}}
+			{{#boot}}
+				<script src="{{{.}}}"></script>
+			{{/boot}}
+			{{#helpers}}
+				<script src="{{{.}}}"></script>
+			{{/helpers}}
+			<script>
+				'use strict';
+				require.onError = function(error) {
+					var message = error.requireType + ': ';
+					if (error.requireType === 'scripterror' || error.requireType === 'notloaded' && error.requireModules) {
+						message += 'File not found or script error: ' + '[\'' + error.requireModules.join("', '") + '\']';
+					} else {
+						message += error.message;
+					}
+					throw Error(message);
+				};
+				require.config({{{requireConfig}}});
+				var start = window.onload;
+				window.onload = null;
+				require([
+					{{#specs}}'{{{.}}}',{{/specs}}
+					{{#reporters}}'{{{.}}}',{{/reporters}}
+				], start);
+			</script>
+		{{/scripts}}
+	</head>
+	<body></body>
+</html>

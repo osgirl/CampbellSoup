@@ -9,6 +9,7 @@ module.exports = (grunt) ->
 	stripRegExp = (path, ext) -> new RegExp "^#{path}/|\\.#{ext}$", 'g'
 	httpProxy = require 'http-proxy'
 	proxy = httpProxy.createProxyServer {}
+	Handlebars = require 'handlebars'
 	
 	grunt.initConfig
 		source: 'client'
@@ -18,6 +19,8 @@ module.exports = (grunt) ->
 		templateSrc: '<%= source %>/<%= template %>'
 		stage: '.tmp'
 		dist: 'dist'
+		specTemplatePath = '<%= source %>/SpecRunner.mustache'
+		specTemplate = Handlebars.compile grunt.file.read grunt.config 'specTemplatePath'
 		
 		handlebars:
 			options:
@@ -103,7 +106,10 @@ module.exports = (grunt) ->
 						'<%= source %>/bower_components/jasmine-jquery/lib/jasmine-jquery.js'
 					]
 					# host: 'http://localhost:8000/'
-					template: require 'grunt-template-jasmine-requirejs'
+					template:
+						process: (grunt, task, context) ->
+							template = grunt.config 'specTemplate'
+							# continue here
 					templateOptions:
 						requireConfigFile: '<%= stage %>/<%= script %>/main.js'
 						requireConfig:

@@ -1,0 +1,38 @@
+{
+	"temp": ".grunt/grunt-contrib-jasmine",
+	"outfile": "_SpecRunner.html",
+	"css": [
+		".grunt/grunt-contrib-jasmine/jasmine.css"
+	],
+	"scripts": {
+		"polyfills": [
+			".grunt/grunt-contrib-jasmine/es5-shim.js"
+		],
+		"jasmine": [
+			".grunt/grunt-contrib-jasmine/jasmine.js",
+			".grunt/grunt-contrib-jasmine/jasmine-html.js",
+			".grunt/grunt-contrib-jasmine/json2.js"
+		],
+		"helpers": [
+			"client/bower_components/jquery/dist/jquery.js",
+			"client/bower_components/jasmine-jquery/lib/jasmine-jquery.js"
+		],
+		"specs": [
+			".tmp/script/view/home_test.js"
+		],
+		"src": [],
+		"vendor": [],
+		"reporters": [
+			".grunt/grunt-contrib-jasmine/reporter.js"
+		],
+		"boot": [
+			".grunt/grunt-contrib-jasmine/boot.js"
+		]
+	},
+	"options": {
+		"requireConfigFile": ".tmp/script/main.js",
+		"requireConfig": {
+			"baseUrl": ".tmp/script"
+		}
+	}
+}
