@@ -96,10 +96,6 @@ module.exports = (grunt) ->
 		
 		jasmine:
 			test:
-				src: [
-					'<%= stage %>/<%= script %>/**/*.js'
-					'!<%= stage %>/<%= script %>/**/*_test.js'
-				]
 				options:
 					specs: '<%= stage %>/<%= script %>/**/*_test.js'
 					helpers: [
