@@ -107,8 +107,8 @@ module.exports = (grunt) ->
 					templateOptions:
 						requireConfigFile: '<%= stage %>/<%= script %>/main.js'
 						requireConfig:
-							baseUrl: '<%= stage %>/<%= script %>'
-					# outfile: '<%= stage %>/_SpecRunner.html'
+							baseUrl: '<%= script %>'
+					outfile: '<%= stage %>/_SpecRunner.html'
 		
 		requirejs:
 			dist:
