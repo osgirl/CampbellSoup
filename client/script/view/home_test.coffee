@@ -24,6 +24,3 @@ define [
 			expect(main).toContainElement 'p'
 			expect(main.children 'h1').toContainText 'CampbellSoup'
 			expect(main.children 'p').toContainText 'Welcome'
-		
-		it 'fails if you want to', ->
-			expect(false).toBe true
