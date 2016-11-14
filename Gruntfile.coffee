@@ -110,6 +110,27 @@ module.exports = (grunt) ->
 							baseUrl: '<%= script %>'
 					outfile: '<%= stage %>/_SpecRunner.html'
 		
+		watch:
+			handlebars:
+				files: '<%= handlebars.compile.src %>'
+				tasks: 'handlebars:compile'
+			scripts:
+				files: '<%= coffee.compile.src %>'
+				tasks: ['coffee:compile', 'jasmine:test']
+			compass:
+				files: '<%= compass.options.sassDir %>/**'
+				tasks: 'compass:compile'
+			copy:
+				files: '<%= copy.compile.src %>'
+				tasks: 'copy:compile'
+			config:
+				files: 'Gruntfile.coffee'
+			initially:
+				files: []
+				tasks: ['jasmine:test']
+				options:
+					atBegin: true
+		
 		requirejs:
 			dist:
 				options:
@@ -127,6 +148,7 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-shell'
 	grunt.loadNpmTasks 'grunt-concurrent'
 	grunt.loadNpmTasks 'grunt-contrib-jasmine'
+	grunt.loadNpmTasks 'grunt-contrib-watch'
 	grunt.loadNpmTasks 'grunt-contrib-requirejs'
 	
 	# grunt.registerTask 'default', ['develop']
