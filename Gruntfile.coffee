@@ -19,8 +19,8 @@ module.exports = (grunt) ->
 		templateSrc: '<%= source %>/<%= template %>'
 		stage: '.tmp'
 		dist: 'dist'
-		specTemplatePath = '<%= source %>/SpecRunner.mustache'
-		specTemplate = Handlebars.compile grunt.file.read grunt.config 'specTemplatePath'
+		specTemplatePath: '<%= source %>/SpecRunner.mustache'
+		# specTemplate: Handlebars.compile grunt.file.read grunt.config 'specTemplatePath'
 		
 		handlebars:
 			options:
@@ -106,15 +106,12 @@ module.exports = (grunt) ->
 						'<%= source %>/bower_components/jasmine-jquery/lib/jasmine-jquery.js'
 					]
 					# host: 'http://localhost:8000/'
-					template:
-						process: (grunt, task, context) ->
-							template = grunt.config 'specTemplate'
-							# continue here
+					template: require 'grunt-template-jasmine-requirejs'
 					templateOptions:
 						requireConfigFile: '<%= stage %>/<%= script %>/main.js'
 						requireConfig:
-							baseUrl: '<%= stage %>/<%= script %>'
-					# outfile: '<%= stage %>/_SpecRunner.html'
+							baseUrl: '<%= script %>'
+					outfile: '<%= stage %>/_SpecRunner.html'
 		
 		requirejs:
 			dist:
