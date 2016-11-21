@@ -88,16 +88,6 @@ module.exports = (grunt) ->
 					filename ?= 'config.py'
 					"$VIRTUAL_ENV/bin/python manage.py -c ../#{filename} runserver -rd"
 		
-		concurrent:
-			server:
-				tasks: ['shell:backend', 'connect:server:keepalive']
-				options:
-					logConcurrentOutput: true
-			develop:
-				tasks: [['compile', 'jasmine:test', 'watch'], 'server']
-				options:
-					logConcurrentOutput: true
-		
 		jasmine:
 			test:
 				options:
@@ -145,6 +135,16 @@ module.exports = (grunt) ->
 					mainConfigFile: '<%= stage %>/<%= script %>/main.js'
 					include: ['main.js']
 					out: '<%= dist %>/campbellsoup.js'
+		
+		concurrent:
+			server:
+				tasks: ['shell:backend', 'connect:server:keepalive']
+				options:
+					logConcurrentOutput: true
+			develop:
+				tasks: [['compile', 'jasmine:test', 'watch'], 'server']
+				options:
+					logConcurrentOutput: true
 	
 	grunt.loadNpmTasks 'grunt-contrib-handlebars'
 	grunt.loadNpmTasks 'grunt-contrib-coffee'
