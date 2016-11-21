@@ -113,6 +113,8 @@ module.exports = (grunt) ->
 						requireConfig:
 							baseUrl: '<%= script %>'
 					outfile: '<%= stage %>/_SpecRunner.html'
+					display: 'short'
+					summary: true
 		
 		watch:
 			handlebars:
