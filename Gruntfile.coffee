@@ -93,6 +93,10 @@ module.exports = (grunt) ->
 				tasks: ['shell:backend', 'connect:server:keepalive']
 				options:
 					logConcurrentOutput: true
+			develop:
+				tasks: [['compile', 'watch'], 'server']
+				options:
+					logConcurrentOutput: true
 		
 		jasmine:
 			test:
@@ -156,5 +160,15 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-contrib-jasmine'
 	grunt.loadNpmTasks 'grunt-contrib-watch'
 	grunt.loadNpmTasks 'grunt-contrib-requirejs'
+	
+	grunt.registerTask 'compile', [
+		'handlebars:compile'
+		'coffee:compile'
+		'compass:compile'
+		'copy:compile'
+		'symlink:compile'
+	]
+	grunt.registerTask 'server', ['concurrent:server']
+	grunt.registerTask 'default', ['concurrent:develop']
 	
 	# grunt.registerTask 'default', ['develop']
