@@ -174,5 +174,3 @@ module.exports = (grunt) ->
 	]
 	grunt.registerTask 'server', ['concurrent:server']
 	grunt.registerTask 'default', ['compile', 'concurrent:develop']
-	
-	# grunt.registerTask 'default', ['develop']
