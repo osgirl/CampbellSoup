@@ -117,7 +117,7 @@ module.exports = (grunt) ->
 				options:
 					cwd:
 						files: '<%= coffee.compile.cwd %>'
-				tasks: ['coffee:compile', 'jasmine:test']
+				tasks: ['newer:coffee:compile', 'jasmine:test']
 			compass:
 				files: '<%= compass.options.sassDir %>/*'
 				tasks: 'compass:compile'
@@ -126,7 +126,7 @@ module.exports = (grunt) ->
 				options:
 					cwd:
 						files: '<%= copy.compile.cwd %>'
-				tasks: 'copy:compile'
+				tasks: 'newer:copy:compile'
 			config:
 				files: 'Gruntfile.coffee'
 			livereload:
@@ -163,12 +163,13 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-contrib-jasmine'
 	grunt.loadNpmTasks 'grunt-contrib-watch'
 	grunt.loadNpmTasks 'grunt-contrib-requirejs'
+	grunt.loadNpmTasks 'grunt-newer'
 	
 	grunt.registerTask 'compile', [
 		'handlebars:compile'
-		'coffee:compile'
+		'newer:coffee:compile'
 		'compass:compile'
-		'copy:compile'
+		'newer:copy:compile'
 		'symlink:compile'
 	]
 	grunt.registerTask 'server', ['concurrent:server']
