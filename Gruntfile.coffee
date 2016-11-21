@@ -116,12 +116,18 @@ module.exports = (grunt) ->
 				tasks: 'handlebars:compile'
 			scripts:
 				files: '<%= coffee.compile.src %>'
+				options:
+					cwd:
+						files: '<%= coffee.compile.cwd %>'
 				tasks: ['coffee:compile', 'jasmine:test']
 			compass:
-				files: '<%= compass.options.sassDir %>/**'
+				files: '<%= compass.options.sassDir %>/*'
 				tasks: 'compass:compile'
 			copy:
 				files: '<%= copy.compile.src %>'
+				options:
+					cwd:
+						files: '<%= copy.compile.cwd %>'
 				tasks: 'copy:compile'
 			config:
 				files: 'Gruntfile.coffee'
