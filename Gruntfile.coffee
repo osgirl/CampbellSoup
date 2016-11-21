@@ -138,7 +138,12 @@ module.exports = (grunt) ->
 			dist:
 				options:
 					baseUrl: '<%= stage %>/<%= script %>'
-					mainConfigFile: '<%= stage %>/<%= script %>/main.js'
+					mainConfigFile: '<%= stage %>/<%= script %>/productionConfig.js'
+					paths:
+						jquery: 'empty:'
+						backbone: 'empty:'
+						underscore: 'empty:'
+						handlebars: 'empty:'
 					include: ['main.js']
 					out: '<%= dist %>/campbellsoup.js'
 		
