@@ -82,6 +82,7 @@ module.exports = (grunt) ->
 							}
 						middlewares
 					open: true
+					livereload: true
 		
 		shell:
 			backend:
@@ -128,6 +129,10 @@ module.exports = (grunt) ->
 				tasks: 'copy:compile'
 			config:
 				files: 'Gruntfile.coffee'
+			livereload:
+				files: '<%= stage %>/**/*'
+				options:
+					livereload: true
 		
 		requirejs:
 			dist:
