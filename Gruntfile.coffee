@@ -94,7 +94,7 @@ module.exports = (grunt) ->
 				options:
 					logConcurrentOutput: true
 			develop:
-				tasks: [['compile', 'watch'], 'server']
+				tasks: [['compile', 'jasmine:test', 'watch'], 'server']
 				options:
 					logConcurrentOutput: true
 		
@@ -135,11 +135,6 @@ module.exports = (grunt) ->
 				tasks: 'copy:compile'
 			config:
 				files: 'Gruntfile.coffee'
-			initially:
-				files: []
-				tasks: ['jasmine:test']
-				options:
-					atBegin: true
 		
 		requirejs:
 			dist:
