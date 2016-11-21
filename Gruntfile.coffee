@@ -143,7 +143,7 @@ module.exports = (grunt) ->
 				options:
 					logConcurrentOutput: true
 			develop:
-				tasks: [['compile', 'jasmine:test', 'watch'], 'server']
+				tasks: ['server', ['jasmine:test', 'watch']]
 				options:
 					logConcurrentOutput: true
 	
@@ -167,6 +167,6 @@ module.exports = (grunt) ->
 		'symlink:compile'
 	]
 	grunt.registerTask 'server', ['concurrent:server']
-	grunt.registerTask 'default', ['concurrent:develop']
+	grunt.registerTask 'default', ['compile', 'concurrent:develop']
 	
 	# grunt.registerTask 'default', ['develop']
