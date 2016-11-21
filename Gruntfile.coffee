@@ -6,6 +6,7 @@
 
 module.exports = (grunt) ->
 	
+	_ = require 'lodash'
 	stripRegExp = (path, ext) -> new RegExp "^#{path}/|\\.#{ext}$", 'g'
 	httpProxy = require 'http-proxy'
 	proxy = httpProxy.createProxyServer {}
@@ -115,6 +116,7 @@ module.exports = (grunt) ->
 			scripts:
 				files: '<%= coffee.compile.src %>'
 				options:
+					spawn: false
 					cwd:
 						files: '<%= coffee.compile.cwd %>'
 				tasks: ['newer:coffee:compile', 'jasmine:test']
@@ -174,3 +176,16 @@ module.exports = (grunt) ->
 	]
 	grunt.registerTask 'server', ['concurrent:server']
 	grunt.registerTask 'default', ['compile', 'concurrent:develop']
+	
+	retestList = {}
+	restrictJasmineConfig = _.debounce (
+		() ->
+			grunt.config 'jasmine.test.options.specs', (key for key, val in retestList when val is true)
+			retestList = {}
+	), 20
+	grunt.event.on 'watch', (action, filepath, target) ->
+		return if target != 'scripts'
+		filepath = filepath.replace (grunt.config 'source'), grunt.config 'stage'
+		suffix = '#{if filepath.match "_test.coffee" then "" else "_test"}.js'
+		filepath = filepath.replace '.coffee', suffix
+		retestList[filepath] = (action != 'deleted')
