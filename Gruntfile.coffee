@@ -81,6 +81,7 @@ module.exports = (grunt) ->
 								target: 'http://localhost:5000'
 							}
 						middlewares
+					open: true
 		
 		shell:
 			backend:
