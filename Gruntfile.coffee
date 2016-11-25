@@ -83,20 +83,24 @@ module.exports = (grunt) ->
 				dest: '<%= stage %>'
 		
 		connect:
-			server:
+			options:
+				hostname: 'localhost'
+				middleware: (connect, options, middlewares) ->
+					middlewares.unshift (req, res, next) ->
+						return next() unless req.url.startsWith '/api/'
+						req.url = req.url.slice 4
+						proxy.web req, res, {
+							target: 'http://localhost:5000'
+						}
+					middlewares
+				open: true
+			develop:
 				options:
-					hostname: 'localhost'
 					base: '.tmp'
-					middleware: (connect, options, middlewares) ->
-						middlewares.unshift (req, res, next) ->
-							return next() unless req.url.startsWith '/api/'
-							req.url = req.url.slice 4
-							proxy.web req, res, {
-								target: 'http://localhost:5000'
-							}
-						middlewares
-					open: true
 					livereload: true
+			dist:
+				options:
+					base: 'dist'
 		
 		shell:
 			backend:
@@ -162,7 +166,7 @@ module.exports = (grunt) ->
 		
 		concurrent:
 			server:
-				tasks: ['shell:backend', 'connect:server:keepalive']
+				tasks: ['shell:backend', 'connect:develop:keepalive']
 				options:
 					logConcurrentOutput: true
 			develop:
