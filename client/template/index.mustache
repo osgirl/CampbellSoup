@@ -13,6 +13,19 @@
 			<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 		<![endif]-->
 		<main></main>
-		<script src="bower_components/requirejs/require.js" data-main="script/main"></script>
+		{{#production}}
+		<script src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.3.2/require.min.js"></script>
+		<script>
+			{{>productionConfig}}
+			require(['campbellsoup']);
+		</script>
+		{{/production}}
+		{{^production}}
+		<script src="bower_components/requirejs/require.js"></script>
+		<script>
+			{{>developConfig}}
+			require(['main']);
+		</script>
+		{{/production}}
 	</body>
 </html>

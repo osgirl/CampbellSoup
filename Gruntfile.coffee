@@ -43,6 +43,20 @@ module.exports = (grunt) ->
 				dest: '<%= stage %>/<%= script %>/'
 				ext: '.js'
 		
+		'compile-handlebars':
+			develop:
+				src: '<%= source %>/<%= template %>/index.mustache'
+				dest: '<%= stage %>/index.html'
+				partials: '<%= stage %>/<%= script %>/*.js'
+				templateData:
+					production: false
+			dist:
+				src: '<%= source %>/<%= template %>/index.mustache'
+				dest: '<%= dist %>/index.html'
+				partials: '<%= stage %>/<%= script %>/*.js'
+				templateData:
+					production: true
+		
 		compass:
 			options:
 				sassDir: '<%= source %>/<%= style %>'
@@ -101,7 +115,7 @@ module.exports = (grunt) ->
 					# host: 'http://localhost:8000/'
 					template: require 'grunt-template-jasmine-requirejs'
 					templateOptions:
-						requireConfigFile: '<%= stage %>/<%= script %>/main.js'
+						requireConfigFile: '<%= stage %>/<%= script %>/developConfig.js'
 						requireConfig:
 							baseUrl: '<%= script %>'
 					outfile: '<%= stage %>/_SpecRunner.html'
@@ -121,12 +135,12 @@ module.exports = (grunt) ->
 			compass:
 				files: '<%= compass.options.sassDir %>/*'
 				tasks: 'compass:compile'
-			copy:
-				files: '<%= copy.compile.src %>'
-				options:
-					cwd:
-						files: '<%= copy.compile.cwd %>'
-				tasks: 'newer:copy:compile'
+			html:
+				files: [
+					'<%= grunt.config("compile-handlebars.develop.src") %>'
+					'<%= stage %>/<%= script %>/developConfig.js'
+				]
+				tasks: 'compile-handlebars:develop'
 			config:
 				files: 'Gruntfile.coffee'
 			livereload:
@@ -138,7 +152,6 @@ module.exports = (grunt) ->
 			dist:
 				options:
 					baseUrl: '<%= stage %>/<%= script %>'
-					mainConfigFile: '<%= stage %>/<%= script %>/productionConfig.js'
 					paths:
 						jquery: 'empty:'
 						backbone: 'empty:'
@@ -159,6 +172,7 @@ module.exports = (grunt) ->
 	
 	grunt.loadNpmTasks 'grunt-contrib-handlebars'
 	grunt.loadNpmTasks 'grunt-contrib-coffee'
+	grunt.loadNpmTasks 'grunt-compile-handlebars'  # compile, not contrib
 	grunt.loadNpmTasks 'grunt-contrib-compass'
 	grunt.loadNpmTasks 'grunt-contrib-copy'
 	grunt.loadNpmTasks 'grunt-contrib-symlink'
@@ -174,7 +188,7 @@ module.exports = (grunt) ->
 		'handlebars:compile'
 		'newer:coffee:compile'
 		'compass:compile'
-		'newer:copy:compile'
+		'compile-handlebars:develop'
 		'symlink:compile'
 	]
 	grunt.registerTask 'server', ['concurrent:server']
