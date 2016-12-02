@@ -227,13 +227,23 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-contrib-cssmin'
 	grunt.loadNpmTasks 'grunt-newer'
 	
-	grunt.registerTask 'compile', [
+	grunt.registerTask 'compile-base', [
 		'handlebars:compile'
 		'newer:coffee:compile'
 		'compass:compile'
+	]
+	grunt.registerTask 'compile', [
+		'compile-base'
 		'clean:develop'
 		'compile-handlebars:develop'
 		'symlink:compile'
+	]
+	grunt.registerTask 'dist', [
+		'compile-base'
+		'clean:dist'
+		'compile-handlebars:dist'
+		'requirejs:dist'
+		'cssmin:dist'
 	]
 	grunt.registerTask 'server', ['concurrent:server']
 	grunt.registerTask 'default', ['compile', 'concurrent:develop']
