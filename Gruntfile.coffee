@@ -80,7 +80,6 @@ module.exports = (grunt) ->
 		symlink:
 			compile:
 				expand: true
-				cwd: '<%= source %>'
 				src: [
 					'bower_components'
 				]
@@ -126,8 +125,8 @@ module.exports = (grunt) ->
 				options:
 					specs: '<%= stage %>/<%= script %>/**/*_test.js'
 					helpers: [
-						'<%= source %>/bower_components/jquery/dist/jquery.js'
-						'<%= source %>/bower_components/jasmine-jquery/lib/jasmine-jquery.js'
+						'bower_components/jquery/dist/jquery.js'
+						'bower_components/jasmine-jquery/lib/jasmine-jquery.js'
 					]
 					# host: 'http://localhost:8000/'
 					template: require 'grunt-template-jasmine-requirejs'
