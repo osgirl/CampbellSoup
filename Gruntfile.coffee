@@ -19,6 +19,11 @@ module.exports = (grunt) ->
 		stage: '.tmp'
 		dist: 'dist'
 		
+		clean:
+			develop: ['<%= stage %>/index.html']
+			dist: ['<%= dist %>/index.html']
+			all: ['<%= stage %>', '<%= dist %>']
+		
 		handlebars:
 			options:
 				amd: true
@@ -144,7 +149,7 @@ module.exports = (grunt) ->
 					'<%= grunt.config("compile-handlebars.develop.src") %>'
 					'<%= stage %>/<%= script %>/developConfig.js'
 				]
-				tasks: 'compile-handlebars:develop'
+				tasks: ['clean:develop', 'compile-handlebars:develop']
 			config:
 				files: 'Gruntfile.coffee'
 			livereload:
@@ -174,6 +179,7 @@ module.exports = (grunt) ->
 				options:
 					logConcurrentOutput: true
 	
+	grunt.loadNpmTasks 'grunt-contrib-clean'
 	grunt.loadNpmTasks 'grunt-contrib-handlebars'
 	grunt.loadNpmTasks 'grunt-contrib-coffee'
 	grunt.loadNpmTasks 'grunt-compile-handlebars'  # compile, not contrib
@@ -192,6 +198,7 @@ module.exports = (grunt) ->
 		'handlebars:compile'
 		'newer:coffee:compile'
 		'compass:compile'
+		'clean:develop'
 		'compile-handlebars:develop'
 		'symlink:compile'
 	]
