@@ -43,7 +43,10 @@ module.exports = (grunt) ->
 					knownHelpers: {}
 					knownHelpersOnly: true
 			compile:
-				src: ['<%= source %>/<%= template %>/**/*.mustache']
+				src: [
+					'<%= source %>/<%= template %>/**/*.mustache'
+					'!<%= source %>/<%= template %>/index.mustache'
+				]
 				dest: '<%= stage %>/<%= script %>/templates.js'
 		
 		coffee:
