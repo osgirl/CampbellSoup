@@ -182,6 +182,13 @@ module.exports = (grunt) ->
 					include: ['main.js']
 					out: '<%= dist %>/campbellsoup.js'
 		
+		cssmin:
+			dist:
+				expand: true
+				cwd: '<%= stage %>/<%= style %>'
+				src: ['*.css']
+				dest: '<%= dist %>/<%= style %>'
+		
 		concurrent:
 			server:
 				tasks: ['shell:backend', 'connect:develop:keepalive']
@@ -217,6 +224,7 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-contrib-jasmine'
 	grunt.loadNpmTasks 'grunt-contrib-watch'
 	grunt.loadNpmTasks 'grunt-contrib-requirejs'
+	grunt.loadNpmTasks 'grunt-contrib-cssmin'
 	grunt.loadNpmTasks 'grunt-newer'
 	
 	grunt.registerTask 'compile', [
