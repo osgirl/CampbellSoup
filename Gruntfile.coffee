@@ -9,8 +9,10 @@ module.exports = (grunt) ->
 	stripRegExp = (path, ext) -> new RegExp "^#{path}/|\\.#{ext}$", 'g'
 	httpProxy = require 'http-proxy'
 	proxy = httpProxy.createProxyServer {}
+	fs = require 'fs'
 	
 	grunt.initConfig
+		pypackage: 'campbellsoup'
 		source: 'client'
 		script: 'script'
 		style: 'style'
@@ -160,7 +162,7 @@ module.exports = (grunt) ->
 				]
 				tasks: ['clean:develop', 'compile-handlebars:develop']
 			python:
-				files: '<%= shell.pytest.files[0].src %>'
+				files: '<%= pypackage %>/**/*.py'
 				tasks: 'newer:shell:pytest'
 			config:
 				files: 'Gruntfile.coffee'
@@ -190,6 +192,19 @@ module.exports = (grunt) ->
 				tasks: ['server', ['jasmine:test', 'shell:pytest', 'watch']]
 				options:
 					logConcurrentOutput: true
+		
+		newer:
+			options:
+				override: (info, include) ->
+					if info.task == 'shell' and info.target == 'pytest'
+						source = info.path.replace /_test\.py$/, '.py'
+						fs.stat source, (error, stats) ->
+							if stats.mtime.getTime() > info.time.getTime()
+								include yes
+							else
+								include no
+					else
+						include no
 	
 	grunt.loadNpmTasks 'grunt-contrib-clean'
 	grunt.loadNpmTasks 'grunt-contrib-handlebars'
