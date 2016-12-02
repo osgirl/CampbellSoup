@@ -24,7 +24,13 @@ module.exports = (grunt) ->
 		clean:
 			develop: ['<%= stage %>/index.html']
 			dist: ['<%= dist %>/index.html']
-			all: ['<%= stage %>', '<%= dist %>']
+			all: [
+				'<%= stage %>'
+				'<%= dist %>'
+				'.*cache'
+				'**/__pycache__'
+				'**/*.{pyc,pyo}'
+			]
 		
 		handlebars:
 			options:
