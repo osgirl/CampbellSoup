@@ -112,6 +112,15 @@ module.exports = (grunt) ->
 				command: (filename) ->
 					filename ?= 'config.py'
 					"$VIRTUAL_ENV/bin/python manage.py -c ../#{filename} runserver -rd"
+			pytest:
+				files: [{
+					src: ['campbellsoup/**/*_test.py']
+				}]
+				command: ->
+					files = (o.src for o in grunt.config 'shell.pytest.files')
+					src = [].concat.apply([], files)
+					paths = (grunt.file.expand src).join ' '
+					"py.test #{paths}"
 		
 		jasmine:
 			test:
@@ -150,6 +159,9 @@ module.exports = (grunt) ->
 					'<%= stage %>/<%= script %>/developConfig.js'
 				]
 				tasks: ['clean:develop', 'compile-handlebars:develop']
+			python:
+				files: '<%= shell.pytest.files[0].src %>'
+				tasks: 'newer:shell:pytest'
 			config:
 				files: 'Gruntfile.coffee'
 			livereload:
@@ -175,7 +187,7 @@ module.exports = (grunt) ->
 				options:
 					logConcurrentOutput: true
 			develop:
-				tasks: ['server', ['jasmine:test', 'watch']]
+				tasks: ['server', ['jasmine:test', 'shell:pytest', 'watch']]
 				options:
 					logConcurrentOutput: true
 	
