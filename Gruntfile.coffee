@@ -77,15 +77,6 @@ module.exports = (grunt) ->
 				options:
 					cssDir: '<%= stage %>/<%= style %>'
 		
-		copy:
-			compile:
-				expand: true
-				cwd: '<%= source %>'
-				src: [
-					'index.html'
-				]
-				dest: '<%= stage %>'
-		
 		symlink:
 			compile:
 				expand: true
@@ -217,7 +208,6 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-contrib-coffee'
 	grunt.loadNpmTasks 'grunt-compile-handlebars'  # compile, not contrib
 	grunt.loadNpmTasks 'grunt-contrib-compass'
-	grunt.loadNpmTasks 'grunt-contrib-copy'
 	grunt.loadNpmTasks 'grunt-contrib-symlink'
 	grunt.loadNpmTasks 'grunt-contrib-connect'
 	grunt.loadNpmTasks 'grunt-shell'
