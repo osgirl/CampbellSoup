@@ -178,7 +178,7 @@ module.exports = (grunt) ->
 						jquery: 'empty:'
 						backbone: 'empty:'
 						underscore: 'empty:'
-						handlebars: 'empty:'
+						'handlebars.runtime': 'empty:'
 					include: ['main.js']
 					out: '<%= dist %>/campbellsoup.js'
 		
