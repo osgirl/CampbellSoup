@@ -200,7 +200,11 @@ module.exports = (grunt) ->
 				options:
 					logConcurrentOutput: true
 			develop:
-				tasks: ['server', ['jasmine:test', 'shell:pytest', 'watch']]
+				tasks: [
+					['shell:pytest', 'shell:backend']
+					['watch']
+					['compile', 'jasmine:test', 'connect:develop:keepalive']
+				]
 				options:
 					logConcurrentOutput: true
 		
@@ -251,4 +255,4 @@ module.exports = (grunt) ->
 		'cssmin:dist'
 	]
 	grunt.registerTask 'server', ['concurrent:server']
-	grunt.registerTask 'default', ['compile', 'concurrent:develop']
+	grunt.registerTask 'default', ['concurrent:develop']
