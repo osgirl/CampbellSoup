@@ -107,6 +107,7 @@ module.exports = (grunt) ->
 			dist:
 				options:
 					base: 'dist'
+					port: 8080
 		
 		shell:
 			backend:
@@ -192,6 +193,10 @@ module.exports = (grunt) ->
 		concurrent:
 			server:
 				tasks: ['shell:backend', 'connect:develop:keepalive']
+				options:
+					logConcurrentOutput: true
+			dist:
+				tasks: ['shell:backend', 'connect:dist:keepalive']
 				options:
 					logConcurrentOutput: true
 			develop:
