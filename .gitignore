@@ -10,3 +10,4 @@
 .cache
 .grunt
 _SpecRunner.html
+/.functional-tests
