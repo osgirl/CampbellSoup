@@ -1,0 +1,34 @@
+{{!
+	(c) 2016 Julian Gonggrijp
+}}
+<!DOCTYPE html>
+<html>
+	<head>
+		<!--
+			(c) 2016 Julian Gonggrijp
+		-->
+		<meta charset="utf-8">
+		<title>CampbellSoup</title>
+		<link rel="stylesheet" href="style/main.css">
+	</head>
+	<body>
+		<!--[if lt IE 10]>
+			<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+		<![endif]-->
+		<main></main>
+		{{#production}}
+		<script src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.3.2/require.min.js"></script>
+		<script>
+			{{>productionConfig}}
+			require(['campbellsoup']);
+		</script>
+		{{/production}}
+		{{^production}}
+		<script src="bower_components/requirejs/require.js"></script>
+		<script>
+			{{>developConfig}}
+			require(['main']);
+		</script>
+		{{/production}}
+	</body>
+</html>

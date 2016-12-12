@@ -1,4 +1,4 @@
-# (c) 2014 Julian Gonggrijp (j.gonggrijp@gmail.com)
+# (c) 2014, 2016 Julian Gonggrijp
 
 """
     CampbellSoup, the web-based archive of Campbell test questions.
@@ -7,20 +7,30 @@
     returns a Werkzeug WSGI application that can be deployed on a web
     server, or run directly for testing on localhost. The
     configuration object should at the very least include SECRET_KEY
-    and SQLALCHEMY_DATABASE_URI. For a simple example, read the source
-    code of run.py.
+    and SQLALCHEMY_DATABASE_URI.
 """
 
 import flask
+from flask_migrate import Migrate
 
 from .models import db
 from .api import api
+from . import defaults
 
-def create_application (config):
+
+migrate = Migrate()
+
+
+def create_application(config=defaults, create_db=False):
     """ Return a Werkzeug-flavoured WSGI application. """
     app = flask.Flask(__name__)
-    app.config.from_object(config)
+    if type(config) in (str, bytes):
+        app.config.from_pyfile(config)
+    else:
+        app.config.from_object(config)
     models.db.init_app(app)
-    db.create_all(app = app)  # passing application because of context
+    if create_db:
+        db.create_all(app=app)  # passing application because of context
+    migrate.init_app(app, db)
     app.register_blueprint(api)
     return app

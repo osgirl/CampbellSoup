@@ -1,2 +1,12 @@
 *.pyc
 *.db
+/config.py
+/settings.py
+/node_modules
+/bower_components
+.tmp
+.sass-cache
+/dist
+.cache
+.grunt
+_SpecRunner.html

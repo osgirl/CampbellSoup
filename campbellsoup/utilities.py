@@ -1,4 +1,4 @@
-# (c) 2014 Julian Gonggrijp (j.gonggrijp@gmail.com)
+# (c) 2014, 2016 Julian Gonggrijp
 
 """
     Useful abstractions that don't belong anywhere else.
@@ -8,18 +8,15 @@ import re
 
 camelcase_regex = re.compile(r'[A-Z][a-z0-9]*')
 
-def un_camelcase (name):
+
+def un_camelcase(name):
     """
         Turn a camelcased name into a lowercase name with underscore separators.
-        
-        >>> un_camelcase('CampbellSoupX')
-        'campbell_soup_x'
-        >>> un_camelcase('NBOCampbellToets')
-        'n_b_o_campbell_toets'
     """
     return '_'.join(camelcase_regex.findall(name)).lower()
 
-def append_to (__all__):
+
+def append_to(__all__):
     """
         Class and function decorator to include the name in __all__.
         
@@ -43,18 +40,16 @@ def append_to (__all__):
         ... class Illustration (object):
         ...     pass
         >>> @append_to(__all__)
-        ... def foo ( ):
+        ... def foo():
         ...     pass
-        >>> def bar ( ):
+        >>> def bar():
         ...     pass
-        >>> __all__
-        ['Illustration', 'foo']
         >>> # from wild import *
         >>> # will only import Illustration and foo.
         >>> # To import everything from this module, do
         >>> # from wild import Example, bar, *
     """
-    def wrap (obj):
+    def wrap(obj):
         assert hasattr(obj, '__name__'), "Decorated object must have a __name__."
         __all__.append(obj.__name__)
         return obj
