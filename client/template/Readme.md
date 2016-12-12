@@ -19,3 +19,6 @@ You should also NOT use the following features from Handlebars:
 The lack of both Mustache lambdas and Handlebars helpers means that our templating language is completely logic-free; this is considered a welcome side effect.
 
 I propose to call the intersection of Mustache and Handlebars described here 'MinHandleStache', for lack of a better name.
+
+
+(c) 2016 Julian Gonggrijp
