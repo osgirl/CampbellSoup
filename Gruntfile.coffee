@@ -150,6 +150,8 @@ module.exports = (grunt) ->
 					summary: true
 		
 		casperjs:
+			options:
+				silent: true
 			functional:
 				src: ['.<%= functional %>/**/*.js']
 		
