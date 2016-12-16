@@ -182,7 +182,7 @@ module.exports = (grunt) ->
 				options:
 					cwd:
 						files: '<%= coffee.functional.cwd %>'
-				tasks: ['newer:coffee:functional', 'casperjs:functional']
+				tasks: ['newer:coffee:functional', 'newer:casperjs:functional']
 			config:
 				files: 'Gruntfile.coffee'
 			livereload:
