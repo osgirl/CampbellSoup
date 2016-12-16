@@ -28,6 +28,7 @@ module.exports = (grunt) ->
 			all: [
 				'<%= stage %>'
 				'<%= dist %>'
+				'.<%= functional %>'
 				'.*cache'
 				'**/__pycache__'
 				'**/*.{pyc,pyo}'
