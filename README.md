@@ -41,7 +41,7 @@ At your option, you may also run any of the tasks above separately. The required
   - `grunt coffee` to compile all CoffeeScript sources to JavaScript ([grunt-contrib-coffee][3]). `grunt coffee:compile` to limit compilation to the client side scripts or `grunt coffee:functional` to limit compilation to the functional tests.
   - `grunt newer:coffee`, `grunt newer:coffee:compile` or `grunt newer:coffee:functional` to do the same but only with changed sources ([grunt-newer][15]).
   - `grunt clean:develop compile-handlebars:develop` to generate the `index.html` ([grunt-compile-handlebars][4]). The `clean` step is necessary because `compile-handlebars` appends to output files instead of replacing them.
-  - `grunt compass` to compile the stylesheets from Sass to CSS ([grunt-contrib-compass][5]).
+  - `grunt sass postcss` to compile the stylesheets from Sass to CSS ([grunt-sass][18], [grunt-postcss][19]).
   - `grunt symlink` to ensure that the `/bower_components` are accessible from within the `/.tmp` ([grunt-contrib-symlink][6]).
   - `grunt compile` to do all of the above.
   - `python manage.py [-c ../config.py] runserver -rd` to run just the backend server ([flask-script][12]). Keeps running.
@@ -106,7 +106,6 @@ Directory reference
 [2]: http://docs.sqlalchemy.org/en/rel_1_0/core/engines.html
 [3]: https://www.npmjs.com/package/grunt-contrib-coffee
 [4]: https://www.npmjs.com/package/grunt-compile-handlebars
-[5]: https://www.npmjs.com/package/grunt-contrib-compass
 [6]: https://www.npmjs.com/package/grunt-contrib-symlink
 [7]: https://www.npmjs.com/package/grunt-contrib-connect
 [8]: https://www.npmjs.com/package/http-proxy
@@ -119,3 +118,5 @@ Directory reference
 [15]: https://www.npmjs.com/package/grunt-newer
 [16]: https://www.npmjs.com/package/grunt-casperjs
 [17]: http://docs.casperjs.org/
+[18]: https://www.npmjs.com/package/grunt-sass
+[19]: https://www.npmjs.com/package/grunt-postcss

@@ -81,12 +81,27 @@ module.exports = (grunt) ->
 				templateData:
 					production: true
 		
-		compass:
-			options:
-				sassDir: '<%= source %>/<%= style %>'
+		sass:
 			compile:
 				options:
-					cssDir: '<%= stage %>/<%= style %>'
+					sourceComments: true
+				expand: true
+				cwd: '<%= source %>/<%= style %>'
+				src: ['*.sass', '*.scss']
+				dest: '<%= stage %>/<%= style %>'
+				ext: '.css.pre'
+		
+		postcss:
+			compile:
+				options:
+					processors: [
+						(require 'autoprefixer')()
+					]
+				expand: true
+				cwd: '<%= stage %>/<%= style %>'
+				src: ['*.css.pre']
+				dest: '<%= stage %>/<%= style %>'
+				ext: '.css'
 		
 		symlink:
 			compile:
@@ -166,9 +181,12 @@ module.exports = (grunt) ->
 					cwd:
 						files: '<%= coffee.compile.cwd %>'
 				tasks: ['newer:coffee:compile', 'jasmine:test']
-			compass:
-				files: '<%= compass.options.sassDir %>/*'
-				tasks: 'compass:compile'
+			sass:
+				files: '<%= sass.compile.src %>'
+				options:
+					cwd:
+						files: '<%= sass.compile.cwd %>'
+				tasks: ['sass:compile', 'postcss:compile']
 			html:
 				files: [
 					'<%= grunt.config("compile-handlebars.develop.src") %>'
@@ -187,8 +205,10 @@ module.exports = (grunt) ->
 			config:
 				files: 'Gruntfile.coffee'
 			livereload:
-				files: '<%= stage %>/**/*'
+				files: ['<%= script %>/**/*.js', '<%= style %>/*.css', '*.html']
 				options:
+					cwd:
+						files: '<%= stage %>'
 					livereload: true
 		
 		requirejs:
@@ -245,7 +265,8 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-contrib-handlebars'
 	grunt.loadNpmTasks 'grunt-contrib-coffee'
 	grunt.loadNpmTasks 'grunt-compile-handlebars'  # compile, not contrib
-	grunt.loadNpmTasks 'grunt-contrib-compass'
+	grunt.loadNpmTasks 'grunt-sass'
+	grunt.loadNpmTasks 'grunt-postcss'
 	grunt.loadNpmTasks 'grunt-contrib-symlink'
 	grunt.loadNpmTasks 'grunt-contrib-connect'
 	grunt.loadNpmTasks 'grunt-shell'
@@ -260,7 +281,8 @@ module.exports = (grunt) ->
 	grunt.registerTask 'compile-base', [
 		'handlebars:compile'
 		'newer:coffee:compile'
-		'compass:compile'
+		'sass:compile'
+		'postcss:compile'
 	]
 	grunt.registerTask 'compile', [
 		'compile-base'
