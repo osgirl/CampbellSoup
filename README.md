@@ -31,14 +31,15 @@ Make sure that your virtual environment is activated, then run `grunt`. This wil
   - Forward all requests under `localhost:8000/api/` to `localhost:5000/`.
   - Open `localhost:8000/` (`/.tmp/index.html`) in your default browser (henceforth the "development browser tab").
   - Watch all sources for changes, automatically recompiling static assets, re-running unit tests and reloading the development browser tab where applicable.
+  - Recompile and rerun the functional tests when changed. Note that the functional tests are not automatically rerun when you change source files. Functional tests are further discussed below.
 
 All subprocesses log to the same single terminal that you run `grunt` from, so the output will be a mess at first. After that, however, you will be grateful for the combined output, as any server hiccups, test failures and compilation errors will automatically come to your attention from a single window. This process keeps running until you kill it with `ctrl-c`.
 
 At your option, you may also run any of the tasks above separately. The required commands are listed below with pointers to further documentation. Refer to the `Gruntfile.coffee` for the definitions and configuration of the Grunt-based tasks.
 
   - `grunt handlebars` to precompile all Mustache templates except for the `index.mustache` to a single `templates.js` ([grunt-contrib-handlebars][13]).
-  - `grunt coffee` to compile the CoffeeScript sources to JavaScript ([grunt-contrib-coffee][3]).
-  - `grunt newer:coffee` to do the same but only with changed sources ([grunt-newer][15]).
+  - `grunt coffee` to compile all CoffeeScript sources to JavaScript ([grunt-contrib-coffee][3]). `grunt coffee:compile` to limit compilation to the client side scripts or `grunt coffee:functional` to limit compilation to the functional tests.
+  - `grunt newer:coffee`, `grunt newer:coffee:compile` or `grunt newer:coffee:functional` to do the same but only with changed sources ([grunt-newer][15]).
   - `grunt clean:develop compile-handlebars:develop` to generate the `index.html` ([grunt-compile-handlebars][4]).
   - `grunt compass` to compile the stylesheets from Sass to CSS ([grunt-contrib-compass][5]).
   - `grunt symlink` to ensure that the `/bower_components` are accessible from within the `/.tmp` ([grunt-contrib-symlink][6]).
@@ -46,7 +47,9 @@ At your option, you may also run any of the tasks above separately. The required
   - `python manage.py [-c ../config.py] runserver -rd` to run just the backend server ([flask-script][12]). Keeps running.
   - `grunt connect:develop:keepalive` to serve just the static assets and open the index in your default browser ([grunt-contrib-connect][7], [http-proxy][8]). Be warned that it will still forward requests under `/api` to `localhost:5000`. Keeps running.
   - `grunt concurrent:server` to run both servers at the same time ([grunt-concurrent][9]). Keeps running.
-  - `grunt watch` to automatically recompile, retest and reload when files change ([grunt-contrib-watch][10]). Note that if you start the static server before the watch task, livereload will not work until you manually refresh the development browser tab. Keeps running.
+  - `grunt watch` to automatically recompile, retest and reload when files change ([grunt-contrib-watch][10]). This includes the functional tests as described above. Note that if you start the static server before the watch task, livereload will not work until you manually refresh the development browser tab. Keeps running.
+  - `grunt casperjs` to run all functional tests. This assumes that you already compiled the CoffeeScript sources. ([grunt-casperjs][16], [CasperJS][17])
+  - `grunt newer:casperjs` to run only the functional tests that you edited and recompiled.
 
 In order to remove generated files but not the `node_modules` or the `bower_components`, run `grunt clean:all` ([grunt-contrib-clean][11]).
 
@@ -63,6 +66,7 @@ Directory reference
 
     project root                 (whatever you called it)
     ├── .editorconfig            notation conventions, in-VCS
+    ├── .functional-tests        functional tests compiled to JS, out-of-VCS
     ├── .gitignore
     ├── .tmp/                    generated static assets for dev., out-of-VCS
     ├── Gruntfile.coffee         task configuration, in-VCS
@@ -81,6 +85,7 @@ Directory reference
     ├── config.py                supposed to be written by you, out-of-VCS
     ├── dist/                    generated static assets for depl., out-of-VCS
     ├── doc/                     additional documentation, in-VCS
+    ├── functional-tests         functional test sources in Coffee, in-VCS
     ├── manage.py                backend manager, in-VCS
     ├── migrations               Alembic DB migration definitions, in-VCS
     │   ├── ...                  (ignore these)
@@ -110,3 +115,5 @@ Directory reference
 [13]: https://www.npmjs.com/package/grunt-contrib-handlebars
 [14]: http://flask-migrate.readthedocs.io/en/latest/
 [15]: https://www.npmjs.com/package/grunt-newer
+[16]: https://www.npmjs.com/package/grunt-casperjs
+[17]: http://docs.casperjs.org/
