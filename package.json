@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "grunt": "^1.0.1",
+    "grunt-casperjs": "^2.2.1",
     "grunt-compile-handlebars": "^2.0.2",
     "grunt-concurrent": "^2.3.1",
     "grunt-contrib-clean": "^1.0.0",

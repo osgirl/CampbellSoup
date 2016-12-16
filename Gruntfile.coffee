@@ -18,6 +18,7 @@ module.exports = (grunt) ->
 		style: 'style'
 		template: 'template'
 		templateSrc: '<%= source %>/<%= template %>'
+		functional: 'functional-tests'
 		stage: '.tmp'
 		dist: 'dist'
 		
@@ -27,6 +28,7 @@ module.exports = (grunt) ->
 			all: [
 				'<%= stage %>'
 				'<%= dist %>'
+				'.<%= functional %>'
 				'.*cache'
 				'**/__pycache__'
 				'**/*.{pyc,pyo}'
@@ -57,6 +59,12 @@ module.exports = (grunt) ->
 				cwd: '<%= source %>/<%= script %>'
 				src: ['**/*.coffee']
 				dest: '<%= stage %>/<%= script %>/'
+				ext: '.js'
+			functional:
+				expand: true
+				cwd: '<%= functional %>'
+				src: ['**/*.coffee']
+				dest: '.<%= functional %>/'
 				ext: '.js'
 		
 		'compile-handlebars':
@@ -142,6 +150,12 @@ module.exports = (grunt) ->
 					display: 'short'
 					summary: true
 		
+		casperjs:
+			options:
+				silent: true
+			functional:
+				src: ['.<%= functional %>/**/*.js']
+		
 		watch:
 			handlebars:
 				files: '<%= handlebars.compile.src %>'
@@ -164,6 +178,12 @@ module.exports = (grunt) ->
 			python:
 				files: '<%= pypackage %>/**/*.py'
 				tasks: 'newer:shell:pytest'
+			functional:
+				files: '<%= coffee.functional.src %>'
+				options:
+					cwd:
+						files: '<%= coffee.functional.cwd %>'
+				tasks: ['newer:coffee:functional', 'newer:casperjs:functional']
 			config:
 				files: 'Gruntfile.coffee'
 			livereload:
@@ -231,6 +251,7 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-shell'
 	grunt.loadNpmTasks 'grunt-concurrent'
 	grunt.loadNpmTasks 'grunt-contrib-jasmine'
+	grunt.loadNpmTasks 'grunt-casperjs'
 	grunt.loadNpmTasks 'grunt-contrib-watch'
 	grunt.loadNpmTasks 'grunt-contrib-requirejs'
 	grunt.loadNpmTasks 'grunt-contrib-cssmin'
