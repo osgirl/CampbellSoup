@@ -40,7 +40,7 @@ At your option, you may also run any of the tasks above separately. The required
   - `grunt handlebars` to precompile all Mustache templates except for the `index.mustache` to a single `templates.js` ([grunt-contrib-handlebars][13]).
   - `grunt coffee` to compile all CoffeeScript sources to JavaScript ([grunt-contrib-coffee][3]). `grunt coffee:compile` to limit compilation to the client side scripts or `grunt coffee:functional` to limit compilation to the functional tests.
   - `grunt newer:coffee`, `grunt newer:coffee:compile` or `grunt newer:coffee:functional` to do the same but only with changed sources ([grunt-newer][15]).
-  - `grunt clean:develop compile-handlebars:develop` to generate the `index.html` ([grunt-compile-handlebars][4]).
+  - `grunt clean:develop compile-handlebars:develop` to generate the `index.html` ([grunt-compile-handlebars][4]). The `clean` step is necessary because `compile-handlebars` appends to output files instead of replacing them.
   - `grunt compass` to compile the stylesheets from Sass to CSS ([grunt-contrib-compass][5]).
   - `grunt symlink` to ensure that the `/bower_components` are accessible from within the `/.tmp` ([grunt-contrib-symlink][6]).
   - `grunt compile` to do all of the above.
@@ -59,7 +59,9 @@ Deployment
 ----------
 An optimized version of the static assets can be obtained by running `grunt dist`. The optimized files are put in the `/dist` project subdirectory. In this case you do not need the `bower_components`; the external libraries are fetched from CDNs in their minified forms.
 
-You are advised to run the Flask-based backend as a WSGI application from your favourite HTTP server. Create a WSGI file that imports `campbellsoup.create_application` and calls it with the path to your custom settings module. Serve the WSGI application under `/api/` while serving the static assets under `/`.
+You are advised to run the Flask-based backend as a WSGI application from your favourite HTTP server. Create a WSGI file that imports `campbellsoup.create_application` and calls it with the path to your custom settings module.
+
+Serve the WSGI application under `/api/` while serving the static assets under `/`.
 
 Directory reference
 -------------------
