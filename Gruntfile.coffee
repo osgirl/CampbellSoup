@@ -81,12 +81,41 @@ module.exports = (grunt) ->
 				templateData:
 					production: true
 		
-		compass:
-			options:
-				sassDir: '<%= source %>/<%= style %>'
+		sass:
 			compile:
 				options:
-					cssDir: '<%= stage %>/<%= style %>'
+					includePaths: [
+						'bower_components/bootstrap-sass/assets/stylesheets'
+					]
+					sourceComments: true
+				expand: true
+				cwd: '<%= source %>/<%= style %>'
+				src: ['*.sass', '*.scss']
+				dest: '<%= stage %>/<%= style %>'
+				ext: '.css.pre'
+		
+		postcss:
+			compile:
+				options:
+					processors: [
+						(require 'autoprefixer') {
+							browsers: [
+								'Android 2.3'
+								'Android >= 4'
+								'Chrome >= 20'
+								'Firefox >= 24'
+								'Explorer >= 8'
+								'iOS >= 6'
+								'Opera >= 12'
+								'Safari >= 6'
+							]
+						}
+					]
+				expand: true
+				cwd: '<%= stage %>/<%= style %>'
+				src: ['*.css.pre']
+				dest: '<%= stage %>/<%= style %>'
+				ext: '.css'
 		
 		symlink:
 			compile:
@@ -166,9 +195,12 @@ module.exports = (grunt) ->
 					cwd:
 						files: '<%= coffee.compile.cwd %>'
 				tasks: ['newer:coffee:compile', 'jasmine:test']
-			compass:
-				files: '<%= compass.options.sassDir %>/*'
-				tasks: 'compass:compile'
+			sass:
+				files: '<%= sass.compile.src %>'
+				options:
+					cwd:
+						files: '<%= sass.compile.cwd %>'
+				tasks: ['sass:compile', 'postcss:compile']
 			html:
 				files: [
 					'<%= grunt.config("compile-handlebars.develop.src") %>'
@@ -187,14 +219,18 @@ module.exports = (grunt) ->
 			config:
 				files: 'Gruntfile.coffee'
 			livereload:
-				files: '<%= stage %>/**/*'
+				files: ['<%= script %>/**/*.js', '<%= style %>/*.css', '*.html']
 				options:
+					cwd:
+						files: '<%= stage %>'
 					livereload: true
 		
 		requirejs:
 			dist:
 				options:
 					baseUrl: '<%= stage %>/<%= script %>'
+					mainConfigFile: '<%= stage %>/<%= script %>/developConfig.js'
+					wrapShim: true
 					paths:
 						jquery: 'empty:'
 						backbone: 'empty:'
@@ -245,7 +281,8 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-contrib-handlebars'
 	grunt.loadNpmTasks 'grunt-contrib-coffee'
 	grunt.loadNpmTasks 'grunt-compile-handlebars'  # compile, not contrib
-	grunt.loadNpmTasks 'grunt-contrib-compass'
+	grunt.loadNpmTasks 'grunt-sass'
+	grunt.loadNpmTasks 'grunt-postcss'
 	grunt.loadNpmTasks 'grunt-contrib-symlink'
 	grunt.loadNpmTasks 'grunt-contrib-connect'
 	grunt.loadNpmTasks 'grunt-shell'
@@ -260,7 +297,8 @@ module.exports = (grunt) ->
 	grunt.registerTask 'compile-base', [
 		'handlebars:compile'
 		'newer:coffee:compile'
-		'compass:compile'
+		'sass:compile'
+		'postcss:compile'
 	]
 	grunt.registerTask 'compile', [
 		'compile-base'
