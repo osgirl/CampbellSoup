@@ -219,7 +219,12 @@ module.exports = (grunt) ->
 			config:
 				files: 'Gruntfile.coffee'
 			livereload:
-				files: ['<%= script %>/**/*.js', '<%= style %>/*.css', '*.html']
+				files: [
+					'<%= script %>/**/*.js'
+					'<%= style %>/*.css'
+					'*.html'
+					'!_SpecRunner.html'
+				]
 				options:
 					cwd:
 						files: '<%= stage %>'
