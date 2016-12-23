@@ -229,6 +229,8 @@ module.exports = (grunt) ->
 			dist:
 				options:
 					baseUrl: '<%= stage %>/<%= script %>'
+					mainConfigFile: '<%= stage %>/<%= script %>/developConfig.js'
+					wrapShim: true
 					paths:
 						jquery: 'empty:'
 						backbone: 'empty:'
