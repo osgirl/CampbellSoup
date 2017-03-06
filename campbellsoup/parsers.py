@@ -123,7 +123,9 @@ w_type_line         = (w_type_start + (
     t_whichof2 | w_mc_decl | w_open_decl | w_truefalse_decl
 ) + pp.lineEnd).setName('w_type_line')
 
-w_empty_line         = (pp.lineStart + pp.lineEnd).setName('w_empty_line')
+w_empty_line         = (
+    pp.lineStart + pp.lineEnd
+).leaveWhitespace().setName('w_empty_line')
 
 w_normal_line        = (
     ~w_empty_line + pp.lineStart + ~l_bang + pp.restOfLine + pp.lineEnd
