@@ -6,9 +6,11 @@ import pyparsing as pp
 integer = pp.Word(pp.nums)
 floating = pp.Optional(integer) + '.' + integer | integer
 
+
 def twoOrMore(parserElement):
     """ returns a parser that matches `parserElement` twice or more. """
     return parserElement + pp.OneOrMore(parserElement)
+
 
 # Meta keywords
 m_toetsjaar       = pp.CaselessKeyword('toetsjaar')
@@ -34,7 +36,6 @@ l_comment         = pp.Keyword('comment')
 l_points          = pp.Keyword('points')
 l_type            = pp.Keyword('type')
 l_complete_text   = pp.Keyword('complete_text')
-l_answerblock     = pp.Keyword('answerblock')
 l_dont_randomize  = pp.Keyword('dont_randomize')
 l_subquestions    = pp.Keyword('subquestions')
 l_answerblock     = pp.Keyword('answerblock')
@@ -43,59 +44,63 @@ l_drawbox         = pp.Keyword('drawbox')
 
 # LaTeX-writer type values
 t_whichof2        = pp.Keyword('whichof2')
-t_complete_text   = pp.Keyword('complete_text')
 t_mc              = pp.Keyword('mc')
 t_open            = pp.Keyword('open')
 t_truefalse       = pp.Keyword('truefalse') | pp.Keyword('plusmin')
 
 # LaTeX-writer parts
-w_command_start    = pp.lineStart + bang
-w_integer_arg      = bang + integer
-w_floating_arg     = bang + floating
-w_generic_arg      = bang + pp.CharsNotIn('!')
-w_figure_com       = figure + generic_arg + pp.Optional(floating_arg)
-w_subquestions_com = subquestions + integer_arg
-w_command_line     = command_start + (
-    figure_com | dont_randomize | subquestions_com
+w_command_start     = pp.lineStart + l_bang
+w_integer_arg       = l_bang + integer
+w_floating_arg      = l_bang + floating
+w_generic_arg       = l_bang + pp.CharsNotIn('!')
+w_figure_com        = l_figure + w_generic_arg + pp.Optional(w_floating_arg)
+w_subquestions_com  = l_subquestions + w_integer_arg
+w_command_line      = w_command_start + (
+    w_figure_com | l_dont_randomize | w_subquestions_com
 ) + pp.lineEnd
 
-w_type_start       = command_start + type + bang
-w_mc_decl          = mc + pp.Optional(integer_arg)
-w_open_declaration = open + integer_arg
-w_truefalse_decl   = truefalse + pp.Optional(integer_arg)
-w_type_line        = type_start + (
-    whichof2 | mc_decl | open_decl | truefalse_decl
+w_type_start        = w_command_start + l_type + l_bang
+w_mc_decl           = t_mc + pp.Optional(w_integer_arg)
+w_open_decl         = t_open + w_integer_arg
+w_truefalse_decl    = t_truefalse + pp.Optional(w_integer_arg)
+w_type_line         = w_type_start + (
+    t_whichof2 | w_mc_decl | w_open_decl | w_truefalse_decl
 ) + pp.lineEnd
 
-w_normal_line       = pp.lineStart + ~bang + pp.restOfLine + pp.lineEnd
-w_empty_line        = pp.lineStart + pp.lineEnd
-w_drawbox_line      = command_start + drawbox + floating_arg + pp.lineEnd
-w_answerblock_line  = command_start + answerblock + integer_arg * 2 + pp.lineEnd
-w_command_line_x    = command_line | answerblock_line
-w_type_line_x       = type_line | answerblock_line | drawbox_line
-w_complete_text_line = type_start + complete_text + pp.lineEnd
-w_choose_line     = command_start + choose + twoOrMore(generic_arg) + pp.lineEnd
-w_complete_text_duet = normal_line + choose_line
-
-w_atleast1command  = (
-    pp.ZeroOrMore(command_line_x) + type_line_x + pp.ZeroOrMore(command_line_x)
+w_normal_line        = pp.lineStart + ~l_bang + pp.restOfLine + pp.lineEnd
+w_empty_line         = pp.lineStart + pp.lineEnd
+w_drawbox_line       = w_command_start + l_drawbox + w_floating_arg + pp.lineEnd
+w_answerblock_line   = (
+    w_command_start + l_answerblock + w_integer_arg * 2 + pp.lineEnd
 )
-w_atleast2commands = atleast1command & command_line_x
-w_atleast3commands = atleast2commands & command_line_x
+w_command_line_x     = w_command_line | w_answerblock_line
+w_type_line_x        = w_type_line | w_answerblock_line | w_drawbox_line
+w_complete_text_line = w_type_start + l_complete_text + pp.lineEnd
+w_choose_line        = (
+    w_command_start + l_choose + twoOrMore(w_generic_arg) + pp.lineEnd
+)
+w_complete_text_duet = w_normal_line + w_choose_line
 
-w_intro_block = (
-    normal_line + pp.Optional(normal_line) + pp.Optional(figure_command)
+w_atleast1command    = (
+    pp.ZeroOrMore(w_command_line_x) + w_type_line_x +
+    pp.ZeroOrMore(w_command_line_x)
+)
+w_atleast2commands   = w_atleast1command & w_command_line_x
+w_atleast3commands   = w_atleast2commands & w_command_line_x
+
+w_intro_block        = (
+    w_normal_line + pp.Optional(w_normal_line) + pp.Optional(figure_command)
 ).leaveWhitespace()
-w_standard_question_block = pp.OneOrMore(normal_line) + (
-    normal_line * 2 + atleast1command  |
-    normal_line     + atleast2commands | atleast3commands
+w_standard_question_block = pp.OneOrMore(w_normal_line) + (
+    w_normal_line * 2 + w_atleast1command  |
+    w_normal_line     + w_atleast2commands | w_atleast3commands
 ).leaveWhitespace()
 w_complete_text_block = (
-    complete_text_line + pp.OneOrMore(complete_text_duet) +
-    pp.Optional(normal_line) + pp.ZeroOrMore(command_line)
+    w_complete_text_line + pp.OneOrMore(w_complete_text_duet) +
+    pp.Optional(w_normal_line) + pp.ZeroOrMore(w_command_line)
 ).leaveWhitespace()
-w_block = intro_block | standard_question_block | complete_text_block
+w_block      = w_intro_block | w_standard_question_block | w_complete_text_block
 
-w_question_group = (
-    block + pp.ZeroOrMore(empty_line + block)
+w_question_group    = (
+    w_block + pp.ZeroOrMore(w_empty_line + w_block)
 ).ignore(pp.pythonStyleComment + pp.lineEnd)
