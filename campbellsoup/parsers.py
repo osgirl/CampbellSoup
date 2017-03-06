@@ -170,11 +170,11 @@ w_atleast1command    = (
 ).setName('w_atleast1command')
 
 w_atleast2commands   = (
-    w_atleast1command & w_command_line_x
+    w_type_line_x & w_command_line_x & pp.ZeroOrMore(w_command_line_x)
 ).setName('w_atleast2commands')
 
 w_atleast3commands   = (
-    w_atleast2commands & w_command_line_x
+    w_type_line_x & w_command_line_x & pp.OneOrMore(w_command_line_x)
 ).setName('w_atleast3commands')
 
 w_intro_block        = (
