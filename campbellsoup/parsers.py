@@ -181,10 +181,10 @@ w_intro_block        = (
     w_normal_line + pp.Optional(w_normal_line) + pp.Optional(w_command_line)
 ).leaveWhitespace().setName('w_intro_block')
 
-w_standard_question_block = (pp.OneOrMore(w_normal_line) + (
-    w_normal_line * 2 + w_atleast1command  |
-    w_normal_line     + w_atleast2commands | w_atleast3commands
-).leaveWhitespace()).setName('w_standard_question_block')
+w_standard_question_block = (w_normal_line + (
+    w_atleast3commands | w_normal_line + w_atleast2commands |
+    twoOrMore(w_normal_line) + w_atleast1command
+)).leaveWhitespace().setName('w_standard_question_block')
 
 w_complete_text_block = (
     w_complete_text_line + pp.OneOrMore(w_complete_text_duet) +
