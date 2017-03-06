@@ -67,7 +67,7 @@ t_truefalse       = (
 
 # LaTeX-writer parts
 
-w_table_cell        = (pp.CharsNotIn('|')).setName('w_table_cell')
+w_table_cell        = (pp.CharsNotIn('|\n\r')).setName('w_table_cell')
 
 w_table_row         = (
     w_table_cell + pp.ZeroOrMore(l_pipe + w_table_cell)
@@ -80,7 +80,7 @@ w_table             = (
 w_integer_arg       = (l_bang + integer).setName('w_integer_arg')
 w_floating_arg      = (l_bang + floating).setName('w_floating_arg')
 w_table_arg         = (l_bang + w_table).setName('w_table_arg')
-w_generic_arg       = (l_bang + pp.CharsNotIn('!')).setName('w_generic_arg')
+w_generic_arg       = (l_bang + pp.CharsNotIn('!\r\n')).setName('w_generic_arg')
 
 w_command_start     = (pp.lineStart + l_bang).setName('w_command_start')
 
