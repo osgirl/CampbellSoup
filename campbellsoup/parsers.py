@@ -19,6 +19,7 @@ def twoOrMore(parserElement):
 m_colon           = pp.Literal(':').setName('m_colon')
 m_comma           = pp.Literal(',').setName('m_comma')
 m_dash            = pp.Literal('-').setName('m_dash')
+m_quote           = pp.Literal('"').setName('m_quote')
 m_toetsjaar       = (pp.CaselessKeyword('toetsjaar')).setName('m_toetsjaar')
 m_auteur          = (pp.CaselessKeyword('auteur')).setName('m_auteur')
 m_titel           = (pp.CaselessKeyword('titel')).setName('m_titel')
@@ -203,6 +204,26 @@ w_question_group    = (
     w_block + pp.ZeroOrMore(empty_line + w_block)
 ).ignore(pp.pythonStyleComment + pp.lineEnd).setName('w_question_group')
 
+# Plaintext parts
+
+p_separator   = pp.Literal('**$$**').setName('p_separator')
+
+p_normal_line = (
+    ~p_separator + pp.restOfLine
+).setName('p_normal_line')
+
+p_block       = pp.delimitedList(p_normal_line, pp.lineEnd).setName('p_block')
+
+p_question_group = (
+    pp.delimitedList(p_block, p_separator)
+).setName('p_question_group')
+
+
+def p_parse(toks):
+    """ Parsing action for applying p_question_group to a nested token. """
+    return p_question_group.parseString(toks[0])
+
+
 # Global parts
 
 g_null         = (v_nee | v_onbekend | v_geen).setName('g_null')
@@ -263,6 +284,14 @@ g_meta_field    = (
     g_questions_field | g_answer_field | g_points_field | g_images_field
 ).setName('g_meta_field')
 
+g_plaintext_field = (
+    pp.lineStart + m_plat + m_colon +
+    pp.QuotedString('"', multiline=True).setParseAction(
+        pp.removeQuotes,
+        p_parse,
+    )
+).setName('g_plaintext_field')
+
 # Full document parsing
 
 latex_writer_header   = (
@@ -273,3 +302,8 @@ latex_writer_document = (
     latex_writer_header + w_question_group
 ).setName('latex_writer_document')
 
+plaintext_document = (
+    pp.OneOrMore(g_meta_field) + g_plaintext_field + pp.ZeroOrMore(g_meta_field)
+).setName('plaintext_document')
+
+document = (latex_writer_document | plaintext_document).setName('document')
