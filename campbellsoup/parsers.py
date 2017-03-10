@@ -218,6 +218,14 @@ g_text_value    = (
     g_null | pp.dblQuotedString | pp.restOfLine
 ).setName('g_text_value')
 
+g_points_value = (g_null | integer + pp.Optional(
+    pp.Literal('(') + pp.delimitedList(integer, delim=':') + pp.Literal(')')
+).leaveWhitespace()).setName('g_points_value')
+
+g_images_value = (
+    g_null | pp.delimitedList(pp.dblQuotedString)
+).setName('g_images_value')
+
 g_author_field  = (
     pp.lineStart + m_auteur + m_colon + g_authors_value + pp.lineEnd
 ).setName('g_author_field')
@@ -226,8 +234,33 @@ g_reuse_field   = (
     pp.lineStart + m_herbruik + m_colon + g_reuse_value + pp.lineEnd
 ).setName('g_reuse_field')
 
+g_year_field    = (
+    pp.lineStart + m_toetsjaar + m_colon + g_year_value + pp.lineEnd
+).setName('g_year_field')
+
+g_title_field   = (
+    pp.lineStart + m_titel + m_colon + g_text_value + pp.lineEnd
+).setName('g_title_field')
+
+g_questions_field = (
+    pp.lineStart + m_deelvragen + m_colon + integer + pp.lineEnd
+).setName('g_questions_field')
+
+g_answer_field = (
+    pp.lineStart + m_antwoord + m_colon + g_text_value + pp.lineEnd
+).setName('g_answer_field')
+
+g_points_field = (
+    pp.lineStart + m_puntenverdeling + m_colon + g_points_value + pp.lineEnd
+).setName('g_points_field')
+
+g_images_field = (
+    pp.lineStart + m_afbeeldingen + m_colon + g_images_value + pp.lineEnd
+).setName('g_images_field')
+
 g_meta_field    = (
-    g_author_field | g_reuse_field
+    g_author_field | g_reuse_field | g_year_field | g_title_field |
+    g_questions_field | g_answer_field | g_points_field | g_images_field
 ).setName('g_meta_field')
 
 # Full document parsing
