@@ -15,6 +15,9 @@ def twoOrMore(parserElement):
 
 # Meta keywords
 
+m_colon           = pp.Literal(':').setName('m_colon')
+m_comma           = pp.Literal(',').setName('m_comma')
+m_dash            = pp.Literal('-').setName('m_dash')
 m_toetsjaar       = (pp.CaselessKeyword('toetsjaar')).setName('m_toetsjaar')
 m_auteur          = (pp.CaselessKeyword('auteur')).setName('m_auteur')
 m_titel           = (pp.CaselessKeyword('titel')).setName('m_titel')
@@ -36,6 +39,10 @@ m_afbeeldingen    = (
 v_onbekend        = (pp.CaselessKeyword('onbekend')).setName('v_onbekend')
 v_geen            = (pp.CaselessKeyword('geen')).setName('v_geen')
 v_nee             = (pp.CaselessKeyword('nee')).setName('v_nee')
+v_year            = pp.Regex('20(0[4-9]|[1-9]\d)').setName('v_year')
+                             # ^ not century-proof
+v_question_number = pp.Word(pp.nums, min=1, max=2).setName('v_question_number')
+v_author          = pp.CharsNotIn(',\r\n').setName('v_author')
 
 # LaTeX-writer keywords
 
@@ -198,3 +205,41 @@ w_block      = (
 w_question_group    = (
     w_block + pp.ZeroOrMore(w_empty_line + w_block)
 ).ignore(pp.pythonStyleComment + pp.lineEnd).setName('w_question_group')
+
+# Global parts
+
+g_null         = (v_nee | v_onbekend | v_geen).setName('g_null')
+g_year_value   = (v_year | g_null).setName('g_year_value')
+g_question_ref = (v_year + m_dash + v_question_number).setName('g_question_ref')
+g_reuse_value  = (g_question_ref | g_null).setName('g_reuse_value')
+
+g_authors_value = (
+    g_null | v_author + pp.ZeroOrMore(m_comma + v_author).leaveWhitespace()
+).setName('g_authors_value')
+
+g_text_value    = (
+    g_null | pp.dblQuotedString | pp.restOfLine
+).setName('g_text_value')
+
+g_author_field  = (
+    pp.lineStart + m_auteur + m_colon + g_authors_value + pp.lineEnd
+).setName('g_author_field')
+
+g_reuse_field   = (
+    pp.lineStart + m_herbruik + m_colon + g_reuse_value + pp.lineEnd
+).setName('g_reuse_field')
+
+g_meta_field    = (
+    g_author_field | g_reuse_field
+).setName('g_meta_field')
+
+# Full document parsing
+
+latex_writer_header   = (
+    g_author_field & g_reuse_field
+).setName('latex_writer_header')
+
+latex_writer_document = (
+    latex_writer_header + w_question_group
+).setName('latex_writer_document')
+
