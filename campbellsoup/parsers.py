@@ -6,6 +6,7 @@ import pyparsing as pp
 
 integer = (pp.Word(pp.nums)).setName('integer')
 floating = (pp.Optional(integer) + '.' + integer | integer).setName('floating')
+empty_line = (pp.lineStart + pp.lineEnd).leaveWhitespace().setName('empty_line')
 
 
 def twoOrMore(parserElement):
@@ -130,12 +131,8 @@ w_type_line         = (w_type_start + (
     t_whichof2 | w_mc_decl | w_open_decl | w_truefalse_decl
 ) + pp.lineEnd).setName('w_type_line')
 
-w_empty_line         = (
-    pp.lineStart + pp.lineEnd
-).leaveWhitespace().setName('w_empty_line')
-
 w_normal_line        = (
-    ~w_empty_line + pp.lineStart + ~l_bang + pp.restOfLine + pp.lineEnd
+    ~empty_line + pp.lineStart + ~l_bang + pp.restOfLine + pp.lineEnd
 ).setName('w_normal_line')
 
 w_drawbox_line       = (
@@ -203,7 +200,7 @@ w_block      = (
 ).setName('w_block')
 
 w_question_group    = (
-    w_block + pp.ZeroOrMore(w_empty_line + w_block)
+    w_block + pp.ZeroOrMore(empty_line + w_block)
 ).ignore(pp.pythonStyleComment + pp.lineEnd).setName('w_question_group')
 
 # Global parts
