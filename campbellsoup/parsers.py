@@ -79,15 +79,15 @@ t_truefalse       = (
 
 w_table_cell        = (pp.CharsNotIn('|\n\r')).setName('w_table_cell')
 
-w_table_row         = pp.delimitedList(
+w_table_row         = pp.Group(pp.delimitedList(
     w_table_cell,
     l_pipe,
-).setName('w_table_row')
+)).setName('w_table_row')
 
-w_table             = pp.delimitedList(
+w_table             = pp.Group(pp.delimitedList(
     w_table_row,
     l_pipe * 2,
-).setName('w_table')
+)).setName('w_table')
 
 w_integer_arg       = (l_bang + integer).setName('w_integer_arg')
 w_floating_arg      = (l_bang + floating).setName('w_floating_arg')
@@ -199,23 +199,23 @@ w_complete_text_block = (
     pp.Optional(w_normal_line) + pp.ZeroOrMore(w_command_line)
 ).leaveWhitespace().setName('w_complete_text_block')
 
-w_block      = (
+w_block      = pp.Group(
     w_standard_question_block | w_intro_block | w_complete_text_block
 ).setName('w_block')
 
-w_question_group    = pp.delimitedList(w_block, empty_line).ignore(
+w_question_group    = pp.Group(pp.delimitedList(w_block, empty_line).ignore(
     pp.pythonStyleComment + pp.lineEnd
-).setName('w_question_group')
+)).setName('w_question_group')
 
 # Plaintext parts
 
 p_separator   = (pp.Literal('**$$**') + pp.lineEnd).setName('p_separator')
 
-p_block       = pp.OneOrMore(
+p_block       = pp.Group(pp.OneOrMore(
     line_start + ~p_separator + pp.restOfLine + pp.lineEnd
-).setName('p_block')
+)).setName('p_block')
 
-p_question_group = (
+p_question_group = pp.Group(
     pp.delimitedList(p_block, p_separator)
 ).setName('p_question_group')
 
