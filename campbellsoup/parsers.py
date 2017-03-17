@@ -206,10 +206,10 @@ w_question_group    = (
 
 # Plaintext parts
 
-p_separator   = pp.Literal('**$$**').setName('p_separator')
+p_separator   = (pp.Literal('**$$**') + pp.lineEnd).setName('p_separator')
 
 p_block       = pp.OneOrMore(
-    pp.lineStart.leaveWhitespace() + pp.restOfLine + pp.lineEnd
+    pp.lineStart.leaveWhitespace() + ~p_separator + pp.restOfLine + pp.lineEnd
 ).setName('p_block')
 
 p_question_group = (
