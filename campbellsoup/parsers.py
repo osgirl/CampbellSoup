@@ -208,11 +208,9 @@ w_question_group    = (
 
 p_separator   = pp.Literal('**$$**').setName('p_separator')
 
-p_normal_line = (
-    ~p_separator + pp.restOfLine
-).setName('p_normal_line')
-
-p_block       = pp.delimitedList(p_normal_line, pp.lineEnd).setName('p_block')
+p_block       = pp.OneOrMore(
+    pp.lineStart.leaveWhitespace() + pp.restOfLine + pp.lineEnd
+).setName('p_block')
 
 p_question_group = (
     pp.delimitedList(p_block, p_separator)
