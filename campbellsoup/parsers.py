@@ -307,3 +307,13 @@ plaintext_document = (
 ).setName('plaintext_document')
 
 document = (latex_writer_document | plaintext_document).setName('document')
+
+
+def debug_all():
+    """ Helper function for the developer: call .setDebug() on all parsers. """
+    import sys
+    this_module = sys.modules[__name__]
+    for name in dir(this_module):
+        candidate = getattr(this_module, name)
+        if isinstance(candidate, pp.ParserElement):
+            candidate.setDebug()
