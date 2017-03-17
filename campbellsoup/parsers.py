@@ -17,31 +17,49 @@ def twoOrMore(parserElement):
 
 # Meta keywords
 
-m_colon           = pp.Literal(':').setName('m_colon')
-m_comma           = pp.Literal(',').setName('m_comma')
-m_dash            = pp.Literal('-').setName('m_dash')
-m_quote           = pp.Literal('"').setName('m_quote')
-m_toetsjaar       = (pp.CaselessKeyword('toetsjaar')).setName('m_toetsjaar')
-m_auteur          = (pp.CaselessKeyword('auteur')).setName('m_auteur')
-m_titel           = (pp.CaselessKeyword('titel')).setName('m_titel')
-m_deelvragen      = (pp.CaselessKeyword('deelvragen')).setName('m_deelvragen')
-m_plat            = (pp.CaselessKeyword('plat')).setName('m_plat')
-m_antwoord        = (pp.CaselessKeyword('antwoord')).setName('m_antwoord')
-m_herbruik        = (pp.CaselessKeyword('herbruik')).setName('m_herbruik')
+m_colon           = pp.Literal(':').setName('m_colon').suppress()
+m_comma           = pp.Literal(',').setName('m_comma').suppress()
+m_dash            = pp.Literal('-').setName('m_dash').suppress()
+m_quote           = pp.Literal('"').setName('m_quote').suppress()
+m_titel           = (pp.CaselessKeyword('titel')).setName('m_titel').suppress()
+m_plat            = (pp.CaselessKeyword('plat')).setName('m_plat').suppress()
+
+m_toetsjaar       = (
+    pp.CaselessKeyword('toetsjaar')
+).setName('m_toetsjaar').suppress()
+
+m_auteur          = (
+    pp.CaselessKeyword('auteur')
+).setName('m_auteur').suppress()
+
+m_deelvragen      = (
+    pp.CaselessKeyword('deelvragen')
+).setName('m_deelvragen').suppress()
+
+m_antwoord        = (
+    pp.CaselessKeyword('antwoord')
+).setName('m_antwoord').suppress()
+
+m_herbruik        = (
+    pp.CaselessKeyword('herbruik')
+).setName('m_herbruik').suppress()
 
 m_puntenverdeling = (
     pp.CaselessKeyword('puntenverdeling')
-).setName('m_puntenverdeling')
+).setName('m_puntenverdeling').suppress()
 
 m_afbeeldingen    = (
     pp.CaselessKeyword('afbeeldingen')
-).setName('m_afbeeldingen')
+).setName('m_afbeeldingen').suppress()
 
 # Meta values
 
-v_onbekend        = (pp.CaselessKeyword('onbekend')).setName('v_onbekend')
-v_geen            = (pp.CaselessKeyword('geen')).setName('v_geen')
-v_nee             = (pp.CaselessKeyword('nee')).setName('v_nee')
+v_onbekend        = (
+    pp.CaselessKeyword('onbekend')
+).setName('v_onbekend').suppress()
+
+v_geen            = (pp.CaselessKeyword('geen')).setName('v_geen').suppress()
+v_nee             = (pp.CaselessKeyword('nee')).setName('v_nee').suppress()
 v_year            = pp.Regex('20(0[4-9]|[1-9]\d)').setName('v_year')
                              # ^ not century-proof
 v_question_number = pp.Word(pp.nums, min=1, max=2).setName('v_question_number')
@@ -49,21 +67,36 @@ v_author          = pp.CharsNotIn(',\r\n').setName('v_author')
 
 # LaTeX-writer keywords
 
-l_bang            = (pp.Literal('!')).setName('l_bang')
-l_pipe            = (pp.Literal('|')).setName('l_pipe')
-l_figure          = (pp.Keyword('figure')).setName('l_figure')
-l_answerfigure    = (pp.Keyword('answerfigure')).setName('l_answerfigure')
-l_answer          = (pp.Keyword('answer')).setName('l_answer')
-l_comment         = (pp.Keyword('comment')).setName('l_comment')
-l_points          = (pp.Keyword('points')).setName('l_points')
-l_type            = (pp.Keyword('type')).setName('l_type')
-l_complete_text   = (pp.Keyword('complete_text')).setName('l_complete_text')
-l_dont_randomize  = (pp.Keyword('dont_randomize')).setName('l_dont_randomize')
-l_subquestions    = (pp.Keyword('subquestions')).setName('l_subquestions')
-l_answerblock     = (pp.Keyword('answerblock')).setName('l_answerblock')
-l_choose          = (pp.Keyword('choose')).setName('l_choose')
-l_drawbox         = (pp.Keyword('drawbox')).setName('l_drawbox')
-l_table           = (pp.Keyword('table')).setName('l_table')
+l_bang            = (pp.Literal('!')).setName('l_bang').suppress()
+l_pipe            = (pp.Literal('|')).setName('l_pipe').suppress()
+l_figure          = (pp.Keyword('figure')).setName('l_figure').suppress()
+l_answer          = (pp.Keyword('answer')).setName('l_answer').suppress()
+l_comment         = (pp.Keyword('comment')).setName('l_comment').suppress()
+l_points          = (pp.Keyword('points')).setName('l_points').suppress()
+l_type            = (pp.Keyword('type')).setName('l_type').suppress()
+l_choose          = (pp.Keyword('choose')).setName('l_choose').suppress()
+l_drawbox         = (pp.Keyword('drawbox')).setName('l_drawbox').suppress()
+l_table           = (pp.Keyword('table')).setName('l_table').suppress()
+
+l_answerfigure    = (
+    pp.Keyword('answerfigure')
+).setName('l_answerfigure').suppress()
+
+l_complete_text   = (
+    pp.Keyword('complete_text')
+).setName('l_complete_text').suppress()
+
+l_dont_randomize  = (
+    pp.Keyword('dont_randomize')
+).setName('l_dont_randomize').suppress()
+
+l_subquestions    = (
+    pp.Keyword('subquestions')
+).setName('l_subquestions').suppress()
+
+l_answerblock     = (
+    pp.Keyword('answerblock')
+).setName('l_answerblock').suppress()
 
 # LaTeX-writer type values
 
@@ -98,25 +131,33 @@ w_command_start     = (line_start + l_bang).setName('w_command_start')
 
 w_figure_com        = (
     l_figure + w_generic_arg + pp.Optional(w_floating_arg)
-).setName('w_figure_com')
+).setName('w_figure_com').setResultsName('figure')
 
 w_subquestions_com  = (
     l_subquestions + w_integer_arg
-).setName('w_subquestions_com')
+).setName('w_subquestions_com').setResultsName('subquestions')
 
-w_table_com         = (l_table + w_table_arg).setName('w_table_com')
-w_points_com        = (l_points + w_floating_arg).setName('w_points_com')
+w_table_com         = (
+    l_table + w_table_arg
+).setName('w_table_com').setResultsName('table')
+
+w_points_com        = (
+    l_points + w_floating_arg
+).setName('w_points_com').setResultsName('points')
 
 w_comment_com       = (
     l_comment + w_generic_arg + pp.restOfLine
 ).setName('w_comment_com')
+# TODO: find a way to group comments regardless of their order
+# relative to other commands.
 
 w_answer_com        = (
     l_answer + l_bang + pp.restOfLine
-).setName('w_answer_com')
+).setName('w_answer_com').setResultsName('answer')
 
 w_command_line      = (w_command_start + (
-    w_figure_com | l_dont_randomize | w_subquestions_com | w_table_com |
+    l_dont_randomize.setResultsName('dontRandomize') |
+    w_figure_com | w_subquestions_com | w_table_com |
     w_points_com | w_comment_com | w_answer_com
 ) + pp.lineEnd).setName('w_command_line')
 
@@ -133,7 +174,7 @@ w_truefalse_decl    = (
 
 w_type_line         = (w_type_start + (
     t_whichof2 | w_mc_decl | w_open_decl | w_truefalse_decl
-) + pp.lineEnd).setName('w_type_line')
+) + pp.lineEnd).setName('w_type_line').setResultsName('type')
 
 w_normal_line        = (
     ~empty_line + line_start + ~l_bang + pp.restOfLine + pp.lineEnd
@@ -141,16 +182,16 @@ w_normal_line        = (
 
 w_drawbox_line       = (
     w_command_start + l_drawbox + w_floating_arg + pp.lineEnd
-).setName('w_drawbox_line')
+).setName('w_drawbox_line').setResultsName('drawbox')
 
 w_answerfigure_line  = (
     w_command_start + l_answerfigure + w_generic_arg +
     pp.Optional(w_floating_arg) + pp.lineEnd
-).setName('w_answerfigure_line')
+).setName('w_answerfigure_line').setResultsName('answerfigure')
 
 w_answerblock_line   = (
     w_command_start + l_answerblock + w_integer_arg * 2 + pp.lineEnd
-).setName('w_answerblock_line')
+).setName('w_answerblock_line').setResultsName('answerblock')
 
 w_command_line_x     = (
     w_command_line | w_answerblock_line
@@ -162,7 +203,7 @@ w_type_line_x        = (
 
 w_complete_text_line = (
     w_type_start + l_complete_text + pp.lineEnd
-).setName('w_complete_text_line')
+).setName('w_complete_text_line').setResultsName('complete_text')
 
 w_choose_line        = (
     w_command_start + l_choose + twoOrMore(w_generic_arg) + pp.lineEnd
@@ -186,17 +227,24 @@ w_atleast3commands   = (
 ).setName('w_atleast3commands')
 
 w_intro_block        = (
-    w_normal_line + pp.Optional(w_normal_line) + pp.Optional(w_command_line)
+    w_normal_line.setResultsName('title') +
+    pp.Optional(w_normal_line.setResultsName('intro')) +
+    pp.Optional(w_command_line)
 ).leaveWhitespace().setName('w_intro_block')
 
-w_standard_question_block = (w_normal_line + (
-    w_atleast3commands | w_normal_line + w_atleast2commands |
-    twoOrMore(w_normal_line) + w_atleast1command
-)).leaveWhitespace().setName('w_standard_question_block')
+w_standard_question_block = (
+    w_normal_line.setResultsName('question') + w_atleast3commands |
+    (w_normal_line * 2).setResultsName('question') + w_atleast2commands |
+    (
+        w_normal_line + twoOrMore(w_normal_line)
+    ).setResultsName('question') + w_atleast1command
+).leaveWhitespace().setName('w_standard_question_block')
 
 w_complete_text_block = (
-    w_complete_text_line + pp.OneOrMore(w_complete_text_duet) +
-    pp.Optional(w_normal_line) + pp.ZeroOrMore(w_command_line)
+    w_complete_text_line + (
+        pp.OneOrMore(w_complete_text_duet) +
+        pp.Optional(w_normal_line)
+    ).setResultsName('question') + pp.ZeroOrMore(w_command_line)
 ).leaveWhitespace().setName('w_complete_text_block')
 
 w_block      = pp.Group(
@@ -205,11 +253,13 @@ w_block      = pp.Group(
 
 w_question_group    = pp.Group(pp.delimitedList(w_block, empty_line).ignore(
     pp.pythonStyleComment + pp.lineEnd
-)).setName('w_question_group')
+)).setName('w_question_group').setResultsName('content')
 
 # Plaintext parts
 
-p_separator   = (pp.Literal('**$$**') + pp.lineEnd).setName('p_separator')
+p_separator   = (
+    pp.Literal('**$$**').suppress() + pp.lineEnd.suppress()
+).setName('p_separator')
 
 p_block       = pp.Group(pp.OneOrMore(
     line_start + ~p_separator + pp.restOfLine + pp.lineEnd
@@ -217,7 +267,7 @@ p_block       = pp.Group(pp.OneOrMore(
 
 p_question_group = pp.Group(
     pp.delimitedList(p_block, p_separator)
-).setName('p_question_group')
+).setName('p_question_group').setResultsName('content')
 
 
 def p_parse(toks):
@@ -250,35 +300,35 @@ g_images_value = (
 
 g_author_field  = (
     pp.lineStart + m_auteur + m_colon + g_authors_value + pp.lineEnd
-).setName('g_author_field')
+).setName('g_author_field').setResultsName('authors')
 
 g_reuse_field   = (
     pp.lineStart + m_herbruik + m_colon + g_reuse_value + pp.lineEnd
-).setName('g_reuse_field')
+).setName('g_reuse_field').setResultsName('reuse')
 
 g_year_field    = (
     pp.lineStart + m_toetsjaar + m_colon + g_year_value + pp.lineEnd
-).setName('g_year_field')
+).setName('g_year_field').setResultsName('year')
 
 g_title_field   = (
     pp.lineStart + m_titel + m_colon + g_text_value + pp.lineEnd
-).setName('g_title_field')
+).setName('g_title_field').setResultsName('title')
 
 g_questions_field = (
     pp.lineStart + m_deelvragen + m_colon + integer + pp.lineEnd
-).setName('g_questions_field')
+).setName('g_questions_field').setResultsName('questionCount')
 
 g_answer_field = (
     pp.lineStart + m_antwoord + m_colon + g_text_value + pp.lineEnd
-).setName('g_answer_field')
+).setName('g_answer_field').setResultsName('answer')
 
 g_points_field = (
     pp.lineStart + m_puntenverdeling + m_colon + g_points_value + pp.lineEnd
-).setName('g_points_field')
+).setName('g_points_field').setResultsName('points')
 
 g_images_field = (
     pp.lineStart + m_afbeeldingen + m_colon + g_images_value + pp.lineEnd
-).setName('g_images_field')
+).setName('g_images_field').setResultsName('images')
 
 g_meta_field    = (
     g_author_field | g_reuse_field | g_year_field | g_title_field |
