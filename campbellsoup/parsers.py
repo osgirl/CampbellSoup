@@ -4,9 +4,10 @@ import pyparsing as pp
 
 # General
 
-integer = (pp.Word(pp.nums)).setName('integer')
-floating = (pp.Optional(integer) + '.' + integer | integer).setName('floating')
+integer    = (pp.Word(pp.nums)).setName('integer')
+floating  = (pp.Optional(integer) + '.' + integer | integer).setName('floating')
 line_start = pp.lineStart.leaveWhitespace()
+line_end   = pp.lineEnd.suppress()
 empty_line = (line_start + pp.lineEnd).setName('empty_line')
 
 
@@ -159,7 +160,7 @@ w_command_line      = (w_command_start + (
     l_dont_randomize.setResultsName('dontRandomize') |
     w_figure_com | w_subquestions_com | w_table_com |
     w_points_com | w_comment_com | w_answer_com
-) + pp.lineEnd).setName('w_command_line')
+) + line_end).setName('w_command_line')
 
 w_type_start        = (
     w_command_start + l_type + l_bang
@@ -174,23 +175,23 @@ w_truefalse_decl    = (
 
 w_type_line         = (w_type_start + (
     t_whichof2 | w_mc_decl | w_open_decl | w_truefalse_decl
-) + pp.lineEnd).setName('w_type_line').setResultsName('type')
+) + line_end).setName('w_type_line').setResultsName('type')
 
 w_normal_line        = (
     ~empty_line + line_start + ~l_bang + pp.restOfLine + pp.lineEnd
 ).setName('w_normal_line')
 
 w_drawbox_line       = (
-    w_command_start + l_drawbox + w_floating_arg + pp.lineEnd
+    w_command_start + l_drawbox + w_floating_arg + line_end
 ).setName('w_drawbox_line').setResultsName('drawbox')
 
 w_answerfigure_line  = (
     w_command_start + l_answerfigure + w_generic_arg +
-    pp.Optional(w_floating_arg) + pp.lineEnd
+    pp.Optional(w_floating_arg) + line_end
 ).setName('w_answerfigure_line').setResultsName('answerfigure')
 
 w_answerblock_line   = (
-    w_command_start + l_answerblock + w_integer_arg * 2 + pp.lineEnd
+    w_command_start + l_answerblock + w_integer_arg * 2 + line_end
 ).setName('w_answerblock_line').setResultsName('answerblock')
 
 w_command_line_x     = (
@@ -202,7 +203,7 @@ w_type_line_x        = (
 ).setName('w_type_line_x')
 
 w_complete_text_line = (
-    w_type_start + l_complete_text + pp.lineEnd
+    w_type_start + l_complete_text + line_end
 ).setName('w_complete_text_line').setResultsName('complete_text')
 
 w_choose_line        = (
@@ -251,15 +252,17 @@ w_block      = pp.Group(
     w_standard_question_block | w_intro_block | w_complete_text_block
 ).setName('w_block')
 
-w_question_group    = pp.Group(pp.delimitedList(w_block, empty_line).ignore(
+w_question_group    = pp.Group(pp.delimitedList(
+    w_block, empty_line.suppress()
+).ignore(
     pp.pythonStyleComment + pp.lineEnd
 )).setName('w_question_group').setResultsName('content')
 
 # Plaintext parts
 
 p_separator   = (
-    pp.Literal('**$$**').suppress() + pp.lineEnd.suppress()
-).setName('p_separator')
+    pp.Literal('**$$**') + pp.lineEnd
+).suppress().setName('p_separator')
 
 p_block       = pp.Group(pp.OneOrMore(
     line_start + ~p_separator + pp.restOfLine + pp.lineEnd
@@ -287,47 +290,47 @@ g_authors_value = (
 ).setName('g_authors_value')
 
 g_text_value    = (
-    g_null | pp.dblQuotedString | pp.restOfLine
+    g_null | pp.dblQuotedString.setParseAction(pp.removeQuotes) | pp.restOfLine
 ).setName('g_text_value')
 
 g_points_value = (g_null | integer + pp.Optional(
     pp.nestedExpr(content=pp.delimitedList(integer, ':'))
 ).leaveWhitespace()).setName('g_points_value')
 
-g_images_value = (
-    g_null | pp.delimitedList(pp.dblQuotedString)
-).setName('g_images_value')
+g_images_value = (g_null | pp.delimitedList(
+    pp.dblQuotedString.setParseAction(pp.removeQuotes)
+)).setName('g_images_value')
 
 g_author_field  = (
-    pp.lineStart + m_auteur + m_colon + g_authors_value + pp.lineEnd
+    pp.lineStart + m_auteur + m_colon + g_authors_value + line_end
 ).setName('g_author_field').setResultsName('authors')
 
 g_reuse_field   = (
-    pp.lineStart + m_herbruik + m_colon + g_reuse_value + pp.lineEnd
+    pp.lineStart + m_herbruik + m_colon + g_reuse_value + line_end
 ).setName('g_reuse_field').setResultsName('reuse')
 
 g_year_field    = (
-    pp.lineStart + m_toetsjaar + m_colon + g_year_value + pp.lineEnd
+    pp.lineStart + m_toetsjaar + m_colon + g_year_value + line_end
 ).setName('g_year_field').setResultsName('year')
 
 g_title_field   = (
-    pp.lineStart + m_titel + m_colon + g_text_value + pp.lineEnd
+    pp.lineStart + m_titel + m_colon + g_text_value + line_end
 ).setName('g_title_field').setResultsName('title')
 
 g_questions_field = (
-    pp.lineStart + m_deelvragen + m_colon + integer + pp.lineEnd
+    pp.lineStart + m_deelvragen + m_colon + integer + line_end
 ).setName('g_questions_field').setResultsName('questionCount')
 
 g_answer_field = (
-    pp.lineStart + m_antwoord + m_colon + g_text_value + pp.lineEnd
+    pp.lineStart + m_antwoord + m_colon + g_text_value + line_end
 ).setName('g_answer_field').setResultsName('answer')
 
 g_points_field = (
-    pp.lineStart + m_puntenverdeling + m_colon + g_points_value + pp.lineEnd
+    pp.lineStart + m_puntenverdeling + m_colon + g_points_value + line_end
 ).setName('g_points_field').setResultsName('points')
 
 g_images_field = (
-    pp.lineStart + m_afbeeldingen + m_colon + g_images_value + pp.lineEnd
+    pp.lineStart + m_afbeeldingen + m_colon + g_images_value + line_end
 ).setName('g_images_field').setResultsName('images')
 
 g_meta_field    = (
@@ -337,7 +340,7 @@ g_meta_field    = (
 
 g_plaintext_field = (
     pp.lineStart + m_plat + m_colon +
-    pp.QuotedString('"', multiline=True).setParseAction(p_parse) + pp.lineEnd
+    pp.QuotedString('"', multiline=True).setParseAction(p_parse) + line_end
 ).setName('g_plaintext_field')
 
 # Full document parsing
