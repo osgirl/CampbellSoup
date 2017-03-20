@@ -4,8 +4,16 @@ import pyparsing as pp
 
 # General
 
-integer    = (pp.Word(pp.nums)).setName('integer')
-floating  = (pp.Optional(integer) + '.' + integer | integer).setName('floating')
+def to_int(toks):
+    """ Parser action for converting strings of digits to int. """
+    return int(toks[0])
+
+integer    = pp.Word(pp.nums).setName('integer').setParseAction(to_int)
+
+floating  = pp.Combine(
+    pp.Optional(integer) + '.' + integer | integer
+).setName('floating').setParseAction(lambda toks: float(toks[0]))
+
 line_start = pp.lineStart.leaveWhitespace()
 line_end   = pp.lineEnd.suppress()
 empty_line = (line_start + pp.lineEnd).setName('empty_line')
@@ -61,9 +69,17 @@ v_onbekend        = (
 
 v_geen            = (pp.CaselessKeyword('geen')).setName('v_geen').suppress()
 v_nee             = (pp.CaselessKeyword('nee')).setName('v_nee').suppress()
-v_year            = pp.Regex('20(0[4-9]|[1-9]\d)').setName('v_year')
-                             # ^ not century-proof
-v_question_number = pp.Word(pp.nums, min=1, max=2).setName('v_question_number')
+
+v_year            = pp.Regex(
+    '20(0[4-9]|[1-9]\d)',  # not century-proof
+).setName('v_year').setParseAction(to_int)
+
+v_question_number = pp.Word(
+    pp.nums,
+    min=1,
+    max=2,
+).setName('v_question_number').setParseAction(to_int)
+
 v_author          = pp.CharsNotIn(',\r\n').setName('v_author')
 
 # LaTeX-writer keywords
@@ -107,7 +123,7 @@ t_open            = (pp.Keyword('open')).setName('t_open')
 
 t_truefalse       = (
     pp.Keyword('truefalse') | pp.Keyword('plusmin')
-).setName('t_truefalse')
+).setName('t_truefalse').setParseAction(pp.replaceWith('truefalse'))
 
 # LaTeX-writer parts
 
@@ -280,7 +296,10 @@ def p_parse(toks):
 
 # Global parts
 
-g_null         = (v_nee | v_onbekend | v_geen).setName('g_null')
+g_null         = (
+    v_nee | v_onbekend | v_geen
+).setName('g_null').setParseAction(pp.replaceWith(None))
+
 g_year_value   = (v_year | g_null).setName('g_year_value')
 g_question_ref = (v_year + m_dash + v_question_number).setName('g_question_ref')
 g_reuse_value  = (g_question_ref | g_null).setName('g_reuse_value')
