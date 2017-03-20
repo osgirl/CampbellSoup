@@ -163,10 +163,8 @@ w_points_com        = (
 ).setName('w_points_com').setResultsName('points')
 
 w_comment_com       = (
-    l_comment + w_generic_arg + pp.restOfLine
-).setName('w_comment_com')
-# TODO: find a way to group comments regardless of their order
-# relative to other commands.
+    l_comment + w_generic_arg + l_bang + pp.restOfLine
+).setName('w_comment_com').setResultsName('comments', True)
 
 w_answer_com        = (
     l_answer + l_bang + pp.restOfLine
