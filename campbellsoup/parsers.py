@@ -274,7 +274,7 @@ w_question_group    = pp.Group(pp.delimitedList(
     w_block, empty_line.suppress()
 ).ignore(
     pp.pythonStyleComment + pp.lineEnd
-)).setName('w_question_group').setResultsName('content')
+)).setName('w_question_group').setResultsName('contentLW')
 
 # Plaintext parts
 
@@ -288,7 +288,7 @@ p_block       = pp.originalTextFor(pp.OneOrMore(
 
 p_question_group = pp.Group(
     pp.delimitedList(p_block, p_separator)
-).setName('p_question_group').setResultsName('content')
+).setName('p_question_group').setResultsName('contentPlain')
 
 
 def p_parse(toks):
