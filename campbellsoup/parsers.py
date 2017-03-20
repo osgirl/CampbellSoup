@@ -279,7 +279,7 @@ w_question_group    = pp.Group(pp.delimitedList(
 # Plaintext parts
 
 p_separator   = (
-    pp.Literal('**$$**') + pp.lineEnd
+    pp.Literal('**$$**').leaveWhitespace() + pp.lineEnd
 ).suppress().setName('p_separator')
 
 p_block       = pp.originalTextFor(pp.OneOrMore(
