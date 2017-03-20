@@ -193,8 +193,8 @@ w_type_line         = (w_type_start + (
     t_whichof2 | w_mc_decl | w_open_decl | w_truefalse_decl
 ) + line_end).setName('w_type_line').setResultsName('type')
 
-w_normal_line        = (
-    ~empty_line + line_start + ~l_bang + pp.restOfLine + pp.lineEnd
+w_normal_line        = pp.Combine(
+    ~empty_line + line_start + ~l_bang + pp.restOfLine + line_end
 ).setName('w_normal_line')
 
 w_drawbox_line       = (
@@ -222,8 +222,8 @@ w_complete_text_line = (
     w_type_start + l_complete_text + line_end
 ).setName('w_complete_text_line').setResultsName('complete_text')
 
-w_choose_line        = (
-    w_command_start + l_choose + twoOrMore(w_generic_arg) + pp.lineEnd
+w_choose_line        = pp.Group(
+    w_command_start + l_choose + twoOrMore(w_generic_arg) + line_end
 ).setName('w_choose_line')
 
 w_complete_text_duet = (
@@ -250,9 +250,13 @@ w_intro_block        = (
 ).leaveWhitespace().setName('w_intro_block')
 
 w_standard_question_block = (
-    w_normal_line.setResultsName('question') + w_atleast3commands |
-    (w_normal_line * 2).setResultsName('question') + w_atleast2commands |
-    (
+    pp.originalTextFor(
+        w_normal_line
+    ).setResultsName('question') + w_atleast3commands |
+    pp.originalTextFor(
+        w_normal_line * 2
+    ).setResultsName('question') + w_atleast2commands |
+    pp.originalTextFor(
         w_normal_line + twoOrMore(w_normal_line)
     ).setResultsName('question') + w_atleast1command
 ).leaveWhitespace().setName('w_standard_question_block')
@@ -280,7 +284,7 @@ p_separator   = (
     pp.Literal('**$$**') + pp.lineEnd
 ).suppress().setName('p_separator')
 
-p_block       = pp.Group(pp.OneOrMore(
+p_block       = pp.originalTextFor(pp.OneOrMore(
     line_start + ~p_separator + pp.restOfLine + pp.lineEnd
 )).setName('p_block')
 
