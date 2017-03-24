@@ -148,6 +148,289 @@ def test_l_keywords():
             assert not parser.matches(invalid)
 
 
+def test_t_keywords():
+    assert t_whichof2.parseString('whichof2')[0] == 'whichof2'
+    assert t_mc.parseString('mc')[0] == 'mc'
+    assert t_open.parseString('open')[0] == 'open'
+    assert t_truefalse.parseString('truefalse')[0] == 'truefalse'
+    assert t_truefalse.parseString('plusmin')[0] == 'truefalse'
+    for parser in (t_whichof2, t_mc, t_open, t_truefalse):
+        for invalid in ('', '.', 'a', '1'):
+            assert not parser.matches(invalid)
+
+
+def test_w_tables():
+    cell = 'abc 123;!'
+    row = 'abc|123|...'
+    table = 'a|b|c||1|2|3||.|.|.'
+    results = [[parser.parseString(string) for parser in (
+        w_table_cell,
+        w_table_row,
+        w_table,
+    )] for string in (cell, row, table)]
+    for subresults in results:
+        for result in subresults:
+            assert len(result) == 1
+    # parse cell as w_cell
+    assert results[0][0][0] == 'abc 123;!'
+    # parse cell as w_row
+    assert results[0][1][0].asList() == ['abc 123;!']
+    # parse cell as w_table
+    assert results[0][2][0].asList() == [['abc 123;!']]
+    # parse row as w_cell
+    assert results[1][0][0] == 'abc'
+    # parse row as w_row
+    assert results[1][1][0].asList() == ['abc', '123', '...']
+    # parse row as w_table
+    assert results[1][2][0].asList() == [['abc', '123', '...']]
+    # parse table as w_cell
+    assert results[2][0][0] == 'a'
+    # parse table as w_row
+    assert results[2][1][0].asList() == ['a', 'b', 'c']
+    # parse table as w_table
+    assert results[2][2][0].asList() == [
+        ['a', 'b', 'c'],
+        ['1', '2', '3'],
+        ['.', '.', '.'],
+    ]
+
+
+def test_w_args():
+    int_arg = '!123'
+    float_arg = '!123.456'
+    text_arg = '!12ab'
+    table_arg = '!1a|2b||3c|4d'
+    assert w_integer_arg.parseString(int_arg).asList() == [123]
+    assert w_integer_arg.parseString(float_arg).asList() == [123]
+    assert w_integer_arg.parseString(text_arg).asList() == [12]
+    assert w_integer_arg.parseString(table_arg).asList() == [1]
+    assert w_floating_arg.parseString(int_arg).asList() == [123]
+    assert w_floating_arg.parseString(float_arg).asList() == [123.456]
+    assert w_floating_arg.parseString(text_arg).asList() == [12]
+    assert w_floating_arg.parseString(table_arg).asList() == [1]
+    assert w_table_arg.parseString(int_arg).asList() == [[['123']]]
+    assert w_table_arg.parseString(float_arg).asList() == [[['123.456']]]
+    assert w_table_arg.parseString(text_arg).asList() == [[['12ab']]]
+    assert w_table_arg.parseString(table_arg).asList() == [[
+        ['1a', '2b'],
+        ['3c', '4d'],
+    ]]
+    assert w_generic_arg.parseString(int_arg).asList() == ['123']
+    assert w_generic_arg.parseString(float_arg).asList() == ['123.456']
+    assert w_generic_arg.parseString(text_arg).asList() == ['12ab']
+    assert w_generic_arg.parseString(table_arg).asList() == ['1a|2b||3c|4d']
+
+
+def test_w_command_start():
+    assert w_command_start.matches('!')
+    assert (pp.lineEnd + w_command_start).matches('\n!')
+
+
+def test_w_figure_com():
+    assert w_figure_com.parseString('figure!banana.png').asDict() == {
+        'figure': ['banana.png'],
+    }
+    assert w_figure_com.parseString('figure!banana.png!0.3').asDict() == {
+        'figure': ['banana.png', 0.3],
+    }
+    assert not w_figure_com.matches('figure!banana.png!banana.png')
+    assert not w_figure_com.matches('figure')
+
+
+def test_w_subquestions_com():
+    assert w_subquestions_com.parseString('subquestions!10').asDict() == {
+        'subquestions': [10],
+    }
+    assert not w_subquestions_com.matches('subquestions!10.5')
+    assert not w_subquestions_com.matches('subquestions!10!5')
+    assert not w_subquestions_com.matches('subquestions')
+
+
+def test_w_table_com():
+    assert w_table_com.parseString('table!ab|cd||12|34').asDict() == {'table': [
+        [['ab', 'cd'], ['12', '34']],
+    ]}
+    assert not w_table_com.matches('table')
+
+
+def test_w_points_com():
+    assert w_points_com.parseString('points!10').asDict() == {
+        'points': [10.0],
+    }
+    # assert w_points_com.parseString('points!10(3:4:3)').asDict() == {
+    #     'points': [10.0, [3.0, 4.0, 3.0]],
+    # }
+    assert not w_points_com.matches('points!10!4')
+    assert not w_points_com.matches('points')
+
+
+def test_w_comment_com():
+    assert w_comment_com.parseString('comment!bla!123!abc|||!').asDict() == {
+        'comments': [['bla', '123!abc|||!']],
+    }
+    parser = pp.OneOrMore(w_comment_com)
+    assert parser.parseString('comment!bla!123\ncomment!yada!456').asDict() == {
+        'comments': [['bla', '123'], ['yada', '456']],
+    }
+    assert not w_comment_com.matches('comment')
+
+
+def test_w_answer_com():
+    assert w_answer_com.parseString('answer!bla!123!abc|||!').asDict() == {
+        'answer': ['bla!123!abc|||!'],
+    }
+    assert not w_answer_com.matches('answer')
+
+
+def test_w_command_line():
+    assert w_command_line.parseString('!dont_randomize').asDict() == {
+        'dontRandomize': True,
+    }
+    for valid in (
+        'figure!banana.png!0.3', 'subquestions!10', 'table!ab|cd||12|34',
+        'points!10', 'comment!bla!123!abc|||!', 'answer!bla!123!abc|||!',
+    ):
+        assert not w_command_line.matches(valid)
+        assert len(w_command_line.parseString('!' + valid).asDict()) == 1
+        assert w_command_line.matches('!' + valid + '\n')
+    for invalid in (
+        'dont_randomize!1', 'figure!banana.png!banana.png', 'anything'
+        'subquestions!10.5', 'table', 'points!10!4', 'comment', 'answer',
+    ):
+        assert not w_command_line.matches(invalid)
+        assert not w_command_line.matches('!' + invalid)
+        assert not w_command_line.matches('!' + invalid + '\n')
+
+
+def test_w_type_start():
+    assert w_type_start.matches('!type!')
+    assert w_type_start.matches('  !type!')
+    assert not w_type_start.matches('type!')
+    assert not w_type_start.matches('!type')
+    assert not w_type_start.matches('')
+
+
+def test_w_mc_decl():
+    assert w_mc_decl.matches('mc')
+    assert w_mc_decl.parseString('mc!4').asList() == ['mc', 4]
+    assert not w_mc_decl.matches('mc!4.5')
+    assert not w_mc_decl.matches('mc!4!5')
+    assert not w_mc_decl.matches('mc!ab')
+
+
+def test_w_open_decl():
+    assert w_open_decl.parseString('open!2').asList() == ['open', 2]
+    assert w_open_decl.matches('open!34')
+    assert w_open_decl.matches('open!567')
+    assert not w_open_decl.matches('open!4.5')
+    assert not w_open_decl.matches('open!ab')
+    assert not w_open_decl.matches('open')
+
+
+def test_w_truefalse_decl():
+    assert w_truefalse_decl.matches('truefalse')
+    assert w_truefalse_decl.matches('truefalse!6')
+    assert w_truefalse_decl.matches('plusmin')
+    assert w_truefalse_decl.parseString('plusmin!6').asList() == [
+        'truefalse',
+        6,
+    ]
+    assert not w_truefalse_decl.matches('truefalse!ab')
+    assert not w_truefalse_decl.matches('truefalse!1.2')
+    assert not w_truefalse_decl.matches('plusmin!ab')
+    assert not w_truefalse_decl.matches('plusmin!1.2')
+
+
+def test_w_type_line():
+    assert w_type_line.parseString('!type!whichof2').asDict() == {
+        'type': ['whichof2'],
+    }
+    for valid in ('mc!4', 'open!4', 'truefalse!4', 'plusmin!4'):
+        result = w_type_line.parseString('!type!' + valid).asDict()
+        assert len(result) == 1
+        assert 'type' in result
+        assert len(result['type']) == 2
+        assert type(result['type'][0]) == str
+        assert result['type'][1] == 4
+        assert w_type_line.matches('!type!' + valid + '\n')
+    for invalid in ('whichof2!1', 'mc!ab', 'open', 'truefalse!1.2'):
+        assert not w_type_line.matches(invalid)
+        assert not w_type_line.matches('!type!' + invalid)
+        assert not w_type_line.matches('!type!' + invalid + '\n')
+
+
+def test_w_normal_line():
+    assert w_normal_line.parseString('bananas bananas').asList() == [
+        'bananas bananas',
+    ]
+    assert w_normal_line.parseString('bananas!bananas').asList() == [
+        'bananas!bananas',
+    ]
+    assert w_normal_line.parseString('bananas\nbananas').asList() == ['bananas']
+    assert not w_normal_line.matches('')
+    assert not w_normal_line.matches(' \n')
+    assert not w_normal_line.matches('!bananas\n')
+
+
+def test_w_drawbox_line():
+    assert w_drawbox_line.parseString('!drawbox!10.8\n').asDict() == {
+        'drawbox': [10.8],
+    }
+    assert not w_drawbox_line.matches('!drawbox!ab\n')
+    assert not w_drawbox_line.matches('!drawbox\n')
+
+
+def test_w_answerfigure_line():
+    assert w_answerfigure_line.parseString(
+        '!answerfigure!banana.png\n',
+    ).asDict() == {'answerfigure': ['banana.png']}
+    assert w_answerfigure_line.parseString(
+        '!answerfigure!banana.png!4.5',
+    ).asDict() == {'answerfigure': ['banana.png', 4.5]}
+    assert not w_answerfigure_line.matches('!answerfigure!banana.png!bla')
+    assert not w_answerfigure_line.matches('!answerfigure\n')
+
+
+def test_w_answerblock_line():
+    assert w_answerblock_line.parseString('!answerblock!2!3\n').asDict() == {
+        'answerblock': [2, 3],
+    }
+    assert not w_answerblock_line.matches('!answerblock!2!3.5\n')
+    assert not w_answerblock_line.matches('!answerblock!2.5!3\n')
+    assert not w_answerblock_line.matches('!answerblock!2\n')
+    assert not w_answerblock_line.matches('!answerblock\n')
+
+
+def test_w_command_line_x():
+    assert w_command_line_x.matches('!figure!banana.png!0.3')
+    assert w_command_line_x.matches('!answerblock!2!3\n')
+    assert not w_command_line_x.matches('!type!open!4')
+    assert not w_command_line_x.matches('!drawbox!10.8\n')
+    assert not w_command_line_x.matches('!answerfigure!banana.png\n')
+    assert not w_command_line_x.matches('!type!complete_text')
+    assert not w_command_line_x.matches('!choose!abc!def\n')
+    assert not w_command_line_x.matches('banana bananas')
+
+
+def test_w_type_line_x():
+    assert not w_type_line_x.matches('!figure!banana.png!0.3')
+    assert w_type_line_x.matches('!answerblock!2!3\n')
+    assert w_type_line_x.matches('!type!open!4')
+    assert w_type_line_x.matches('!drawbox!10.8\n')
+    assert w_type_line_x.matches('!answerfigure!banana.png\n')
+    assert not w_type_line_x.matches('!type!complete_text')
+    assert not w_type_line_x.matches('!choose!abc!def\n')
+    assert not w_type_line_x.matches('banana bananas')
+
+
+def test_w_complete_text_line():
+    assert w_complete_text_line.parseString('!type!complete_text').asDict() == {
+        'complete_text': [],
+    }
+    assert not w_complete_text_line.matches('!type!complete_text!1')
+    assert not w_complete_text_line.matches('!type')
+
+
 def test_document():
     for example, result in TEST_DOCUMENTS:  # bottom of file
         assert document.parseString(example, parseAll=True).asDict() == result

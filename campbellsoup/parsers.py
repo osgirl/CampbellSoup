@@ -171,7 +171,9 @@ w_answer_com        = (
 ).setName('w_answer_com').setResultsName('answer')
 
 w_command_line      = (w_command_start + (
-    l_dont_randomize.setResultsName('dontRandomize') |
+    l_dont_randomize.copy().setParseAction(
+        pp.replaceWith(True),
+    ).setResultsName('dontRandomize') |
     w_figure_com | w_subquestions_com | w_table_com |
     w_points_com | w_comment_com | w_answer_com
 ) + line_end).setName('w_command_line')
