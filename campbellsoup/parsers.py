@@ -278,6 +278,13 @@ w_question_group    = pp.Group(pp.delimitedList(
     pp.pythonStyleComment + pp.lineEnd
 )).setName('w_question_group').setResultsName('contentLW')
 
+w_question_group_sources = pp.delimitedList(
+    pp.originalTextFor(w_block.copy().ignore(
+        pp.pythonStyleComment + pp.lineEnd,
+    )),
+    empty_line.copy().ignore(pp.pythonStyleComment + pp.lineEnd).suppress(),
+).setName('w_question_group_sources')
+
 # Plaintext parts
 
 p_separator   = (
@@ -375,6 +382,10 @@ latex_writer_header   = (
 latex_writer_document = (
     latex_writer_header + w_question_group
 ).setName('latex_writer_document')
+
+latex_writer_sources = (
+    latex_writer_header.copy().suppress() + w_question_group_sources
+).setName('latex_writer_sources')
 
 plaintext_document = (
     pp.OneOrMore(g_meta_field) + g_plaintext_field + pp.ZeroOrMore(g_meta_field)
