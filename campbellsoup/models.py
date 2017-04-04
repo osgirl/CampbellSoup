@@ -70,7 +70,7 @@ class Person(db.Model):
     id = _integer_pkey()
     short_name = db.Column(db.String(30), nullable=False, unique=True)
     full_name = db.Column(db.String(60), nullable=False)
-    role_id = db.Column(db.ForeignKey('user_role.id'), nullable=False)
+    role_id = db.Column(db.ForeignKey('user_role.id'))
     email_address = db.Column(db.String(30))
     password_hash = db.Column(db.String(30))
     
