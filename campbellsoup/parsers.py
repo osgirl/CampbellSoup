@@ -393,6 +393,16 @@ plaintext_document = (
 
 document = (latex_writer_document | plaintext_document).setName('document')
 
+# File names
+
+# Parses the proper name only, use os.path.splitext to remove the extension.
+filename_parts = (
+    pp.Optional(v_year + '-').suppress() +
+    integer + pp.Optional(
+        pp.Word(pp.alphas, exact=1) | pp.Literal('-').suppress() + integer
+    )
+).setName('filename_parts')
+
 
 def debug_all():
     """ Helper function for the developer: call .setDebug() on all parsers. """
