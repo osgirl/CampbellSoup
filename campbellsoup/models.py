@@ -219,6 +219,7 @@ class Question(db.Model):
         nullable = False )
     text = db.Column(db.Text)
     answer = db.Column(db.Text)
+    points = db.Column(db.Float)
     notes = db.Column(db.Text)  # by the author, not discussion
     bibliography = db.Column(db.Text)
     difficulty = db.Column(db.Enum('low', 'average', 'high', name='difficulty'))
