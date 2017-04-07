@@ -163,26 +163,83 @@ def get_or_add_person(short_name, session, **kwargs):
 
 def import_plain(tree, revision, session):
     """ Import a group and its blocks from parsing `tree` in plain notation. """
+    # TODO: factor out group creation and implement get_group_ancestry
+    ancestry_info = get_group_ancestry(tree.get('reuse')),
     group = m.Group(
         revision=revision,
-        format=get_plain_format(),
-        network=get_group_network(tree.get('reuse')),
-        title=tree.get('title'),
+        format=get_plain_format(session),
+        **ancestry_info
     )
-    block_count = len(tree['contentPlain'])
+    if 'parent' in ancestry_info:
+        session.add(m.GroupHistory(parent=ancestry_info['parent'], child=group))
+    plain_blocks = tree['contentPlain']
+    block_count = len(plain_blocks)
     if 'questionCount' in tree:
         question_count = tree['questionCount'][0]
     else:
         question_count = block_count
     intro_count = 0
     if block_count < question_count:
-        logger.warning('{} questions claimed but only {} blocks found'.format(
+        logger.error('{} questions claimed but only {} blocks found'.format(
             question_count,
             block_count,
         ))
     elif block_count > question_count:
         intro_count = block_count - question_count
-    
+    group.title = tree.get('title')
+    if not group.title and intro_count > 0:
+        group.title = plain_blocks[0].splitlines()[0]
+    intros, questions = import_plain_blocks(
+        plain_blocks,
+        intro_count,
+        group,
+        session,
+    )
+    if 'answer' in tree:
+        questions[0].answer = tree['answer'][0]
+    if 'points' in tree:
+        points = tree['points']
+        if len(points) == 2:
+            if points[0] != sum(points[1]):
+                logger.warning('{} != {} points'.format(
+                    ' + '.join(points[1]),
+                    points[0],
+                ))
+            if len(points[1]) != len(questions):
+                logger.error('Mismatch: {} points, {} questions'.format(
+                    len(points[1]),
+                    len(questions),
+                ))
+            for question, points in zip(questions, points[1]):
+                question.points = points
+        else:
+            questions[0].points = points[0]
+    # TODO: images
+
+
+def import_plain_blocks(plain_blocks, intro_count, group, session):
+    """ Import Introductions and Questions in `group` in plain notation. """
+    intros = [m.Introduction(
+        revision=group.revision,
+        text=text,
+    ) for text in plain_blocks[:intro_count]]
+    session.add_all(m.GroupIntroductionBinding(
+        group=group,
+        introduction=intro,
+        order=index,
+    ) for index, intro in enumerate(intros))
+    questions = [m.Question(
+        revision=group.revision,
+        status=get_import_status(session),
+        network=m.QuestionNetwork(),
+        text=text,
+    ) for text in plain_blocks[intro_count:]]
+    session.add_all(m.GroupQuestionBinding(
+        group=group,
+        question=question,
+        order=index,
+    ) for index, question in enumerate(questions))
+    return intros, questions
 
 
 def import_latex_writer(tree, sources, revision, session):
