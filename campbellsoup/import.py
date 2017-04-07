@@ -11,9 +11,13 @@ from flask_script import Manager
 from .parsers import document, latex_writer_sources, filename_parts
 import .models as m
 
-MY_NAME = 'auto_import'
+UNKNOWN_AUTHOR_NAME = 'unattributed'
+UNKNOWN_AUTHOR_FULL_NAME = 'Unidentified Author'
+REVISION_FMT = 'Auto import of group {} within test "{}".'
+ATTRIBUTION_FMT = '\nOther authors mentioned in archive: {}.'
 
 logger = logging.getLogger(__name__)
+_author_cache = {}
 
 
 def process_options(app, **kwargs):
@@ -58,30 +62,16 @@ def import_test(directory, title=None, year=None, order_by_stdin=False):
     session = m.db.session
     try:
         me = get_auto_import_person(session)
-        revision = m.Revision(author=me, date=datetime.now())
         test = m.Test(title=title, date=test_date)
-        import_groups(files, test, revision, session)
-        revision.date = datetime.now()
-        revision.commit_msg = 'Auto import of test "{}"'.format(title)
-        session.add_all([test, revision])
+        import_groups(files, test, session)
+        session.add(test)
         session.commit()
     except:
         session.rollback()
         raise
 
 
-def get_auto_import_person(session):
-    """ Return the auto_import `Person`. Create if it does not exist. """
-    me = session.query(m.Person).filter_by(
-        short_name=MY_NAME,
-    ).one_or_none()
-    if me is None:
-        me = m.Person(short_name=MY_NAME, full_name='Automated Import')
-        session.add(me)
-    return me
-
-
-def import_groups(files, test, revision, session):
+def import_groups(files, test, session):
     """ Import `files` in the given order and add to `test`. """
     order = 1
     blocks = []   # blocks that mention figures
@@ -93,15 +83,20 @@ def import_groups(files, test, revision, session):
             # group.
             session.add_all(bind_figures(blocks, figures))
             blocks, figures = [], []
-            group, blocks = import_textfile(filename, revision, session)
+            group, blocks = import_textfile(
+                filename,
+                order,
+                test.title,
+                session,
+            )
             session.add(m.TestGroupBinding(test=test, group=group, order=order))
             order += 1
         else:
-            figures.append(import_figure(filename, revision, session))
+            figures.append(import_figure(filename, group.revision, session))
     session.add_all(bind_figures(blocks, figures))
 
 
-def import_textfile(filename, revision, session):
+def import_textfile(filename, group_order, test_title, session):
     """ Parse and import the contents of an archive textfile. """
     logger.info('Importing textfile {}'.format(filename))
     try:
@@ -109,6 +104,12 @@ def import_textfile(filename, revision, session):
     except ValueError:  # Silly Windows file
         text = open(filename, encoding='cp1252').read()
     tree = document.parseString(text, True)
+    revision = make_revision(
+        tree.get('authors'),
+        group_order,
+        test_title,
+        session,
+    )
     if 'contentPlain' in tree:
         return import_plain(tree, revision, session)
     elif 'contentLW' in tree:
@@ -116,6 +117,48 @@ def import_textfile(filename, revision, session):
         return import_latex_writer(tree, raw_blocks, revision, session)
     else:
         raise KeyError('No known content type in parse tree')
+
+
+def make_revision(authors, group_order, test_title, session):
+    """ Create a revision for the question group under consideration. """
+    now = datetime.datetime.now()
+    message_first_line = REVISION_FMT.format(group_order, test_title)
+    message_tail = ''
+    if authors in (None, [None]):
+        author_objs = [get_or_add_person(
+            UNKNOWN_AUTHOR_NAME,
+            session,
+            full_name=UNKNOWN_AUTHOR_FULL_NAME,
+        )]
+    else:
+        author_objs = [get_or_add_person(name, session) for name in authors]
+    if len(author_objs) > 1:
+        message_tail = ATTRIBUTION_FMT.format(', '.join(authors[1:]))
+    revision = m.Revision(
+        author=author_objs[0],
+        date=now,
+        commit_msg=message_first_line+message_tail,
+    )
+    session.add(revision)
+    return revision
+
+
+def get_or_add_person(short_name, session, **kwargs):
+    """ Try to fetch a Person from database, create if she does not exist. """
+    global _person_cache
+    short_name = short_name.strip()
+    person = session.query(m.Person).filter_by(
+        short_name=short_name,
+    ).one_or_none() or _person_cache.get(short_name)
+    if person is None:
+        kwargs.setdefault('full_name', short_name)
+        person = m.Person(
+            short_name=short_name,
+            **kwargs
+        )
+        _person_cache[short_name] = person
+        session.add(person)
+    return person
 
 
 def import_plain(tree, revision, session):
