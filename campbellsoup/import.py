@@ -73,7 +73,7 @@ def import_test(directory, title=None, year=None, order_by_stdin=False):
 
 def import_groups(files, test, session):
     """ Import `files` in the given order and add to `test`. """
-    order = 1
+    order = 1     # archives start at 1, so we do the same here
     blocks = []   # blocks that mention figures
     figures = []  # figures that will fill the gaps in `blocks`
     for filename in files:
@@ -110,11 +110,12 @@ def import_textfile(filename, group_order, test_title, session):
         test_title,
         session,
     )
+    group = make_group(revision, tree.get('reuse'), session)
     if 'contentPlain' in tree:
-        return import_plain(tree, revision, session)
+        return import_plain(tree, group, session)
     elif 'contentLW' in tree:
         raw_blocks = latex_writer_sources.parseString(text, True)
-        return import_latex_writer(tree, raw_blocks, revision, session)
+        return import_latex_writer(tree, raw_blocks, group, session)
     else:
         raise KeyError('No known content type in parse tree')
 
@@ -161,17 +162,37 @@ def get_or_add_person(short_name, session, **kwargs):
     return person
 
 
-def import_plain(tree, revision, session):
-    """ Import a group and its blocks from parsing `tree` in plain notation. """
-    # TODO: factor out group creation and implement get_group_ancestry
-    ancestry_info = get_group_ancestry(tree.get('reuse')),
+def make_group(revision, reuse, session):
+    """ Common group creation logic in import_plain and import_latex_writer. """
+    if reuse not in (None, [None]) and len(reuse) == 2:
+        parent_title = str(reuse[0])  # actually the year, but works for now
+        parent_order = reuse[1]
+        parent = session.query(m.Group).join('test_bindings', 'test').filter(
+            m.TestGroupBinding.order == parent_order,
+            m.Test.title == parent_title,
+        ).one()
+        network = parent.network
+    else:
+        parent = None
+        network = m.GroupNetwork()
     group = m.Group(
         revision=revision,
-        format=get_plain_format(session),
-        **ancestry_info
+        format=get_format('text/plain', session),
+        network=network,
     )
-    if 'parent' in ancestry_info:
-        session.add(m.GroupHistory(parent=ancestry_info['parent'], child=group))
+    if parent is not None:
+        session.add(m.GroupHistory(parent=parent, child=group))
+    session.add(group)
+    return group
+
+
+def get_format(format, session):
+    """ Return a Format object if available, create if necessary. """
+    pass
+
+
+def import_plain(tree, group, session):
+    """ Import a group and its blocks from parsing `tree` in plain notation. """
     plain_blocks = tree['contentPlain']
     block_count = len(plain_blocks)
     if 'questionCount' in tree:
@@ -242,7 +263,7 @@ def import_plain_blocks(plain_blocks, intro_count, group, session):
     return intros, questions
 
 
-def import_latex_writer(tree, sources, revision, session):
+def import_latex_writer(tree, sources, group, session):
     """ Import a group and its blocks from `tree` with `sources` in LaTeX-w. """
     pass
 
