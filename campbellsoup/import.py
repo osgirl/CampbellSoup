@@ -247,7 +247,7 @@ def import_plain_blocks(plain_blocks, intro_count, group, session):
         group=group,
         introduction=intro,
         order=index,
-    ) for index, intro in enumerate(intros))
+    ) for index, intro in enumerate(intros, start=1))
     questions = [m.Question(
         revision=group.revision,
         status=get_import_status(session),
@@ -258,7 +258,7 @@ def import_plain_blocks(plain_blocks, intro_count, group, session):
         group=group,
         question=question,
         order=index,
-    ) for index, question in enumerate(questions)]
+    ) for index, question in enumerate(questions, start=intro_count+1)]
     session.add_all(question_bindings)
     return intros, questions, question_bindings
 
@@ -294,7 +294,7 @@ def import_latex_writer(tree, sources, revision, session):
     )
     session.add(group)
     figure_blocks = []
-    for index, (subtree, source) in enumerate(zip(subtrees, sources)):
+    for index, (subtree, source) in enumerate(zip(subtrees, sources), start=1):
         if 'question' in subtree:
             points = subtree.get('points')
             block = import_latex_writer_question(subtree, revision, session)
