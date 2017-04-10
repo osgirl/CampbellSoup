@@ -219,7 +219,7 @@ def import_plain(tree, revision, session):
     group.title = tree.get('title')
     if not group.title and intro_count > 0:
         group.title = plain_blocks[0].splitlines()[0]
-    intros, questions = import_plain_blocks(
+    intros, questions, question_bindings = import_plain_blocks(
         plain_blocks,
         intro_count,
         group,
@@ -228,7 +228,7 @@ def import_plain(tree, revision, session):
     if 'answer' in tree:
         questions[0].answer = tree['answer'][0]
     if 'points' in tree:
-        plain_attach_global_points(tree['points'], questions)
+        plain_attach_global_points(tree['points'], question_bindings)
     images = tree.get('images')
     if images not in (None, [None]):
         all_blocks = intros + questions
@@ -254,31 +254,32 @@ def import_plain_blocks(plain_blocks, intro_count, group, session):
         network=m.QuestionNetwork(),
         text=text,
     ) for text in plain_blocks[intro_count:]]
-    session.add_all(m.GroupQuestionBinding(
+    question_bindings = [m.GroupQuestionBinding(
         group=group,
         question=question,
         order=index,
-    ) for index, question in enumerate(questions))
-    return intros, questions
+    ) for index, question in enumerate(questions)]
+    session.add_all(question_bindings)
+    return intros, questions, question_bindings
 
 
-def plain_attach_global_points(points, questions):
-    """ Attach globally declared max grades to plaintext question blocks. """
+def plain_attach_global_points(points, question_bindings):
+    """ Attach globally declared max grades to plaintext question bindings. """
     if len(points) == 2:
         if points[0] != sum(points[1]):
             logger.warning('{} != {} points'.format(
                 ' + '.join(points[1]),
                 points[0],
             ))
-        if len(points[1]) != len(questions):
-            logger.error('Mismatch: {} points, {} questions'.format(
+        if len(points[1]) != len(question_bindings):
+            logger.error('Mismatch: {} points, {} question_bindings'.format(
                 len(points[1]),
-                len(questions),
+                len(question_bindings),
             ))
-        for question, points in zip(questions, points[1]):
-            question.points = points
+        for question_binding, points in zip(question_bindings, points[1]):
+            question_binding.weight = points
     else:
-        questions[0].points = points[0]
+        question_bindings[0].weight = points[0]
 
 
 def import_latex_writer(tree, sources, revision, session):
@@ -295,12 +296,13 @@ def import_latex_writer(tree, sources, revision, session):
     figure_blocks = []
     for index, (subtree, source) in enumerate(zip(subtrees, sources)):
         if 'question' in subtree:
+            points = subtree.get('points')
             block = import_latex_writer_question(subtree, revision, session)
             session.add(m.GroupQuestionBinding(
                 group=group,
                 question=block,
                 order=index,
-                weight=getattr(block, 'points'),
+                weight=(points[0] if points else None),
             ))
         else:
             block = import_latex_writer_introduction(subtree, revision, session)
