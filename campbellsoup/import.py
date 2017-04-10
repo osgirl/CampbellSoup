@@ -235,7 +235,12 @@ def import_plain(tree, group, session):
                 question.points = points
         else:
             questions[0].points = points[0]
-    # TODO: images
+    images = tree.get('images')
+    if images not in (None, [None]):
+        all_blocks = intros + questions
+        # Attach all yet-to-be-imported images to the first block
+        return group, all_blocks[0:1] * len(images)
+    return group, []
 
 
 def import_plain_blocks(plain_blocks, intro_count, group, session):
