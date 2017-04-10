@@ -127,13 +127,13 @@ def make_revision(authors, group_order, test_title, session):
     message_first_line = REVISION_FMT.format(group_order, test_title)
     message_tail = ''
     if authors in (None, [None]):
-        author_objs = [get_or_add_person(
+        author_objs = [get_person(
             UNKNOWN_AUTHOR_NAME,
             session,
             full_name=UNKNOWN_AUTHOR_FULL_NAME,
         )]
     else:
-        author_objs = [get_or_add_person(name, session) for name in authors]
+        author_objs = [get_person(name, session) for name in authors]
     if len(author_objs) > 1:
         message_tail = ATTRIBUTION_FMT.format(', '.join(authors[1:]))
     revision = m.Revision(
@@ -145,16 +145,16 @@ def make_revision(authors, group_order, test_title, session):
     return revision
 
 
-def get_or_add_person(short_name, session, **kwargs):
+def get_person(short_name, session, **kwargs):
     """ Try to fetch a Person from database, create if she does not exist. """
     global _person_cache
     short_name = short_name.strip()
-    person = session.query(m.Person).filter_by(
-        short_name=short_name,
-    ).one_or_none() or _person_cache.get(short_name)
+    person = _person_cache.get(short_name)
     if person is None:
         kwargs.setdefault('full_name', short_name)
-        person = m.Person(
+        person = session.query(m.Person).filter_by(
+            short_name=short_name,
+        ).one_or_none() or m.Person(
             short_name=short_name,
             **kwargs
         )
