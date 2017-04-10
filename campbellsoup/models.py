@@ -343,7 +343,7 @@ class GroupQuestionBinding(db.Model):
     question_id = db.Column(db.ForeignKey('question.id'), primary_key=True)
     # might also need a reverse index
     order = db.Column(db.Integer, nullable=False)
-    weight = db.Column(db.Integer)
+    weight = db.Column(db.Float)
     
     group = db.relationship('Group', backref='question_bindings')
     question = db.relationship('Question', backref='group_bindings')
