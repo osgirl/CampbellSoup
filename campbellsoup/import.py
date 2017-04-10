@@ -18,6 +18,7 @@ ATTRIBUTION_FMT = '\nOther authors mentioned in archive: {}.'
 
 logger = logging.getLogger(__name__)
 _author_cache = {}
+_format_cache = {}
 
 
 def process_options(app, **kwargs):
@@ -186,9 +187,17 @@ def make_group(revision, reuse, session):
     return group
 
 
-def get_format(format, session):
+def get_format(format_name, session):
     """ Return a Format object if available, create if necessary. """
-    pass
+    global _format_cache
+    format_obj = _format_cache.get(format_name)
+    if format_obj is None:
+        format_obj = session.query(m.Format).filter_by(
+            name=format_name,
+        ).one_or_none() or m.Format(name=format_name)
+        _format_cache[format_name] = format_obj
+        session.add(format_obj)
+    return format_obj
 
 
 def import_plain(tree, group, session):
