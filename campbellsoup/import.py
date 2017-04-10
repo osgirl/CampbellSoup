@@ -283,6 +283,48 @@ def plain_attach_global_points(points, questions):
 
 def import_latex_writer(tree, sources, revision, session):
     """ Import a group and its blocks from `tree` with `sources` in LaTeX-w. """
+    subtrees = tree['contentLW']
+    assert len(subtrees) == len(sources)
+    group = make_group(
+        revision,
+        tree.get('reuse'),
+        'text/x-latex-writer',
+        session,
+    )
+    session.add(group)
+    figure_blocks = []
+    for index, (subtree, source) in enumerate(zip(subtrees, sources)):
+        if 'question' in subtree:
+            block = import_latex_writer_question(subtree, revision, session)
+            session.add(m.GroupQuestionBinding(
+                group=group,
+                question=block,
+                order=index,
+                weight=getattr(block, 'points'),
+            ))
+        else:
+            block = import_latex_writer_introduction(subtree, revision, session)
+            session.add(m.GroupIntroductionBinding(
+                group=group,
+                introduction=block,
+                order=index,
+            ))
+        block.source_code = source
+        block.figure_filenames = [
+            subtree[fig][0]
+                if fig in subtree for fig in ('figure', 'answerfigure')
+        ]
+        figure_blocks.extend([block] * len(block.figure_filenames))
+    return group, figure_blocks
+
+
+def import_latex_writer_question(tree, revision, session):
+    """ Import a single LW question and return as m.Question. """
+    pass
+
+
+def import_latex_writer_introduction(tree, revision, session):
+    """ Import a single LW introduction and return as m.Introduction. """
     pass
 
 
