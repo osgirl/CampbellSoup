@@ -111,12 +111,11 @@ def import_textfile(filename, group_order, test_title, session):
         test_title,
         session,
     )
-    group = make_group(revision, tree.get('reuse'), session)
     if 'contentPlain' in tree:
-        return import_plain(tree, group, session)
+        return import_plain(tree, revision, session)
     elif 'contentLW' in tree:
         raw_blocks = latex_writer_sources.parseString(text, True)
-        return import_latex_writer(tree, raw_blocks, group, session)
+        return import_latex_writer(tree, raw_blocks, revision, session)
     else:
         raise KeyError('No known content type in parse tree')
 
@@ -163,7 +162,7 @@ def get_person(short_name, session, **kwargs):
     return person
 
 
-def make_group(revision, reuse, session):
+def make_group(revision, reuse, format_name, session):
     """ Common group creation logic in import_plain and import_latex_writer. """
     if reuse not in (None, [None]) and len(reuse) == 2:
         parent_title = str(reuse[0])  # actually the year, but works for now
@@ -178,7 +177,7 @@ def make_group(revision, reuse, session):
         network = m.GroupNetwork()
     group = m.Group(
         revision=revision,
-        format=get_format('text/plain', session),
+        format=get_format(format_name, session),
         network=network,
     )
     if parent is not None:
@@ -200,8 +199,9 @@ def get_format(format_name, session):
     return format_obj
 
 
-def import_plain(tree, group, session):
+def import_plain(tree, revision, session):
     """ Import a group and its blocks from parsing `tree` in plain notation. """
+    group = make_group(revision, tree.get('reuse'), 'text/plain', session)
     plain_blocks = tree['contentPlain']
     block_count = len(plain_blocks)
     if 'questionCount' in tree:
@@ -281,7 +281,7 @@ def plain_attach_global_points(points, questions):
         questions[0].points = points[0]
 
 
-def import_latex_writer(tree, sources, group, session):
+def import_latex_writer(tree, sources, revision, session):
     """ Import a group and its blocks from `tree` with `sources` in LaTeX-w. """
     pass
 
