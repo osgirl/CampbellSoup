@@ -219,22 +219,7 @@ def import_plain(tree, group, session):
     if 'answer' in tree:
         questions[0].answer = tree['answer'][0]
     if 'points' in tree:
-        points = tree['points']
-        if len(points) == 2:
-            if points[0] != sum(points[1]):
-                logger.warning('{} != {} points'.format(
-                    ' + '.join(points[1]),
-                    points[0],
-                ))
-            if len(points[1]) != len(questions):
-                logger.error('Mismatch: {} points, {} questions'.format(
-                    len(points[1]),
-                    len(questions),
-                ))
-            for question, points in zip(questions, points[1]):
-                question.points = points
-        else:
-            questions[0].points = points[0]
+        plain_attach_global_points(tree['points'], questions)
     images = tree.get('images')
     if images not in (None, [None]):
         all_blocks = intros + questions
@@ -266,6 +251,25 @@ def import_plain_blocks(plain_blocks, intro_count, group, session):
         order=index,
     ) for index, question in enumerate(questions))
     return intros, questions
+
+
+def plain_attach_global_points(points, questions):
+    """ Attach globally declared max grades to plaintext question blocks. """
+    if len(points) == 2:
+        if points[0] != sum(points[1]):
+            logger.warning('{} != {} points'.format(
+                ' + '.join(points[1]),
+                points[0],
+            ))
+        if len(points[1]) != len(questions):
+            logger.error('Mismatch: {} points, {} questions'.format(
+                len(points[1]),
+                len(questions),
+            ))
+        for question, points in zip(questions, points[1]):
+            question.points = points
+    else:
+        questions[0].points = points[0]
 
 
 def import_latex_writer(tree, sources, group, session):
