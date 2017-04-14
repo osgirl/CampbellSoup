@@ -19,6 +19,7 @@ ATTRIBUTION_FMT = '\nOther authors mentioned in archive: {}.'
 logger = logging.getLogger(__name__)
 _author_cache = {}
 _format_cache = {}
+_kind_cache = {}
 
 
 def process_options(app, **kwargs):
@@ -359,7 +360,15 @@ def import_latex_writer_question(tree, revision, session):
 
 def get_kind(kind_name, session):
     """ Return m.QuestionKind object, create if necessary. """
-    pass
+    global _kind_cache
+    kind_obj = _kind_cache.get(kind_name)
+    if kind_obj is None:
+        kind_obj = session.query(m.QuestionKind).filter_by(
+            name=kind_name,
+        ).one_or_none() or m.QuestionKind(name=kind_name)
+        _kind_cache[kind_name] = kind_obj
+        session.add(kind_obj)
+    return kind_obj
 
 
 def import_latex_writer_introduction(tree, revision, session):
