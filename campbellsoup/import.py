@@ -321,11 +321,54 @@ def import_latex_writer(tree, sources, revision, session):
 
 def import_latex_writer_question(tree, revision, session):
     """ Import a single LW question and return as m.Question. """
+    question = m.Question(
+        revision=revision,
+        status=get_import_status(session),
+        network=m.QuestionNetwork(),
+    )
+    if 'complete_text' in tree:
+        question.kind = get_kind('complete_text')
+        question.text = ' '.join(
+            '({})'.format('/'.join(line)) if index % 2 else line
+                for index, line in enumerate(tree['question'])
+        )
+    elif 'answerfigure' in tree:
+        question.kind = get_kind('answerfigure')
+    elif 'drawbox' in tree:
+        question.kind = get_kind('drawbox')
+    elif 'type' in tree:
+        question.kind = get_kind(tree['type'][0])
+    else:
+        assert 'answerblock' in tree
+        question.kind = get_kind('mc')
+    if not question.text:
+        question.text = tree['question']
+    if 'table' in tree:
+        question.text += '\n\n' + '\n'.join('; '.join(row)
+            for row in tree['table']
+        )
+    if 'answer' in tree:
+        question.answer = tree['answer'][0]
+    if 'comments' in tree:
+        question.notes = '\n'.join(': '.join(comment)
+            for comment in tree['comments']
+        )
+    session.add(question)
+    return question
+
+
+def get_kind(kind_name, session):
+    """ Return m.QuestionKind object, create if necessary. """
     pass
 
 
 def import_latex_writer_introduction(tree, revision, session):
     """ Import a single LW introduction and return as m.Introduction. """
+    pass
+
+
+def get_import_status(session):
+    """ Return the single m.QuestionStatus object for imported questions. """
     pass
 
 
