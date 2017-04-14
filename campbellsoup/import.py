@@ -368,7 +368,9 @@ def get_kind(kind_name, session):
 
 def import_latex_writer_introduction(tree, revision, session):
     """ Import a single LW introduction and return as m.Introduction. """
-    pass
+    introduction = m.Introduction(revision=revision, text=tree['introduction'])
+    session.add(introduction)
+    return introduction
 
 
 def get_import_status(session):
