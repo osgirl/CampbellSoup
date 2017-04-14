@@ -167,7 +167,7 @@ class Introduction(db.Model):
     
     id = _integer_pkey()
     revision_id = db.Column(db.ForeignKey('revision.id'), nullable=False)
-    text = db.Column(db.Text, nullable=False)
+    text = db.Column(db.Text)
     source_code = db.Column(db.Text)
     
     revision = db.relationship('Revision', backref='introductions')
