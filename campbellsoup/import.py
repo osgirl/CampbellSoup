@@ -292,7 +292,6 @@ def import_latex_writer(tree, sources, revision, session):
         'text/x-latex-writer',
         session,
     )
-    session.add(group)
     figure_blocks = []
     for index, (subtree, source) in enumerate(zip(subtrees, sources), start=1):
         if 'question' in subtree:
