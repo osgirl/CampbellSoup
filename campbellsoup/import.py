@@ -8,6 +8,7 @@ from datetime import date
 
 from flask_script import Manager
 
+from .utilities import maybe
 from .parsers import document, latex_writer_sources, filename_parts
 import .models as m
 
@@ -205,10 +206,7 @@ def import_plain(tree, revision, session):
     group = make_group(revision, tree.get('reuse'), 'text/plain', session)
     plain_blocks = tree['contentPlain']
     block_count = len(plain_blocks)
-    if 'questionCount' in tree:
-        question_count = tree['questionCount'][0]
-    else:
-        question_count = block_count
+    question_count = maybe(tree, 'questionCount', 0) or block_count
     intro_count = 0
     if block_count < question_count:
         logger.error('{} questions claimed but only {} blocks found'.format(
@@ -217,7 +215,7 @@ def import_plain(tree, revision, session):
         ))
     elif block_count > question_count:
         intro_count = block_count - question_count
-    group.title = tree.get('title')
+    group.title = maybe(tree, 'title', 0)
     if not group.title and intro_count > 0:
         group.title = plain_blocks[0].splitlines()[0]
     intros, questions, question_bindings = import_plain_blocks(
@@ -226,8 +224,7 @@ def import_plain(tree, revision, session):
         group,
         session,
     )
-    if 'answer' in tree:
-        questions[0].answer = tree['answer'][0]
+    questions[0].answer = maybe(tree, 'answer', 0)
     if 'points' in tree:
         plain_attach_global_points(tree['points'], question_bindings)
     images = tree.get('images')
@@ -296,13 +293,12 @@ def import_latex_writer(tree, sources, revision, session):
     figure_blocks = []
     for index, (subtree, source) in enumerate(zip(subtrees, sources), start=1):
         if 'question' in subtree:
-            points = subtree.get('points')
             block = import_latex_writer_question(subtree, revision, session)
             session.add(m.GroupQuestionBinding(
                 group=group,
                 question=block,
                 order=index,
-                weight=(points[0] if points else None),
+                weight=maybe(subtree, 'points', 0),
             ))
         else:
             block = import_latex_writer_introduction(subtree, revision, session)
@@ -348,8 +344,7 @@ def import_latex_writer_question(tree, revision, session):
         question.text += '\n\n' + '\n'.join('; '.join(row)
             for row in tree['table']
         )
-    if 'answer' in tree:
-        question.answer = tree['answer'][0]
+    question.answer = maybe(tree, 'answer', 0)
     if 'comments' in tree:
         question.notes = '\n'.join(': '.join(comment)
             for comment in tree['comments']
