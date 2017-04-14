@@ -310,7 +310,8 @@ def import_latex_writer(tree, sources, revision, session):
         block.source_code = source
         block.figure_filenames = [
             subtree[fig][0]
-                if fig in subtree for fig in ('figure', 'answerfigure')
+                for fig in ('figure', 'answerfigure')
+                    if fig in subtree
         ]
         figure_blocks.extend([block] * len(block.figure_filenames))
     return group, figure_blocks
