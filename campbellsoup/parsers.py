@@ -134,10 +134,10 @@ w_table_row         = pp.Group(pp.delimitedList(
     l_pipe,
 )).setName('w_table_row')
 
-w_table             = pp.Group(pp.delimitedList(
+w_table             = pp.delimitedList(
     w_table_row,
     l_pipe * 2,
-)).setName('w_table')
+).setName('w_table')
 
 w_integer_arg       = (l_bang + integer).setName('w_integer_arg')
 w_floating_arg      = (l_bang + floating).setName('w_floating_arg')

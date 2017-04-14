@@ -168,27 +168,24 @@ def test_w_tables():
         w_table_row,
         w_table,
     )] for string in (cell, row, table)]
-    for subresults in results:
-        for result in subresults:
-            assert len(result) == 1
     # parse cell as w_cell
     assert results[0][0][0] == 'abc 123;!'
     # parse cell as w_row
     assert results[0][1][0].asList() == ['abc 123;!']
     # parse cell as w_table
-    assert results[0][2][0].asList() == [['abc 123;!']]
+    assert results[0][2].asList() == [['abc 123;!']]
     # parse row as w_cell
     assert results[1][0][0] == 'abc'
     # parse row as w_row
     assert results[1][1][0].asList() == ['abc', '123', '...']
     # parse row as w_table
-    assert results[1][2][0].asList() == [['abc', '123', '...']]
+    assert results[1][2].asList() == [['abc', '123', '...']]
     # parse table as w_cell
     assert results[2][0][0] == 'a'
     # parse table as w_row
     assert results[2][1][0].asList() == ['a', 'b', 'c']
     # parse table as w_table
-    assert results[2][2][0].asList() == [
+    assert results[2][2].asList() == [
         ['a', 'b', 'c'],
         ['1', '2', '3'],
         ['.', '.', '.'],
@@ -208,13 +205,13 @@ def test_w_args():
     assert w_floating_arg.parseString(float_arg).asList() == [123.456]
     assert w_floating_arg.parseString(text_arg).asList() == [12]
     assert w_floating_arg.parseString(table_arg).asList() == [1]
-    assert w_table_arg.parseString(int_arg).asList() == [[['123']]]
-    assert w_table_arg.parseString(float_arg).asList() == [[['123.456']]]
-    assert w_table_arg.parseString(text_arg).asList() == [[['12ab']]]
-    assert w_table_arg.parseString(table_arg).asList() == [[
+    assert w_table_arg.parseString(int_arg).asList() == [['123']]
+    assert w_table_arg.parseString(float_arg).asList() == [['123.456']]
+    assert w_table_arg.parseString(text_arg).asList() == [['12ab']]
+    assert w_table_arg.parseString(table_arg).asList() == [
         ['1a', '2b'],
         ['3c', '4d'],
-    ]]
+    ]
     assert w_generic_arg.parseString(int_arg).asList() == ['123']
     assert w_generic_arg.parseString(float_arg).asList() == ['123.456']
     assert w_generic_arg.parseString(text_arg).asList() == ['12ab']
@@ -248,7 +245,7 @@ def test_w_subquestions_com():
 
 def test_w_table_com():
     assert w_table_com.parseString('table!ab|cd||12|34').asDict() == {'table': [
-        [['ab', 'cd'], ['12', '34']],
+        ['ab', 'cd'], ['12', '34'],
     ]}
     assert not w_table_com.matches('table')
 
