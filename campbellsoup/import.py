@@ -290,6 +290,7 @@ def import_latex_writer(tree, sources, revision, session):
         'text/x-latex-writer',
         session,
     )
+    group.title = maybe(subtrees, 0, 'title')
     figure_blocks = []
     for index, (subtree, source) in enumerate(zip(subtrees, sources), start=1):
         if 'question' in subtree:
@@ -300,13 +301,19 @@ def import_latex_writer(tree, sources, revision, session):
                 order=index,
                 weight=maybe(subtree, 'points', 0),
             ))
-        else:
+        elif 'intro' in subtree or 'figure' in subtree:
             block = import_latex_writer_introduction(subtree, revision, session)
             session.add(m.GroupIntroductionBinding(
                 group=group,
                 introduction=block,
                 order=index,
             ))
+        else:
+            # This should only happen with the first block, when it contains
+            # the title and nothing else.
+            assert index == 1
+            assert len(source.splitlines()) == 1
+            continue
         block.source_code = source
         block.figure_filenames = [
             subtree[fig][0]
@@ -369,7 +376,10 @@ def get_kind(kind_name, session):
 
 def import_latex_writer_introduction(tree, revision, session):
     """ Import a single LW introduction and return as m.Introduction. """
-    introduction = m.Introduction(revision=revision, text=tree['introduction'])
+    introduction = m.Introduction(
+        revision=revision,
+        text=tree.get('introduction'),
+    )
     session.add(introduction)
     return introduction
 
