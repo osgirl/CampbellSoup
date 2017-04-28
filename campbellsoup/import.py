@@ -16,11 +16,13 @@ UNKNOWN_AUTHOR_NAME = 'unattributed'
 UNKNOWN_AUTHOR_FULL_NAME = 'Unidentified Author'
 REVISION_FMT = 'Auto import of group {} within test "{}".'
 ATTRIBUTION_FMT = '\nOther authors mentioned in archive: {}.'
+IMPORTED_STATUS_NAME = 'imported'
 
 logger = logging.getLogger(__name__)
 _author_cache = {}
 _format_cache = {}
 _kind_cache = {}
+_status_cache = None
 
 
 def process_options(app, **kwargs):
@@ -386,7 +388,13 @@ def import_latex_writer_introduction(tree, revision, session):
 
 def get_import_status(session):
     """ Return the single m.QuestionStatus object for imported questions. """
-    pass
+    global _status_cache
+    if _status_cache is None:
+        _status_cache = session.query(m.QuestionStatus).filter_by(
+            name=IMPORTED_STATUS_NAME,
+        ).one_or_none() or m.QuestionStatus(name=IMPORTED_STATUS_NAME)
+        session.add(_status_cache)
+    return _status_cache
 
 
 def import_figure(filename, revision, session):
