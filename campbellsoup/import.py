@@ -66,7 +66,6 @@ def import_test(directory, title=None, year=None, order_by_stdin=False):
     os.chdir(directory)
     session = m.db.session
     try:
-        me = get_auto_import_person(session)
         test = m.Test(title=title, date=test_date)
         import_groups(files, test, session)
         session.add(test)
