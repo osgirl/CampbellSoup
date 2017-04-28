@@ -21,8 +21,8 @@ IMPORTED_STATUS_NAME = 'imported'
 logger = logging.getLogger(__name__)
 _author_cache = {}
 _format_cache = {}
-_kind_cache = {}
-_status_cache = None
+_question_kind_cache = {}
+_status_cache = {}
 
 
 def process_options(app, **kwargs):
@@ -181,7 +181,7 @@ def make_group(revision, reuse, format_name, session):
         network = m.GroupNetwork()
     group = m.Group(
         revision=revision,
-        format=get_format(format_name, session),
+        format=get_category(format_name, _format_cache, session, m.Format),
         network=network,
     )
     if parent is not None:
@@ -190,17 +190,16 @@ def make_group(revision, reuse, format_name, session):
     return group
 
 
-def get_format(format_name, session):
-    """ Return a Format object if available, create if necessary. """
-    global _format_cache
-    format_obj = _format_cache.get(format_name)
-    if format_obj is None:
-        format_obj = session.query(m.Format).filter_by(
-            name=format_name,
-        ).one_or_none() or m.Format(name=format_name)
-        _format_cache[format_name] = format_obj
-        session.add(format_obj)
-    return format_obj
+def get_category(name, cache, session, model):
+    """ Return existing `model` instance if available, create if necessary. """
+    instance = cache.get(name)
+    if instance is None:
+        instance = session.query(model).filter_by(
+            name=name,
+        ).one_or_none() or model(name=name)
+        cache[name] = instance
+        session.add(instance)
+    return instance
 
 
 def import_plain(tree, revision, session):
@@ -333,21 +332,22 @@ def import_latex_writer_question(tree, revision, session):
         status=get_import_status(session),
         network=m.QuestionNetwork(),
     )
+    get_category_args = (_question_kind_cache, session, m.QuestionKind)
     if 'complete_text' in tree:
-        question.kind = get_kind('complete_text')
+        question.kind = get_category('complete_text', *get_category_args)
         question.text = ' '.join(
             '({})'.format('/'.join(line)) if index % 2 else line
                 for index, line in enumerate(tree['question'])
         )
     elif 'answerfigure' in tree:
-        question.kind = get_kind('answerfigure')
+        question.kind = get_category('answerfigure', *get_category_args)
     elif 'drawbox' in tree:
-        question.kind = get_kind('drawbox')
+        question.kind = get_category('drawbox', *get_category_args)
     elif 'type' in tree:
-        question.kind = get_kind(tree['type'][0])
+        question.kind = get_category(tree['type'][0], *get_category_args)
     else:
         assert 'answerblock' in tree
-        question.kind = get_kind('mc')
+        question.kind = get_category('mc', *get_category_args)
     if not question.text:
         question.text = tree['question']
     if 'table' in tree:
@@ -363,19 +363,6 @@ def import_latex_writer_question(tree, revision, session):
     return question
 
 
-def get_kind(kind_name, session):
-    """ Return m.QuestionKind object, create if necessary. """
-    global _kind_cache
-    kind_obj = _kind_cache.get(kind_name)
-    if kind_obj is None:
-        kind_obj = session.query(m.QuestionKind).filter_by(
-            name=kind_name,
-        ).one_or_none() or m.QuestionKind(name=kind_name)
-        _kind_cache[kind_name] = kind_obj
-        session.add(kind_obj)
-    return kind_obj
-
-
 def import_latex_writer_introduction(tree, revision, session):
     """ Import a single LW introduction and return as m.Introduction. """
     introduction = m.Introduction(
@@ -388,13 +375,12 @@ def import_latex_writer_introduction(tree, revision, session):
 
 def get_import_status(session):
     """ Return the single m.QuestionStatus object for imported questions. """
-    global _status_cache
-    if _status_cache is None:
-        _status_cache = session.query(m.QuestionStatus).filter_by(
-            name=IMPORTED_STATUS_NAME,
-        ).one_or_none() or m.QuestionStatus(name=IMPORTED_STATUS_NAME)
-        session.add(_status_cache)
-    return _status_cache
+    return get_category(
+        IMPORTED_STATUS_NAME,
+        _status_cache,
+        session,
+        m.QuestionStatus,
+    )
 
 
 def import_figure(filename, revision, session):
