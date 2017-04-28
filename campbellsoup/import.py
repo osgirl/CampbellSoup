@@ -6,6 +6,7 @@ import os.path as op
 import logging
 import mimetypes
 from datetime import date
+from itertools import zip_longest
 
 from flask_script import Manager
 
@@ -87,7 +88,7 @@ def import_groups(files, test, session):
             # We first import a group and then any figures belonging to it.
             # So we bind the groups and figures together before starting a new
             # group.
-            session.add_all(bind_figures(blocks, figures))
+            bind_figures(blocks, figures, session)
             blocks, figures = [], []
             group, blocks = import_textfile(
                 filename,
@@ -99,7 +100,7 @@ def import_groups(files, test, session):
             order += 1
         else:
             figures.append(import_figure(filename, group.revision, session))
-    session.add_all(bind_figures(blocks, figures))
+    bind_figures(blocks, figures, session)
 
 
 def import_textfile(filename, group_order, test_title, session):
@@ -409,9 +410,59 @@ def import_figure(filename, revision, session):
     return figure
 
 
-def bind_figures(blocks, figures):
-    """ Bind imported figures to blocks that claim to need figures. """
-    pass
+def bind_figures(blocks, figures, session):
+    """ Binds imported figures to blocks that need figures, adds to session. """
+    for block, figure in zip_longest(blocks, figures):
+        if block is None:
+            logger.warning('Dangling figure: {}'.format(figure.filename))
+            continue
+        block_order = (
+            block.groups[0].test_bindings[0].order,
+            block.group_bindings[0].order,
+        )
+        if figure is None:
+            logger.warning(
+                'Block has unfulfilled figures: {}/{}'.format(*block_order),
+            )
+            continue
+        logger.debug(
+            'Binding block {}/{} with {}'.format(*block_order, figure.filename),
+        )
+        # Keep track of the no. of figures that are associated with each block.
+        block.figure_counter = getattr(block, 'figure_counter', -1) + 1
+        fname_len = 1  # sensible default for the last branch, cf __fname_comp
+        if hasattr(block, 'figure_filenames'):
+            # Special case for LaTeX-writer sources where Remie or Leonie has
+            # renamed the image file, but the original file name is still
+            # referenced in the source code. We prefer the original file name,
+            # because it tends to be more informative.
+            fname_len = len(block.figure_filenames)
+            assert block.figure_counter < fname_len, '{} < {}'.format(
+                block.figure_counter,
+                fname_len,
+            )
+            figure.filename = block.figure_filenames[block.figure_counter]
+        if isinstance(block, m.Introduction):
+            session.add(m.IntroductionFigureBinding(
+                introduction=block,
+                figure=figure,
+            ))
+        else:
+            assert isinstance(block, m.Question)
+            if (
+                block.kind is not None and
+                block.kind.name == 'answerfigure' and
+                block.figure_counter == fname_len - 1  # cf __fname_comp
+                # This is a heuristic, because insufficient information is
+                # available to know for sure which figure is the answerfigure.
+            ):
+                figure.kind = get_category(
+                    'answerfigure',
+                    _figure_kind_cache,
+                    session,
+                    m.FigureKind,
+                )
+            session.add(m.QuestionFigureBinding(question=block, figure=figure))
 
 
 def filename_order_key(name):
