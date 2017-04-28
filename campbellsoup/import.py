@@ -4,6 +4,7 @@ import sys
 import os
 import os.path as op
 import logging
+import mimetypes
 from datetime import date
 
 from flask_script import Manager
@@ -22,6 +23,7 @@ logger = logging.getLogger(__name__)
 _author_cache = {}
 _format_cache = {}
 _question_kind_cache = {}
+_figure_kind_cache = {}
 _status_cache = {}
 
 
@@ -384,7 +386,27 @@ def get_import_status(session):
 
 def import_figure(filename, revision, session):
     """ Import an image file as an m.Figure. """
-    pass
+    with open(filename, 'rb') as image_file:
+        figure = m.Figure(
+            revision=revision,
+            # For the time being, we won't be terribly intelligent about
+            # different kinds of figures. By default we assume it's "just a
+            # figure". In the case of LaTeX-writer questions, the figure may be
+            # marked explicitly as an answerfigure; in that case the kind is
+            # reassigned later.
+            kind=get_category(
+                'figure',
+                _figure_kind_cache,
+                session,
+                m.FigureKind,
+            ),
+            tree=m.FigureTree(),
+            filename=filename,
+            mimetype=mimetypes.guess_type(filename),
+            contents=image_file.read(),
+        )
+    session.add(figure)
+    return figure
 
 
 def bind_figures(blocks, figures):
