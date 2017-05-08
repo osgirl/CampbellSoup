@@ -471,4 +471,7 @@ def filename_order_key(name):
     
         Use as sorting key function.
     """
-    return filename_parts.parseString(op.splitext(name)[0], True).asList()
+    root, extension = op.splitext(name)
+    parts = filename_parts.parseString(root, True).asList()
+    parts.insert(1, 'c' if extension == '.txt' else 'f')
+    return parts
