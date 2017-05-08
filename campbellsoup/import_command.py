@@ -12,7 +12,7 @@ from flask_script import Manager
 
 from .utilities import maybe
 from .parsers import document, latex_writer_sources, filename_parts
-import .models as m
+import campbellsoup.models as m
 
 UNKNOWN_AUTHOR_NAME = 'unattributed'
 UNKNOWN_AUTHOR_FULL_NAME = 'Unidentified Author'
