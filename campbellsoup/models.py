@@ -156,7 +156,7 @@ class Figure(db.Model):
     revision = db.relationship('Revision', backref='figures')
     kind = db.relationship('FigureKind', backref='figures')
     tree = db.relationship('FigureTree', backref='figures')
-    ancestor = db.relationship('Figure', backref='descendants')
+    ancestor = db.relationship('Figure', remote_side=id, backref='descendants')
     introductions = association_proxy('intro_bindings', 'introduction')
     questions = association_proxy('question_bindings', 'question')
 
@@ -248,8 +248,16 @@ class QuestionHistory(db.Model):
     parent_id = db.Column(db.ForeignKey('question.id'), primary_key=True)
     child_id = db.Column(db.ForeignKey('question.id'), primary_key=True)
     
-    parent = db.relationship('Question', backref='child_bindings')
-    child = db.relationship('Question', backref='parent_bindings')
+    parent = db.relationship(
+        'Question',
+        backref='child_bindings',
+        foreign_keys=parent_id
+    )
+    child = db.relationship(
+        'Question',
+        backref='parent_bindings',
+        foreign_keys=child_id,
+    )
 
 
 @append_to(__all__)
@@ -318,8 +326,16 @@ class GroupHistory(db.Model):
     child_id = db.Column(db.ForeignKey('group.id'), primary_key=True)
     # also needs a reverse index
     
-    parent = db.relationship('Group', backref='child_bindings')
-    child = db.relationship('Group', backref='parent_bindings')
+    parent = db.relationship(
+        'Group',
+        backref='child_bindings',
+        foreign_keys=parent_id,
+    )
+    child = db.relationship(
+        'Group',
+        backref='parent_bindings',
+        foreign_keys=child_id,
+    )
 
 
 @append_to(__all__)
@@ -364,8 +380,16 @@ class Issue(db.Model):
     deadline = db.Column(db.DateTime)
     title = db.Column(db.Text, nullable=False)
     
-    raised = db.relationship('Revision', backref='raised_issues')
-    resolved = db.relationship('Revision', backref='resolved_issues')
+    raised = db.relationship(
+        'Revision',
+        backref='raised_issues',
+        foreign_keys=raised_id,
+    )
+    resolved = db.relationship(
+        'Revision',
+        backref='resolved_issues',
+        foreign_keys=resolved_id,
+    )
     test = db.relationship('Test', backref='issues')
     groupnet = db.relationship('GroupNetwork', backref='issues')
     questionnet = db.relationship('QuestionNetwork', backref='issues')
