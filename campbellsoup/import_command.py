@@ -5,7 +5,7 @@ import os
 import os.path as op
 import logging
 import mimetypes
-from datetime import date
+from datetime import date, datetime
 from itertools import zip_longest
 
 from flask_script import Manager
@@ -21,7 +21,7 @@ ATTRIBUTION_FMT = '\nOther authors mentioned in archive: {}.'
 IMPORTED_STATUS_NAME = 'imported'
 
 logger = logging.getLogger(__name__)
-_author_cache = {}
+_person_cache = {}
 _format_cache = {}
 _question_kind_cache = {}
 _figure_kind_cache = {}
@@ -58,7 +58,7 @@ def import_test(directory, title=None, year=None, order_by_stdin=False):
     figure files in the same order in which they appear in the text file.
     """
     if year is None:
-        year = op.split(op.normpath(path))[1]
+        year = op.split(op.normpath(directory))[1]
     if title is None:
         title = year
     test_date = date(int(year), 6, 1)
@@ -128,7 +128,7 @@ def import_textfile(filename, group_order, test_title, session):
 
 def make_revision(authors, group_order, test_title, session):
     """ Create a revision for the question group under consideration. """
-    now = datetime.datetime.now()
+    now = datetime.now()
     message_first_line = REVISION_FMT.format(group_order, test_title)
     message_tail = ''
     if authors in (None, [None]):
