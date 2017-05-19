@@ -128,16 +128,26 @@ def import_textfile(filename, group_order, test_title, session):
 
 def make_revision(authors, group_order, test_title, session):
     """ Create a revision for the question group under consideration. """
+    logger.debug('make_revision({}, {}, {})'.format(
+        authors,
+        group_order,
+        test_title,
+    ))
     now = datetime.now()
     message_first_line = REVISION_FMT.format(group_order, test_title)
     message_tail = ''
     if authors in (None, [None]):
+        logger.debug('make_revision: setting fallback author {}'.format(
+            UNKNOWN_AUTHOR_NAME,
+        ))
         author_objs = [get_person(
             UNKNOWN_AUTHOR_NAME,
             session,
             full_name=UNKNOWN_AUTHOR_FULL_NAME,
         )]
     else:
+        assert len(authors) > 0
+        assert None not in authors
         author_objs = [get_person(name, session) for name in authors]
     if len(author_objs) > 1:
         message_tail = ATTRIBUTION_FMT.format(', '.join(authors[1:]))
