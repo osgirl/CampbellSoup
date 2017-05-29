@@ -369,7 +369,8 @@ g_images_field = (
 ).setName('g_images_field').setResultsName('images')
 
 g_comment_field   = (
-    pp.lineStart + m_comment + m_colon + g_text_value + line_end
+    pp.lineStart + m_comment + m_colon + pp.QuotedString('"', multiline=True) +
+    line_end
 ).setName('g_comment_field').setResultsName('comment')
 
 g_meta_field    = (
