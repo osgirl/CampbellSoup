@@ -67,6 +67,7 @@ def import_test(directory, title=None, year=None, order_by_stdin=False):
     else:
         files = sorted(os.listdir(directory), key=filename_order_key)
     os.chdir(directory)
+    logger.debug('File list:\n{}'.format('\n'.join(files)))
     session = m.db.session
     try:
         test = m.Test(title=title, date=test_date)
