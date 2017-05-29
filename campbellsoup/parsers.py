@@ -61,6 +61,10 @@ m_afbeeldingen    = (
     pp.CaselessKeyword('afbeeldingen')
 ).setName('m_afbeeldingen').suppress()
 
+m_comment    = (
+    pp.CaselessKeyword('comment')
+).setName('m_comment').suppress()
+
 # Meta values
 
 v_onbekend        = (
@@ -364,9 +368,14 @@ g_images_field = (
     pp.lineStart + m_afbeeldingen + m_colon + g_images_value + line_end
 ).setName('g_images_field').setResultsName('images')
 
+g_comment_field   = (
+    pp.lineStart + m_comment + m_colon + g_text_value + line_end
+).setName('g_comment_field').setResultsName('comment')
+
 g_meta_field    = (
     g_author_field | g_reuse_field | g_year_field | g_title_field |
-    g_questions_field | g_answer_field | g_points_field | g_images_field
+    g_questions_field | g_answer_field | g_points_field | g_images_field |
+    g_comment_field
 ).setName('g_meta_field')
 
 g_plaintext_field = (
