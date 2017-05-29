@@ -328,8 +328,9 @@ g_points_value = (g_null | integer + pp.Optional(
 ).leaveWhitespace()).setName('g_points_value')
 
 g_images_value = (g_null | pp.delimitedList(
-    pp.dblQuotedString.setParseAction(pp.removeQuotes)
-)).setName('g_images_value')
+    pp.dblQuotedString.setParseAction(pp.removeQuotes),
+    pp.Regex(r', ?'),
+).leaveWhitespace()).setName('g_images_value')
 
 g_author_field  = (
     pp.lineStart + m_auteur + m_colon + g_authors_value + line_end
