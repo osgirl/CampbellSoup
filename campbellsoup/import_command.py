@@ -136,7 +136,7 @@ def make_revision(authors, group_order, test_title, session):
     now = datetime.now()
     message_first_line = REVISION_FMT.format(group_order, test_title)
     message_tail = ''
-    if authors in (None, [None]):
+    if authors is None or len(authors) == 0 or authors[0] is None:
         logger.debug('make_revision: setting fallback author {}'.format(
             UNKNOWN_AUTHOR_NAME,
         ))
@@ -146,9 +146,10 @@ def make_revision(authors, group_order, test_title, session):
             full_name=UNKNOWN_AUTHOR_FULL_NAME,
         )]
     else:
-        assert len(authors) > 0
-        assert None not in authors
-        author_objs = [get_person(name, session) for name in authors]
+        author_objs = [
+            get_person(name, session) for name in authors if name is not None
+        ]
+    assert len(author_objs) > 0
     if len(author_objs) > 1:
         message_tail = ATTRIBUTION_FMT.format(', '.join(authors[1:]))
     revision = m.Revision(
