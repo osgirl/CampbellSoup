@@ -136,7 +136,7 @@ def make_revision(authors, group_order, test_title, session):
     now = datetime.now()
     message_first_line = REVISION_FMT.format(group_order, test_title)
     message_tail = ''
-    if authors is None or len(authors) == 0 or authors[0] is None:
+    if maybe(authors, 0) is None:
         logger.debug('make_revision: setting fallback author {}'.format(
             UNKNOWN_AUTHOR_NAME,
         ))
@@ -181,7 +181,7 @@ def get_person(short_name, session, **kwargs):
 
 def make_group(revision, reuse, format_name, session):
     """ Common group creation logic in import_plain and import_latex_writer. """
-    if reuse not in (None, [None]) and len(reuse) == 2:
+    if maybe(reuse, 0) is not None and len(reuse) == 2:
         parent_title = str(reuse[0])  # actually the year, but works for now
         parent_order = reuse[1]
         parent = session.query(m.Group).join('test_bindings', 'test').filter(
@@ -242,7 +242,7 @@ def import_plain(tree, revision, session):
     if 'points' in tree:
         plain_attach_global_points(tree['points'], question_bindings)
     images = tree.get('images')
-    if images not in (None, [None]):
+    if maybe(images, 0) is not None:
         all_blocks = intros + questions
         # Attach all yet-to-be-imported images to the first block
         return group, all_blocks[0:1] * len(images)
