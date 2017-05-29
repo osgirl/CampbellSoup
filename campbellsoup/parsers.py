@@ -327,8 +327,8 @@ g_text_value    = (
     g_null | pp.dblQuotedString.setParseAction(pp.removeQuotes) | pp.restOfLine
 ).setName('g_text_value')
 
-g_points_value = (g_null | integer + pp.Optional(
-    pp.nestedExpr(content=pp.delimitedList(integer, ':'))
+g_points_value = (g_null | floating + pp.Optional(
+    pp.nestedExpr(content=pp.delimitedList(floating, ':'))
 ).leaveWhitespace()).setName('g_points_value')
 
 g_images_value = (g_null | pp.delimitedList(
