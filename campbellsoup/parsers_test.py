@@ -428,15 +428,15 @@ def test_w_complete_text_line():
     assert not w_complete_text_line.matches('!type')
 
 
-def test_document():
-    for example, result in TEST_DOCUMENTS:  # bottom of file
-        assert document.parseString(example, parseAll=True).asDict() == result
+def test_regressions():
+    for parser, example, result in EXAMPLES:  # bottom of file
+        assert parser.parseString(example, parseAll=True).asDict() == result
 
 
 # The examples below are based on real question files. They were
 # bananafied in order to keep confidential information confidential.
 
-TEST_DOCUMENTS = [('''Toetsjaar: 2090
+EXAMPLES = [(document, '''Toetsjaar: 2090
 Auteur: onbekend
 Titel:"Banana banana banana"
 Deelvragen:3
@@ -500,7 +500,7 @@ Herbruik:Nee
     'reuse': [None],
     'title': ['Banana banana banana'],
     'year': [2090],
-}), ('''Auteur: Banana Banana
+}), (document, '''Auteur: Banana Banana
 Herbruik:nee
 Banana
 
@@ -548,5 +548,15 @@ Banana Banana banana banana banana banana banana banana banana banana banana ban
         'subquestions': [2],
         'type': ['open', 1],
     }],
+    'reuse': [None],
+}), (pp.ZeroOrMore(g_meta_field), '''Afbeeldingen:"6.png"
+Herbruik:Nee
+''', {
+    'images': ['6.png'],
+    'reuse': [None],
+}), (pp.ZeroOrMore(g_meta_field), '''Afbeeldingen:"2a.png", "2b.png", "2c.png", "2d.png", "2e.png", "2f.png"
+Herbruik:Nee
+''', {
+    'images': ['2a.png', '2b.png', '2c.png', '2d.png', '2e.png', '2f.png'],
     'reuse': [None],
 })]
