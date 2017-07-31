@@ -73,6 +73,7 @@ v_onbekend        = (
 
 v_geen            = (pp.CaselessKeyword('geen')).setName('v_geen').suppress()
 v_nee             = (pp.CaselessKeyword('nee')).setName('v_nee').suppress()
+v_dash            = pp.Keyword('-').setName('v_dash').suppress()
 
 v_year            = pp.Regex(
     '20(0[4-9]|[1-9]\d)',  # not century-proof
@@ -312,7 +313,7 @@ def p_parse(toks):
 # Global parts
 
 g_null         = (
-    v_nee | v_onbekend | v_geen
+    v_nee | v_onbekend | v_geen | v_dash
 ).setName('g_null').setParseAction(pp.replaceWith(None))
 
 g_year_value   = (v_year | g_null).setName('g_year_value')
