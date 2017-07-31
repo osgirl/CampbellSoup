@@ -69,10 +69,10 @@ class Person(db.Model):
     
     id = _integer_pkey()
     short_name = db.Column(db.String(30), nullable=False, unique=True)
-    full_name = db.Column(db.String(60), nullable=False)
+    full_name = db.Column(db.String(254), nullable=False)
     role_id = db.Column(db.ForeignKey('user_role.id'))
-    email_address = db.Column(db.String(30))
-    password_hash = db.Column(db.String(30))
+    email_address = db.Column(db.String(254))
+    password_hash = db.Column(db.String(254))
     
     role = db.relationship('UserRole', backref='users')
 
@@ -96,7 +96,7 @@ class Book(db.Model):
     id = _integer_pkey()
     title = db.Column(db.Text, nullable=False)
     author = db.Column(db.Text, nullable=False)
-    edition = db.Column(db.String(30))
+    edition = db.Column(db.String(62))
     year = db.Column(db.Integer)
     
     topics = association_proxy('topic_bindings', 'topic')
@@ -107,7 +107,7 @@ class Topic(db.Model):
     """ Possible topic for questions, independent of Book. """
 
     id = _integer_pkey()
-    name = db.Column(db.String(60), nullable=False, unique=True)
+    name = db.Column(db.String(254), nullable=False, unique=True)
     
     books = association_proxy('book_bindings', 'book')
     questions = association_proxy('question_bindings', 'question')
@@ -120,10 +120,10 @@ class TopicBookBinding(db.Model):
     
     topic_id = db.Column(db.ForeignKey('topic.id'), primary_key=True)
     book_id = db.Column(db.ForeignKey('book.id'), primary_key=True)
-    chapter = db.Column(db.String(30))
-    section = db.Column(db.String(30))
-    figure = db.Column(db.String(30))
-    table = db.Column(db.String(30))
+    chapter = db.Column(db.String(254))
+    section = db.Column(db.String(254))
+    figure = db.Column(db.String(254))
+    table = db.Column(db.String(254))
     page = db.Column(db.String(30))
     
     topic = db.relationship('Topic', backref='book_bindings')
@@ -149,8 +149,8 @@ class Figure(db.Model):
     kind_id = db.Column(db.ForeignKey('figure_kind.id'), nullable=False)
     tree_id = db.Column(db.ForeignKey('figure_tree.id'), nullable=False)
     ancestor_id = db.Column(db.ForeignKey('figure.id'))
-    filename = db.Column(db.String(30), nullable=False)
-    mimetype = db.Column(db.String(30), nullable=False)
+    filename = db.Column(db.String(254), nullable=False)
+    mimetype = db.Column(db.String(254), nullable=False)
     contents = db.Column(db.LargeBinary, nullable=False)
     
     revision = db.relationship('Revision', backref='figures')
