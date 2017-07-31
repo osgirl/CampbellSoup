@@ -430,7 +430,10 @@ def test_w_complete_text_line():
 
 def test_regressions():
     for parser, example, result in EXAMPLES:  # bottom of file
-        assert parser.parseString(example, parseAll=True).asDict() == result
+        if isinstance(result, dict):
+            assert parser.parseString(example, parseAll=True).asDict() == result
+        else:
+            assert parser.parseString(example, parseAll=True).asList() == result
 
 
 # The examples below are based on real question files. They were
