@@ -559,4 +559,20 @@ Herbruik:Nee
 ''', {
     'images': ['2a.png', '2b.png', '2c.png', '2d.png', '2e.png', '2f.png'],
     'reuse': [None],
+}), (g_plaintext_field, r'''Plat:"Banana banana banana banana’banana banana banana banana. Banana banana banana banana banana banana banana Banana’banana bana¨na banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana?
+
+A. Banana ban\"ana banana banana banana banana banana banana banana banana ban\"ana banana banana.
+B. Banana banana banana banana banana banana, banana banana banana banana banana banana banana
+banana banana banana banana–Banana.
+C. Banana bana¨na banana banana banana banana banana–Banana banana banana banana banana banana banana banana.
+D. Banana bana¨na banana banana banana banana banana banana banana banana banana banana banana.
+E. Banana banana banana banana banana banana banana banana banana banana banana."''', {
+    'contentPlain': ['''Banana banana banana banana’banana banana banana banana. Banana banana banana banana banana banana banana Banana’banana bana¨na banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana?
+
+A. Banana ban\"ana banana banana banana banana banana banana banana banana ban\"ana banana banana.
+B. Banana banana banana banana banana banana, banana banana banana banana banana banana banana
+banana banana banana banana–Banana.
+C. Banana bana¨na banana banana banana banana banana–Banana banana banana banana banana banana banana banana.
+D. Banana bana¨na banana banana banana banana banana banana banana banana banana banana banana.
+E. Banana banana banana banana banana banana banana banana banana banana banana.'''],
 })]

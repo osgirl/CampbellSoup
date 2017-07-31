@@ -381,7 +381,8 @@ g_meta_field    = (
 
 g_plaintext_field = (
     pp.lineStart + m_plat + m_colon +
-    pp.QuotedString('"', multiline=True).setParseAction(p_parse) + line_end
+    pp.QuotedString('"', escChar='\\', multiline=True).setParseAction(p_parse)
+    + line_end
 ).setName('g_plaintext_field')
 
 # Full document parsing
