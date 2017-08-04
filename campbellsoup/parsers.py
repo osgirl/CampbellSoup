@@ -216,7 +216,7 @@ w_answerblock_line   = (
 ).setName('w_answerblock_line').setResultsName('answerblock')
 
 w_command_line_x     = (
-    w_command_line | w_answerblock_line
+    w_command_line | w_answerblock_line | w_drawbox_line
 ).setName('w_command_line_x')
 
 w_type_line_x        = (

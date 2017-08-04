@@ -401,8 +401,8 @@ def test_w_answerblock_line():
 def test_w_command_line_x():
     assert w_command_line_x.matches('!figure!banana.png!0.3')
     assert w_command_line_x.matches('!answerblock!2!3\n')
+    assert w_command_line_x.matches('!drawbox!10.8\n')
     assert not w_command_line_x.matches('!type!open!4')
-    assert not w_command_line_x.matches('!drawbox!10.8\n')
     assert not w_command_line_x.matches('!answerfigure!banana.png\n')
     assert not w_command_line_x.matches('!type!complete_text')
     assert not w_command_line_x.matches('!choose!abc!def\n')
