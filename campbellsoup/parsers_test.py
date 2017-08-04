@@ -578,4 +578,50 @@ banana banana banana banana–Banana.
 C. Banana bana¨na banana banana banana banana banana–Banana banana banana banana banana banana banana banana.
 D. Banana bana¨na banana banana banana banana banana banana banana banana banana banana banana.
 E. Banana banana banana banana banana banana banana banana banana banana banana.'''],
-})]
+}), (w_question_group, '''Banana banana banana banana
+Banana banana [i]Banana banana[/i] banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana (-- banana banana banana banana banana banana ``banana banana banana\'\' banana). Banana banana banana banana banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana banana banana, banana banana banana banana banana. \\newline Banana banana banana banana banana banana banana banana. Banana banana banana banana, banana banana banana banana banana, banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana. 
+!figure!Banana.png
+!comment!Banana!banana banana banana banana banana.
+
+
+Banana + banana banana banana banana banana banana banana: banana banana banana banana banana (banana-) banana. Banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana ($\\alpha$- en $\\beta$- banana banana, banana banana banana banana banana banana) banana banana banana banana $2\\cdot 10^{8}$kg banana. Banana banana banana banana banana banana banana banana banana. \\newline Banana banana banana banana banana banana banana banana banana banana banana banana banana. Banana banana banana. Banana banana banana banana banana banana 4 $\\cdot 10^{X}$L banana banana banana banana 5 $\\cdot 10^{X}$L. Banana banana.
+!type!open!1
+!answer!100
+!points!1
+!comment!Banana!http://www.banana.com/ - banana banana banana banana (B. banana) = 25 mg/ml (A+B banana) - banana: banana = 600 g/L
+''', {'contentLW': [{
+    'title': 'Banana banana banana banana',
+    'intro': 'Banana banana [i]Banana banana[/i] banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana (-- banana banana banana banana banana banana ``banana banana banana\'\' banana). Banana banana banana banana banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana banana banana, banana banana banana banana banana. \\newline Banana banana banana banana banana banana banana banana. Banana banana banana banana, banana banana banana banana banana, banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana. ',
+    'figure': ['Banana.png'],
+    'comments': [['Banana', 'banana banana banana banana banana.']],
+}, {
+    'question': '''Banana + banana banana banana banana banana banana banana: banana banana banana banana banana (banana-) banana. Banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana ($\\alpha$- en $\\beta$- banana banana, banana banana banana banana banana banana) banana banana banana banana $2\\cdot 10^{8}$kg banana. Banana banana banana banana banana banana banana banana banana. \\newline Banana banana banana banana banana banana banana banana banana banana banana banana banana. Banana banana banana. Banana banana banana banana banana banana 4 $\\cdot 10^{X}$L banana banana banana banana 5 $\\cdot 10^{X}$L. Banana banana.
+''',
+    'type': ['open', 1],
+    'answer': ['100'],
+    'points': [1.0],
+    'comments': [['Banana', 'http://www.banana.com/ - banana banana banana banana (B. banana) = 25 mg/ml (A+B banana) - banana: banana = 600 g/L']]
+}]}), (w_question_group_sources, r'''Banana banana banana banana
+Banana banana [i]Banana banana[/i] banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana (-- banana banana banana banana banana banana ``banana banana banana'' banana). Banana banana banana banana banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana banana banana, banana banana banana banana banana. \newline Banana banana banana banana banana banana banana banana. Banana banana banana banana, banana banana banana banana banana, banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana. 
+!figure!Banana.png
+!comment!Banana!banana banana banana banana banana.
+
+
+Banana + banana banana banana banana banana banana banana: banana banana banana banana banana (banana-) banana. Banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana ($\alpha$- en $\beta$- banana banana, banana banana banana banana banana banana) banana banana banana banana $2\cdot 10^{8}$kg banana. Banana banana banana banana banana banana banana banana banana. \newline Banana banana banana banana banana banana banana banana banana banana banana banana banana. Banana banana banana. Banana banana banana banana banana banana 4 $\cdot 10^{X}$L banana banana banana banana 5 $\cdot 10^{X}$L. Banana banana.
+!type!open!1
+!answer!100
+!points!1
+!comment!Banana!http://www.banana.com/ - banana banana banana banana (B. banana) = 25 mg/ml (A+B banana) - banana: banana = 600 g/L
+''', [
+    r'''Banana banana banana banana
+Banana banana [i]Banana banana[/i] banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana (-- banana banana banana banana banana banana ``banana banana banana'' banana). Banana banana banana banana banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana banana banana, banana banana banana banana banana. \newline Banana banana banana banana banana banana banana banana. Banana banana banana banana, banana banana banana banana banana, banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana. 
+!figure!Banana.png
+!comment!Banana!banana banana banana banana banana.
+''',
+    r'''Banana + banana banana banana banana banana banana banana: banana banana banana banana banana (banana-) banana. Banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana ($\alpha$- en $\beta$- banana banana, banana banana banana banana banana banana) banana banana banana banana $2\cdot 10^{8}$kg banana. Banana banana banana banana banana banana banana banana banana. \newline Banana banana banana banana banana banana banana banana banana banana banana banana banana. Banana banana banana. Banana banana banana banana banana banana 4 $\cdot 10^{X}$L banana banana banana banana 5 $\cdot 10^{X}$L. Banana banana.
+!type!open!1
+!answer!100
+!points!1
+!comment!Banana!http://www.banana.com/ - banana banana banana banana (B. banana) = 25 mg/ml (A+B banana) - banana: banana = 600 g/L
+'''
+])]

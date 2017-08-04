@@ -283,7 +283,7 @@ w_block      = pp.Group(
 ).setName('w_block')
 
 w_question_group    = pp.Group(pp.delimitedList(
-    w_block, empty_line.suppress()
+    w_block, pp.OneOrMore(empty_line.suppress())
 ).ignore(
     pp.pythonStyleComment + pp.lineEnd
 )).setName('w_question_group').setResultsName('contentLW')
@@ -292,7 +292,9 @@ w_question_group_sources = pp.delimitedList(
     pp.originalTextFor(w_block.copy().ignore(
         pp.pythonStyleComment + pp.lineEnd,
     )),
-    empty_line.copy().ignore(pp.pythonStyleComment + pp.lineEnd).suppress(),
+    pp.OneOrMore(empty_line.copy().ignore(
+        pp.pythonStyleComment + pp.lineEnd
+    ).suppress()),
 ).setName('w_question_group_sources')
 
 # Plaintext parts
