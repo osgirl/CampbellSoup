@@ -183,6 +183,10 @@ w_command_line      = (w_command_start + (
     w_points_com | w_comment_com | w_answer_com
 ) + line_end).setName('w_command_line')
 
+w_comment_line      = (
+    w_command_start + w_comment_com + line_end
+).setName('w_comment_line')
+
 w_type_start        = (
     w_command_start + l_type + l_bang
 ).setName('w_type_start')
@@ -251,7 +255,8 @@ w_atleast3commands   = (
 w_intro_block        = (
     w_normal_line.setResultsName('title') +
     pp.Optional(w_normal_line.setResultsName('intro')) +
-    pp.Optional(w_command_line)
+    pp.Optional(w_command_line) +
+    pp.ZeroOrMore(w_comment_line)
 ).leaveWhitespace().setName('w_intro_block')
 
 w_standard_question_block = (
