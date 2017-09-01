@@ -402,22 +402,11 @@ def test_w_command_line_x():
     assert w_command_line_x.matches('!figure!banana.png!0.3')
     assert w_command_line_x.matches('!answerblock!2!3\n')
     assert w_command_line_x.matches('!drawbox!10.8\n')
-    assert not w_command_line_x.matches('!type!open!4')
-    assert not w_command_line_x.matches('!answerfigure!banana.png\n')
+    assert w_command_line_x.matches('!type!open!4')
+    assert w_command_line_x.matches('!answerfigure!banana.png\n')
     assert not w_command_line_x.matches('!type!complete_text')
     assert not w_command_line_x.matches('!choose!abc!def\n')
     assert not w_command_line_x.matches('banana bananas')
-
-
-def test_w_type_line_x():
-    assert not w_type_line_x.matches('!figure!banana.png!0.3')
-    assert w_type_line_x.matches('!answerblock!2!3\n')
-    assert w_type_line_x.matches('!type!open!4')
-    assert w_type_line_x.matches('!drawbox!10.8\n')
-    assert w_type_line_x.matches('!answerfigure!banana.png\n')
-    assert not w_type_line_x.matches('!type!complete_text')
-    assert not w_type_line_x.matches('!choose!abc!def\n')
-    assert not w_type_line_x.matches('banana bananas')
 
 
 def test_w_complete_text_line():
@@ -426,6 +415,36 @@ def test_w_complete_text_line():
     }
     assert not w_complete_text_line.matches('!type!complete_text!1')
     assert not w_complete_text_line.matches('!type')
+
+
+def test_addCondition():
+    """ Check the behaviour of pyparsing.ParserElement.addCondition. """
+    parser1 = w_drawbox_line.copy().addCondition(lambda toks: 'drawbox' in toks)
+    assert parser1.matches('!drawbox!1\n')
+    parser2 = w_type_line.copy().addCondition(
+        lambda toks: hasattr(toks, 'type')
+    )
+    assert parser2.matches('!type!open!1\n')
+
+
+def test_w_is_typed():
+    text1 = '!comment!someone!whatever\n'
+    text2 = '!type!open!2\n'
+    text3 = text1 + text2
+    text4 = text1 + text1
+    assert w_comment_line.matches(text1)
+    parser1 = w_comment_line.copy().addCondition(w_is_typed)
+    assert not parser1.matches(text1)
+    assert w_type_line.matches(text2)
+    parser2 = w_type_line.copy().addCondition(w_is_typed)
+    assert parser2.matches(text2)
+    parser3 = pp.OneOrMore(w_command_line_x)
+    assert parser3.matches(text3)
+    parser4 = parser3.copy().addCondition(w_is_typed)
+    assert parser4.matches(text3)
+    assert parser3.matches(text4)
+    parser5 = parser3.copy().addCondition(w_is_typed)
+    assert not parser5.matches(text4)
 
 
 def test_regressions():
@@ -624,4 +643,21 @@ Banana banana [i]Banana banana[/i] banana banana banana banana banana banana ban
 !points!1
 !comment!Banana!http://www.banana.com/ - banana banana banana banana (B. banana) = 25 mg/ml (A+B banana) - banana: banana = 600 g/L
 '''
-])]
+]), (w_atleast3commands, r'''!points!3
+!drawbox!1.5
+!answer!banana banana banana banana banana banana banana banana banana
+!comment!banana1!banana banana, banana banana banana banana banana banana?
+!comment!banana2!banana banana banana banana banana banana, banana banana. banana banana banana banana banana banana, banana banana banana banana. banana banana banana banana banana banana.''', {
+    'points': [3.0],
+    'drawbox': [1.5],
+    'answer': [
+        'banana banana banana banana banana banana banana banana banana'
+    ],
+    'comments': [[
+        'banana1',
+        'banana banana, banana banana banana banana banana banana?',
+    ], [
+        'banana2',
+        'banana banana banana banana banana banana, banana banana. banana banana banana banana banana banana, banana banana banana banana. banana banana banana banana banana banana.',
+    ]],
+})]

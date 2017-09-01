@@ -220,12 +220,9 @@ w_answerblock_line   = (
 ).setName('w_answerblock_line').setResultsName('answerblock')
 
 w_command_line_x     = (
-    w_command_line | w_answerblock_line | w_drawbox_line
+    w_command_line | w_answerblock_line | w_drawbox_line |
+    w_answerfigure_line | w_type_line
 ).setName('w_command_line_x')
-
-w_type_line_x        = (
-    w_type_line | w_answerblock_line | w_drawbox_line | w_answerfigure_line
-).setName('w_type_line_x')
 
 w_complete_text_line = (
     w_type_start + l_complete_text + line_end
@@ -239,17 +236,32 @@ w_complete_text_duet = (
     w_normal_line + w_choose_line
 ).setName('w_complete_text_duet')
 
-w_atleast1command    = (
-    pp.ZeroOrMore(w_command_line_x) + w_type_line_x +
-    pp.ZeroOrMore(w_command_line_x)
+
+def w_is_typed(tokens):
+    """ Check whether a sequence of commands includes a type specifier. """
+    return (
+        'type' in tokens or
+        'answerblock' in tokens or
+        'drawbox' in tokens or
+        'answerfigure' in tokens
+    )
+
+
+w_atleast1command    = pp.OneOrMore(w_command_line_x).addCondition(
+    w_is_typed,
+    message='Must include a type',
 ).setName('w_atleast1command')
 
-w_atleast2commands   = (
-    w_type_line_x & w_command_line_x & pp.ZeroOrMore(w_command_line_x)
+w_atleast2commands   = twoOrMore(w_command_line_x).addCondition(
+    w_is_typed,
+    message='Must include a type',
 ).setName('w_atleast2commands')
 
 w_atleast3commands   = (
-    w_type_line_x & w_command_line_x & pp.OneOrMore(w_command_line_x)
+    w_command_line_x + twoOrMore(w_command_line_x)
+).addCondition(
+    w_is_typed,
+    message='Must include a type',
 ).setName('w_atleast3commands')
 
 w_intro_block        = (
