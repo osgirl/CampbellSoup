@@ -297,15 +297,15 @@ w_block      = pp.Group(
 w_question_group    = pp.Group(pp.delimitedList(
     w_block, pp.OneOrMore(empty_line.suppress())
 ).ignore(
-    pp.pythonStyleComment + pp.lineEnd
+    pp.lineEnd + pp.pythonStyleComment
 )).setName('w_question_group').setResultsName('contentLW')
 
 w_question_group_sources = pp.delimitedList(
     pp.originalTextFor(w_block.copy().ignore(
-        pp.pythonStyleComment + pp.lineEnd,
+        pp.lineEnd + pp.pythonStyleComment,
     )),
     pp.OneOrMore(empty_line.copy().ignore(
-        pp.pythonStyleComment + pp.lineEnd
+        pp.lineEnd + pp.pythonStyleComment
     ).suppress()),
 ).setName('w_question_group_sources')
 

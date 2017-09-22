@@ -209,7 +209,68 @@ Banana banana [i]Banana banana[/i] banana banana banana banana banana banana ban
         'banana2',
         'banana banana banana banana banana banana, banana banana. banana banana banana banana banana banana, banana banana banana banana. banana banana banana banana banana banana.',
     ]],
-})}
+}), 'LW_comment_before_blank_line': (w_question_group, r'''Banana banana banana banana banana banana banana.
+Banana
+Banana banana
+Banana banana
+Banana
+!type!mc
+!points!1
+!answer!banana
+# banana banana 'banana banana banana' banana banana banana banana banana banana banana banana banana.
+
+Banana banana banana banana banana banana banana banana-Banana banana banana-Banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana banana banana banana.
+!drawbox!1
+!comment!Banana!Banana banana banana banana banana: banana banana banana banana banana (= banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana) banana banana banana banana?
+!points!5
+!answer!??? -- Banana banana banana, banana banana banana banana.
+''', {'contentLW': [{
+    'question': r'''Banana banana banana banana banana banana banana.
+Banana
+Banana banana
+Banana banana
+Banana
+''',
+    'type': ['mc'],
+    'points': [1.0],
+    'answer': ['banana'],
+}, {
+    'question': r'''Banana banana banana banana banana banana banana banana-Banana banana banana-Banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana banana banana banana.
+''',
+    'drawbox': [1.0],
+    'comments': [['Banana', 'Banana banana banana banana banana: banana banana banana banana banana (= banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana) banana banana banana banana?']],
+    'points': [5.0],
+    'answer': ['??? -- Banana banana banana, banana banana banana banana.'],
+}]}), 'LW_comment_before_blank_line_src': (w_question_group_sources, r'''Banana banana banana banana banana banana banana.
+Banana
+Banana banana
+Banana banana
+Banana
+!type!mc
+!points!1
+!answer!banana
+# banana banana 'banana banana banana' banana banana banana banana banana banana banana banana banana.
+
+Banana banana banana banana banana banana banana banana-Banana banana banana-Banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana banana banana banana.
+!drawbox!1
+!comment!Banana!Banana banana banana banana banana: banana banana banana banana banana (= banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana) banana banana banana banana?
+!points!5
+!answer!??? -- Banana banana banana, banana banana banana banana.
+''', [r'''Banana banana banana banana banana banana banana.
+Banana
+Banana banana
+Banana banana
+Banana
+!type!mc
+!points!1
+!answer!banana
+# banana banana 'banana banana banana' banana banana banana banana banana banana banana banana banana.
+''', r'''Banana banana banana banana banana banana banana banana-Banana banana banana-Banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana banana banana banana.
+!drawbox!1
+!comment!Banana!Banana banana banana banana banana: banana banana banana banana banana (= banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana) banana banana banana banana?
+!points!5
+!answer!??? -- Banana banana banana, banana banana banana banana.
+'''])}
 
 
 @pytest.fixture(
