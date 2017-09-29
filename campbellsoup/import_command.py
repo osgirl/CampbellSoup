@@ -63,7 +63,7 @@ def import_test(directory, title=None, year=None, order_by_stdin=False):
         title = year
     test_date = date(int(year), 6, 1)
     if order_by_stdin:
-        files = sys.stdin.readlines()
+        files = sys.stdin.read().strip().split('\n')
     else:
         files = sorted(os.listdir(directory), key=filename_order_key)
     os.chdir(directory)
