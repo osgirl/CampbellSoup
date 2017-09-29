@@ -54,3 +54,13 @@ def append_to(__all__):
         __all__.append(obj.__name__)
         return obj
     return wrap
+
+
+def maybe(target, *keys, fallback=None):
+    """ Simple implementation of optional chaining, like Haskell's Maybe. """
+    try:
+        for key in keys:
+            target = target[key]
+        return target
+    except:
+        return fallback

@@ -69,10 +69,10 @@ class Person(db.Model):
     
     id = _integer_pkey()
     short_name = db.Column(db.String(30), nullable=False, unique=True)
-    full_name = db.Column(db.String(60), nullable=False)
-    role_id = db.Column(db.ForeignKey('user_role.id'), nullable=False)
-    email_address = db.Column(db.String(30))
-    password_hash = db.Column(db.String(30))
+    full_name = db.Column(db.String(254), nullable=False)
+    role_id = db.Column(db.ForeignKey('user_role.id'))
+    email_address = db.Column(db.String(254))
+    password_hash = db.Column(db.String(254))
     
     role = db.relationship('UserRole', backref='users')
 
@@ -96,7 +96,7 @@ class Book(db.Model):
     id = _integer_pkey()
     title = db.Column(db.Text, nullable=False)
     author = db.Column(db.Text, nullable=False)
-    edition = db.Column(db.String(30))
+    edition = db.Column(db.String(62))
     year = db.Column(db.Integer)
     
     topics = association_proxy('topic_bindings', 'topic')
@@ -107,7 +107,7 @@ class Topic(db.Model):
     """ Possible topic for questions, independent of Book. """
 
     id = _integer_pkey()
-    name = db.Column(db.String(60), nullable=False, unique=True)
+    name = db.Column(db.String(254), nullable=False, unique=True)
     
     books = association_proxy('book_bindings', 'book')
     questions = association_proxy('question_bindings', 'question')
@@ -120,10 +120,10 @@ class TopicBookBinding(db.Model):
     
     topic_id = db.Column(db.ForeignKey('topic.id'), primary_key=True)
     book_id = db.Column(db.ForeignKey('book.id'), primary_key=True)
-    chapter = db.Column(db.String(30))
-    section = db.Column(db.String(30))
-    figure = db.Column(db.String(30))
-    table = db.Column(db.String(30))
+    chapter = db.Column(db.String(254))
+    section = db.Column(db.String(254))
+    figure = db.Column(db.String(254))
+    table = db.Column(db.String(254))
     page = db.Column(db.String(30))
     
     topic = db.relationship('Topic', backref='book_bindings')
@@ -149,14 +149,14 @@ class Figure(db.Model):
     kind_id = db.Column(db.ForeignKey('figure_kind.id'), nullable=False)
     tree_id = db.Column(db.ForeignKey('figure_tree.id'), nullable=False)
     ancestor_id = db.Column(db.ForeignKey('figure.id'))
-    filename = db.Column(db.String(30), nullable=False)
-    mimetype = db.Column(db.String(30), nullable=False)
+    filename = db.Column(db.String(254), nullable=False)
+    mimetype = db.Column(db.String(254), nullable=False)
     contents = db.Column(db.LargeBinary, nullable=False)
     
     revision = db.relationship('Revision', backref='figures')
     kind = db.relationship('FigureKind', backref='figures')
     tree = db.relationship('FigureTree', backref='figures')
-    ancestor = db.relationship('Figure', backref='descendants')
+    ancestor = db.relationship('Figure', remote_side=id, backref='descendants')
     introductions = association_proxy('intro_bindings', 'introduction')
     questions = association_proxy('question_bindings', 'question')
 
@@ -167,7 +167,7 @@ class Introduction(db.Model):
     
     id = _integer_pkey()
     revision_id = db.Column(db.ForeignKey('revision.id'), nullable=False)
-    text = db.Column(db.Text, nullable=False)
+    text = db.Column(db.Text)
     source_code = db.Column(db.Text)
     
     revision = db.relationship('Revision', backref='introductions')
@@ -248,8 +248,16 @@ class QuestionHistory(db.Model):
     parent_id = db.Column(db.ForeignKey('question.id'), primary_key=True)
     child_id = db.Column(db.ForeignKey('question.id'), primary_key=True)
     
-    parent = db.relationship('Question', backref='child_bindings')
-    child = db.relationship('Question', backref='parent_bindings')
+    parent = db.relationship(
+        'Question',
+        backref='child_bindings',
+        foreign_keys=parent_id
+    )
+    child = db.relationship(
+        'Question',
+        backref='parent_bindings',
+        foreign_keys=child_id,
+    )
 
 
 @append_to(__all__)
@@ -318,8 +326,16 @@ class GroupHistory(db.Model):
     child_id = db.Column(db.ForeignKey('group.id'), primary_key=True)
     # also needs a reverse index
     
-    parent = db.relationship('Group', backref='child_bindings')
-    child = db.relationship('Group', backref='parent_bindings')
+    parent = db.relationship(
+        'Group',
+        backref='child_bindings',
+        foreign_keys=parent_id,
+    )
+    child = db.relationship(
+        'Group',
+        backref='parent_bindings',
+        foreign_keys=child_id,
+    )
 
 
 @append_to(__all__)
@@ -343,7 +359,7 @@ class GroupQuestionBinding(db.Model):
     question_id = db.Column(db.ForeignKey('question.id'), primary_key=True)
     # might also need a reverse index
     order = db.Column(db.Integer, nullable=False)
-    weight = db.Column(db.Integer)
+    weight = db.Column(db.Float)
     
     group = db.relationship('Group', backref='question_bindings')
     question = db.relationship('Question', backref='group_bindings')
@@ -364,8 +380,16 @@ class Issue(db.Model):
     deadline = db.Column(db.DateTime)
     title = db.Column(db.Text, nullable=False)
     
-    raised = db.relationship('Revision', backref='raised_issues')
-    resolved = db.relationship('Revision', backref='resolved_issues')
+    raised = db.relationship(
+        'Revision',
+        backref='raised_issues',
+        foreign_keys=raised_id,
+    )
+    resolved = db.relationship(
+        'Revision',
+        backref='resolved_issues',
+        foreign_keys=resolved_id,
+    )
     test = db.relationship('Test', backref='issues')
     groupnet = db.relationship('GroupNetwork', backref='issues')
     questionnet = db.relationship('QuestionNetwork', backref='issues')

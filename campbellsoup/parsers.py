@@ -61,6 +61,10 @@ m_afbeeldingen    = (
     pp.CaselessKeyword('afbeeldingen')
 ).setName('m_afbeeldingen').suppress()
 
+m_comment    = (
+    pp.CaselessKeyword('comment')
+).setName('m_comment').suppress()
+
 # Meta values
 
 v_onbekend        = (
@@ -69,6 +73,7 @@ v_onbekend        = (
 
 v_geen            = (pp.CaselessKeyword('geen')).setName('v_geen').suppress()
 v_nee             = (pp.CaselessKeyword('nee')).setName('v_nee').suppress()
+v_dash            = pp.Keyword('-').setName('v_dash').suppress()
 
 v_year            = pp.Regex(
     '20(0[4-9]|[1-9]\d)',  # not century-proof
@@ -134,10 +139,10 @@ w_table_row         = pp.Group(pp.delimitedList(
     l_pipe,
 )).setName('w_table_row')
 
-w_table             = pp.Group(pp.delimitedList(
+w_table             = pp.delimitedList(
     w_table_row,
     l_pipe * 2,
-)).setName('w_table')
+).setName('w_table')
 
 w_integer_arg       = (l_bang + integer).setName('w_integer_arg')
 w_floating_arg      = (l_bang + floating).setName('w_floating_arg')
@@ -178,6 +183,10 @@ w_command_line      = (w_command_start + (
     w_points_com | w_comment_com | w_answer_com
 ) + line_end).setName('w_command_line')
 
+w_comment_line      = (
+    w_command_start + w_comment_com + line_end
+).setName('w_comment_line')
+
 w_type_start        = (
     w_command_start + l_type + l_bang
 ).setName('w_type_start')
@@ -211,12 +220,9 @@ w_answerblock_line   = (
 ).setName('w_answerblock_line').setResultsName('answerblock')
 
 w_command_line_x     = (
-    w_command_line | w_answerblock_line
+    w_command_line | w_answerblock_line | w_drawbox_line |
+    w_answerfigure_line | w_type_line
 ).setName('w_command_line_x')
-
-w_type_line_x        = (
-    w_type_line | w_answerblock_line | w_drawbox_line | w_answerfigure_line
-).setName('w_type_line_x')
 
 w_complete_text_line = (
     w_type_start + l_complete_text + line_end
@@ -230,23 +236,39 @@ w_complete_text_duet = (
     w_normal_line + w_choose_line
 ).setName('w_complete_text_duet')
 
-w_atleast1command    = (
-    pp.ZeroOrMore(w_command_line_x) + w_type_line_x +
-    pp.ZeroOrMore(w_command_line_x)
+
+def w_is_typed(tokens):
+    """ Check whether a sequence of commands includes a type specifier. """
+    return (
+        'type' in tokens or
+        'answerblock' in tokens or
+        'drawbox' in tokens or
+        'answerfigure' in tokens
+    )
+
+
+w_atleast1command    = pp.OneOrMore(w_command_line_x).addCondition(
+    w_is_typed,
+    message='Must include a type',
 ).setName('w_atleast1command')
 
-w_atleast2commands   = (
-    w_type_line_x & w_command_line_x & pp.ZeroOrMore(w_command_line_x)
+w_atleast2commands   = twoOrMore(w_command_line_x).addCondition(
+    w_is_typed,
+    message='Must include a type',
 ).setName('w_atleast2commands')
 
 w_atleast3commands   = (
-    w_type_line_x & w_command_line_x & pp.OneOrMore(w_command_line_x)
+    w_command_line_x + twoOrMore(w_command_line_x)
+).addCondition(
+    w_is_typed,
+    message='Must include a type',
 ).setName('w_atleast3commands')
 
 w_intro_block        = (
     w_normal_line.setResultsName('title') +
     pp.Optional(w_normal_line.setResultsName('intro')) +
-    pp.Optional(w_command_line)
+    pp.Optional(w_command_line) +
+    pp.ZeroOrMore(w_comment_line)
 ).leaveWhitespace().setName('w_intro_block')
 
 w_standard_question_block = (
@@ -273,10 +295,19 @@ w_block      = pp.Group(
 ).setName('w_block')
 
 w_question_group    = pp.Group(pp.delimitedList(
-    w_block, empty_line.suppress()
+    w_block, pp.OneOrMore(empty_line.suppress())
 ).ignore(
-    pp.pythonStyleComment + pp.lineEnd
+    pp.lineEnd + pp.pythonStyleComment
 )).setName('w_question_group').setResultsName('contentLW')
+
+w_question_group_sources = pp.delimitedList(
+    pp.originalTextFor(w_block.copy().ignore(
+        pp.lineEnd + pp.pythonStyleComment,
+    )),
+    pp.OneOrMore(empty_line.copy().ignore(
+        pp.lineEnd + pp.pythonStyleComment
+    ).suppress()),
+).setName('w_question_group_sources')
 
 # Plaintext parts
 
@@ -301,7 +332,7 @@ def p_parse(toks):
 # Global parts
 
 g_null         = (
-    v_nee | v_onbekend | v_geen
+    v_nee | v_onbekend | v_geen | v_dash
 ).setName('g_null').setParseAction(pp.replaceWith(None))
 
 g_year_value   = (v_year | g_null).setName('g_year_value')
@@ -316,13 +347,14 @@ g_text_value    = (
     g_null | pp.dblQuotedString.setParseAction(pp.removeQuotes) | pp.restOfLine
 ).setName('g_text_value')
 
-g_points_value = (g_null | integer + pp.Optional(
-    pp.nestedExpr(content=pp.delimitedList(integer, ':'))
+g_points_value = (g_null | floating + pp.Optional(
+    pp.nestedExpr(content=pp.delimitedList(floating, ':'))
 ).leaveWhitespace()).setName('g_points_value')
 
 g_images_value = (g_null | pp.delimitedList(
-    pp.dblQuotedString.setParseAction(pp.removeQuotes)
-)).setName('g_images_value')
+    pp.dblQuotedString.setParseAction(pp.removeQuotes),
+    pp.Regex(r', ?'),
+).leaveWhitespace()).setName('g_images_value')
 
 g_author_field  = (
     pp.lineStart + m_auteur + m_colon + g_authors_value + line_end
@@ -356,14 +388,21 @@ g_images_field = (
     pp.lineStart + m_afbeeldingen + m_colon + g_images_value + line_end
 ).setName('g_images_field').setResultsName('images')
 
+g_comment_field   = (
+    pp.lineStart + m_comment + m_colon + pp.QuotedString('"', multiline=True) +
+    line_end
+).setName('g_comment_field').setResultsName('comment')
+
 g_meta_field    = (
     g_author_field | g_reuse_field | g_year_field | g_title_field |
-    g_questions_field | g_answer_field | g_points_field | g_images_field
+    g_questions_field | g_answer_field | g_points_field | g_images_field |
+    g_comment_field
 ).setName('g_meta_field')
 
 g_plaintext_field = (
     pp.lineStart + m_plat + m_colon +
-    pp.QuotedString('"', multiline=True).setParseAction(p_parse) + line_end
+    pp.QuotedString('"', escChar='\\', multiline=True).setParseAction(p_parse)
+    + line_end
 ).setName('g_plaintext_field')
 
 # Full document parsing
@@ -376,11 +415,25 @@ latex_writer_document = (
     latex_writer_header + w_question_group
 ).setName('latex_writer_document')
 
+latex_writer_sources = (
+    latex_writer_header.copy().suppress() + w_question_group_sources
+).setName('latex_writer_sources')
+
 plaintext_document = (
     pp.OneOrMore(g_meta_field) + g_plaintext_field + pp.ZeroOrMore(g_meta_field)
 ).setName('plaintext_document')
 
 document = (latex_writer_document | plaintext_document).setName('document')
+
+# File names
+
+# Parses the proper name only, use os.path.splitext to remove the extension.
+filename_parts = (
+    pp.Optional(v_year + '-').suppress() +
+    integer + pp.Optional(
+        pp.Word(pp.alphas, exact=1) | pp.Literal('-').suppress() + integer
+    )
+).setName('filename_parts')
 
 
 def debug_all():

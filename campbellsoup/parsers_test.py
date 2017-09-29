@@ -168,27 +168,24 @@ def test_w_tables():
         w_table_row,
         w_table,
     )] for string in (cell, row, table)]
-    for subresults in results:
-        for result in subresults:
-            assert len(result) == 1
     # parse cell as w_cell
     assert results[0][0][0] == 'abc 123;!'
     # parse cell as w_row
     assert results[0][1][0].asList() == ['abc 123;!']
     # parse cell as w_table
-    assert results[0][2][0].asList() == [['abc 123;!']]
+    assert results[0][2].asList() == [['abc 123;!']]
     # parse row as w_cell
     assert results[1][0][0] == 'abc'
     # parse row as w_row
     assert results[1][1][0].asList() == ['abc', '123', '...']
     # parse row as w_table
-    assert results[1][2][0].asList() == [['abc', '123', '...']]
+    assert results[1][2].asList() == [['abc', '123', '...']]
     # parse table as w_cell
     assert results[2][0][0] == 'a'
     # parse table as w_row
     assert results[2][1][0].asList() == ['a', 'b', 'c']
     # parse table as w_table
-    assert results[2][2][0].asList() == [
+    assert results[2][2].asList() == [
         ['a', 'b', 'c'],
         ['1', '2', '3'],
         ['.', '.', '.'],
@@ -208,13 +205,13 @@ def test_w_args():
     assert w_floating_arg.parseString(float_arg).asList() == [123.456]
     assert w_floating_arg.parseString(text_arg).asList() == [12]
     assert w_floating_arg.parseString(table_arg).asList() == [1]
-    assert w_table_arg.parseString(int_arg).asList() == [[['123']]]
-    assert w_table_arg.parseString(float_arg).asList() == [[['123.456']]]
-    assert w_table_arg.parseString(text_arg).asList() == [[['12ab']]]
-    assert w_table_arg.parseString(table_arg).asList() == [[
+    assert w_table_arg.parseString(int_arg).asList() == [['123']]
+    assert w_table_arg.parseString(float_arg).asList() == [['123.456']]
+    assert w_table_arg.parseString(text_arg).asList() == [['12ab']]
+    assert w_table_arg.parseString(table_arg).asList() == [
         ['1a', '2b'],
         ['3c', '4d'],
-    ]]
+    ]
     assert w_generic_arg.parseString(int_arg).asList() == ['123']
     assert w_generic_arg.parseString(float_arg).asList() == ['123.456']
     assert w_generic_arg.parseString(text_arg).asList() == ['12ab']
@@ -248,7 +245,7 @@ def test_w_subquestions_com():
 
 def test_w_table_com():
     assert w_table_com.parseString('table!ab|cd||12|34').asDict() == {'table': [
-        [['ab', 'cd'], ['12', '34']],
+        ['ab', 'cd'], ['12', '34'],
     ]}
     assert not w_table_com.matches('table')
 
@@ -404,23 +401,12 @@ def test_w_answerblock_line():
 def test_w_command_line_x():
     assert w_command_line_x.matches('!figure!banana.png!0.3')
     assert w_command_line_x.matches('!answerblock!2!3\n')
-    assert not w_command_line_x.matches('!type!open!4')
-    assert not w_command_line_x.matches('!drawbox!10.8\n')
-    assert not w_command_line_x.matches('!answerfigure!banana.png\n')
+    assert w_command_line_x.matches('!drawbox!10.8\n')
+    assert w_command_line_x.matches('!type!open!4')
+    assert w_command_line_x.matches('!answerfigure!banana.png\n')
     assert not w_command_line_x.matches('!type!complete_text')
     assert not w_command_line_x.matches('!choose!abc!def\n')
     assert not w_command_line_x.matches('banana bananas')
-
-
-def test_w_type_line_x():
-    assert not w_type_line_x.matches('!figure!banana.png!0.3')
-    assert w_type_line_x.matches('!answerblock!2!3\n')
-    assert w_type_line_x.matches('!type!open!4')
-    assert w_type_line_x.matches('!drawbox!10.8\n')
-    assert w_type_line_x.matches('!answerfigure!banana.png\n')
-    assert not w_type_line_x.matches('!type!complete_text')
-    assert not w_type_line_x.matches('!choose!abc!def\n')
-    assert not w_type_line_x.matches('banana bananas')
 
 
 def test_w_complete_text_line():
@@ -431,125 +417,39 @@ def test_w_complete_text_line():
     assert not w_complete_text_line.matches('!type')
 
 
-def test_document():
-    for example, result in TEST_DOCUMENTS:  # bottom of file
-        assert document.parseString(example, parseAll=True).asDict() == result
+def test_addCondition():
+    """ Check the behaviour of pyparsing.ParserElement.addCondition. """
+    parser1 = w_drawbox_line.copy().addCondition(lambda toks: 'drawbox' in toks)
+    assert parser1.matches('!drawbox!1\n')
+    parser2 = w_type_line.copy().addCondition(
+        lambda toks: hasattr(toks, 'type')
+    )
+    assert parser2.matches('!type!open!1\n')
 
 
-# The examples below are based on real question files. They were
-# bananafied in order to keep confidential information confidential.
-
-TEST_DOCUMENTS = [('''Toetsjaar: 2090
-Auteur: onbekend
-Titel:"Banana banana banana"
-Deelvragen:3
-Plat:
-"Banana banana banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana: banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana banana banana. 
-banana. Banana banana (banana banana banana) banana banana banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana.
-
-	banana				banana
-
-
-
-
-
-
-
-
-Banana banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana.(Banana banana, banana banana banana (banana banana))
-
-	banana	banana
+def test_w_is_typed():
+    text1 = '!comment!someone!whatever\n'
+    text2 = '!type!open!2\n'
+    text3 = text1 + text2
+    text4 = text1 + text1
+    assert w_comment_line.matches(text1)
+    parser1 = w_comment_line.copy().addCondition(w_is_typed)
+    assert not parser1.matches(text1)
+    assert w_type_line.matches(text2)
+    parser2 = w_type_line.copy().addCondition(w_is_typed)
+    assert parser2.matches(text2)
+    parser3 = pp.OneOrMore(w_command_line_x)
+    assert parser3.matches(text3)
+    parser4 = parser3.copy().addCondition(w_is_typed)
+    assert parser4.matches(text3)
+    assert parser3.matches(text4)
+    parser5 = parser3.copy().addCondition(w_is_typed)
+    assert not parser5.matches(text4)
 
 
-
-
-
-
-
-
-
-**$$**
-Banana banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana, banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana. 
-
-banana. Banana banana banana banana banana banana banana banana banana banana banana banana?
-*
-
-*
-
-
-**$$**
-banana.    Banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana-banana banana. Banana banana banana banana banana banana banana banana banana banana banana banana. (Banana banana banana banana banana banana banana banana banana banana banana)
-Banana banana banana banana banana banana banana banana banana banana banana? 
-banana: Banana banana: banana banana banana banana
-     Banana banana: banana banana banana banana
-banana: Banana banana: banana banana banana banana
-     Banana banana: banana banana banana banana"
-
-Antwoord:Onbekend
-Puntenverdeling:Onbekend
-Afbeeldingen:Geen
-Herbruik:Nee
-''', {
-    'answer': [None],
-    'authors': [None],
-    'contentPlain': [
-        'Banana banana banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana: banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana banana banana. \nbanana. Banana banana (banana banana banana) banana banana banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana.\n\n        banana                          banana\n\n\n\n\n\n\n\n\nBanana banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana.(Banana banana, banana banana banana (banana banana))\n\n        banana  banana\n\n\n\n\n\n\n\n\n\n',
-        'Banana banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana, banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana banana. \n\nbanana. Banana banana banana banana banana banana banana banana banana banana banana banana?\n*\n\n*\n\n\n',
-        'banana.    Banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana-banana banana. Banana banana banana banana banana banana banana banana banana banana banana banana. (Banana banana banana banana banana banana banana banana banana banana banana)\nBanana banana banana banana banana banana banana banana banana banana banana? \nbanana: Banana banana: banana banana banana banana\n     Banana banana: banana banana banana banana\nbanana: Banana banana: banana banana banana banana\n     Banana banana: banana banana banana banana',
-    ],
-    'images': [None],
-    'points': [None],
-    'questionCount': [3],
-    'reuse': [None],
-    'title': ['Banana banana banana'],
-    'year': [2090],
-}), ('''Auteur: Banana Banana
-Herbruik:nee
-Banana
-
-Banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana, banana banana banana Banana banana (\\'{a}\\'{a}nana Banana) banana Banana banana (Banana) banana banana banana. Banana banana banana banana banana banana Banana-banana, banana banana banana banana banana Banana-banana banana.
-
-Banana banana banana banana banana banana banana (banana-banana) banana banana banana banana banana Banana banana banana. Banana banana banana banana banana banana banana banana.
-!answerfigure!banana.png
-!points!1
-!answer!Banana banana banana.
-
-Banana banana banana banana banana banana banana banana banana banana banana banana banana.
-!type!open!3
-!points!2
-!answer!banana Banana
-
-Banana Banana banana banana banana banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana banana banana Banana, Banana$_1$ banana Banana$_2$ banana banana banana~Banana banana Banana-banana banana banana banana banana banana banana banana banana Banana-banana banana banana banana banana Banana-banana banana banana banana banana banana banana banana banana banana banana \\'{a}\\'{a}nana banana banana banana banana.\\\\Banana banana banana banana banana banana banana Banana~banana banana banana Banana~banana banana banana banana banana Banana banana, banana banana banana banana banana \\ldots
-\\ldots banana banana banana banana banana banana banana.
-\\ldots banana banana banana Banana banana banana banana, banana banana banana banana banana.
-!subquestions!2
-!type!open!1
-!points!2
-!answer!banana banana banana
-!comment!answer!40 banana banana
-''', {
-    'authors': [' Banana Banana'],
-    'contentLW': [{
-        'title': 'Banana',
-    }, {
-        'title': "Banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana, banana banana banana Banana banana (\\'{a}\\'{a}nana Banana) banana Banana banana (Banana) banana banana banana. Banana banana banana banana banana banana Banana-banana, banana banana banana banana banana Banana-banana banana.",
-    }, {
-        'answer': ['Banana banana banana.'],
-        'answerfigure': ['banana.png'],
-        'points': [1.0],
-        'question': 'Banana banana banana banana banana banana banana (banana-banana) banana banana banana banana banana Banana banana banana. Banana banana banana banana banana banana banana banana.\n',
-    }, {
-        'answer': ['banana Banana'],
-        'points': [2.0],
-        'question': 'Banana banana banana banana banana banana banana banana banana banana banana banana banana.\n',
-        'type': ['open', 3],
-    }, {
-        'answer': ['banana banana banana'],
-        'comments': [['answer', '40 banana banana']],
-        'points': [2.0],
-        'question': "Banana Banana banana banana banana banana banana banana banana banana banana banana banana banana. Banana banana banana banana banana banana banana banana banana banana banana Banana, Banana$_1$ banana Banana$_2$ banana banana banana~Banana banana Banana-banana banana banana banana banana banana banana banana banana Banana-banana banana banana banana banana Banana-banana banana banana banana banana banana banana banana banana banana banana \\'{a}\\'{a}nana banana banana banana banana.\\\\Banana banana banana banana banana banana banana Banana~banana banana banana Banana~banana banana banana banana banana Banana banana, banana banana banana banana banana \\ldots\n\\ldots banana banana banana banana banana banana banana.\n\\ldots banana banana banana Banana banana banana banana, banana banana banana banana banana.\n",
-        'subquestions': [2],
-        'type': ['open', 1],
-    }],
-    'reuse': [None],
-})]
+def test_regressions(regressions_fix):  # from conftest.py
+    parser, example, result = regressions_fix
+    if isinstance(result, dict):
+        assert parser.parseString(example, parseAll=True).asDict() == result
+    else:
+        assert parser.parseString(example, parseAll=True).asList() == result

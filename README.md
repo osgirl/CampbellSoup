@@ -20,6 +20,8 @@ The default configuration in `campbellsoup.defaults` assumes a SQLite database. 
 
 In order to bootstrap your local database before first running the application, run `python manage.py -c path/to/your/config.py db upgrade`. Run this command again after defining new migrations. In order to define a new migration (after modifying the database schema in campbellsoup.models), run `python manage.py -c path/to/your/config.py db migrate` and edit the generated file. See the [Flask-Migrate documentation][14] for details.
 
+**Note** if you checked out the repository and migrated your database between commits 397a92c and e72a25e (which is unlikely), you need downgrade your database to version 410d73a04b1d before performing migrations associated with later commits.
+
 Local development
 -----------------
 Make sure that your virtual environment is activated, then run `grunt`. This will do many things:
