@@ -1,4 +1,4 @@
-# (c) 2014, 2016 Julian Gonggrijp
+# (c) 2014, 2016, 2017 Julian Gonggrijp
 
 """
     CampbellSoup, the web-based archive of Campbell test questions.
@@ -15,6 +15,7 @@ from flask_migrate import Migrate
 
 from .models import db
 from .api import api
+from .frontend import frontend
 from . import defaults
 
 
@@ -32,5 +33,11 @@ def create_application(config=defaults, create_db=False):
     if create_db:
         db.create_all(app=app)  # passing application because of context
     migrate.init_app(app, db)
-    app.register_blueprint(api)
+    app.register_blueprint(api, url_prefix='/api')
+    app.register_blueprint(
+        frontend,
+        # Next two lines may seem redundant, but turned out necessary
+        static_folder=frontend.static_folder,
+        static_url_path=frontend.static_url_path,
+    )
     return app
