@@ -1,9 +1,9 @@
 ###
-	(c) 2016 Julian Gonggrijp
+	(c) 2016, 2017 Julian Gonggrijp
 ###
 
 require.config
-	baseUrl: 'script'
+	baseUrl: 'static/script'
 	paths:
 		jquery: '../bower_components/jquery/dist/jquery'
 		backbone: '../bower_components/backbone/backbone'
