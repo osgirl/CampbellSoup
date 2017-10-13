@@ -12,7 +12,4 @@ frontend = flask.Blueprint(
 
 @frontend.route('/')
 def index():
-    print(frontend.static_folder)
-    print(frontend.static_url_path)
-    print(flask.url_for('Frontend.static', filename='script/main.js'))
     return frontend.send_static_file('index.html')

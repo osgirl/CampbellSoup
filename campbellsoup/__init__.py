@@ -24,7 +24,7 @@ migrate = Migrate()
 
 def create_application(config=defaults, create_db=False):
     """ Return a Werkzeug-flavoured WSGI application. """
-    app = flask.Flask(__name__)
+    app = flask.Flask(__name__, static_folder=None)
     if type(config) in (str, bytes):
         app.config.from_pyfile(config)
     else:
@@ -34,10 +34,5 @@ def create_application(config=defaults, create_db=False):
         db.create_all(app=app)  # passing application because of context
     migrate.init_app(app, db)
     app.register_blueprint(api, url_prefix='/api')
-    app.register_blueprint(
-        frontend,
-        # Next two lines may seem redundant, but turned out necessary
-        static_folder=frontend.static_folder,
-        static_url_path=frontend.static_url_path,
-    )
+    app.register_blueprint(frontend)
     return app
