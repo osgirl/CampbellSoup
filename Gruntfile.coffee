@@ -6,6 +6,7 @@
 
 module.exports = (grunt) ->
 	
+	require('load-grunt-tasks') grunt
 	stripRegExp = (path, ext) -> new RegExp "^#{path}/|\\.#{ext}$", 'g'
 	fs = require 'fs'
 	
@@ -250,22 +251,6 @@ module.exports = (grunt) ->
 								include no
 					else
 						include no
-	
-	grunt.loadNpmTasks 'grunt-contrib-clean'
-	grunt.loadNpmTasks 'grunt-contrib-handlebars'
-	grunt.loadNpmTasks 'grunt-contrib-coffee'
-	grunt.loadNpmTasks 'grunt-compile-handlebars'  # compile, not contrib
-	grunt.loadNpmTasks 'grunt-sass'
-	grunt.loadNpmTasks 'grunt-postcss'
-	grunt.loadNpmTasks 'grunt-contrib-symlink'
-	grunt.loadNpmTasks 'grunt-shell'
-	grunt.loadNpmTasks 'grunt-concurrent'
-	grunt.loadNpmTasks 'grunt-contrib-jasmine'
-	grunt.loadNpmTasks 'grunt-casperjs'
-	grunt.loadNpmTasks 'grunt-contrib-watch'
-	grunt.loadNpmTasks 'grunt-contrib-requirejs'
-	grunt.loadNpmTasks 'grunt-contrib-cssmin'
-	grunt.loadNpmTasks 'grunt-newer'
 	
 	grunt.registerTask 'compile-base', [
 		'handlebars:compile'
