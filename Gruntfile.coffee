@@ -125,27 +125,6 @@ module.exports = (grunt) ->
 				]
 				dest: '<%= stage %>'
 		
-		connect:
-			options:
-				hostname: 'localhost'
-				middleware: (connect, options, middlewares) ->
-					middlewares.unshift (req, res, next) ->
-						return next() unless req.url.startsWith '/api/'
-						req.url = req.url.slice 4
-						proxy.web req, res, {
-							target: 'http://localhost:5000'
-						}
-					middlewares
-				open: true
-			develop:
-				options:
-					base: '.tmp'
-					livereload: true
-			dist:
-				options:
-					base: 'dist'
-					port: 8080
-		
 		shell:
 			backend:
 				command: (filename) ->
@@ -250,22 +229,15 @@ module.exports = (grunt) ->
 				dest: '<%= dist %>/campbellsoup.css'
 		
 		concurrent:
-			server:
-				tasks: ['shell:backend', 'connect:develop:keepalive']
-				options:
-					logConcurrentOutput: true
-			dist:
-				tasks: ['shell:backend', 'connect:dist:keepalive']
-				options:
-					logConcurrentOutput: true
+			preserver:
+				tasks: ['shell:pytest', 'compile']
 			develop:
 				tasks: [
-					['shell:pytest', 'shell:backend']
+					['concurrent:preserver', 'server']
 					['watch']
-					['compile', 'jasmine:test', 'connect:develop:keepalive']
 				]
-				options:
-					logConcurrentOutput: true
+			options:
+				logConcurrentOutput: true
 		
 		newer:
 			options:
@@ -287,7 +259,6 @@ module.exports = (grunt) ->
 	grunt.loadNpmTasks 'grunt-sass'
 	grunt.loadNpmTasks 'grunt-postcss'
 	grunt.loadNpmTasks 'grunt-contrib-symlink'
-	grunt.loadNpmTasks 'grunt-contrib-connect'
 	grunt.loadNpmTasks 'grunt-shell'
 	grunt.loadNpmTasks 'grunt-concurrent'
 	grunt.loadNpmTasks 'grunt-contrib-jasmine'
@@ -316,5 +287,5 @@ module.exports = (grunt) ->
 		'requirejs:dist'
 		'cssmin:dist'
 	]
-	grunt.registerTask 'server', ['concurrent:server']
+	grunt.registerTask 'server', ['shell:backend']
 	grunt.registerTask 'default', ['concurrent:develop']
