@@ -7,8 +7,6 @@
 module.exports = (grunt) ->
 	
 	stripRegExp = (path, ext) -> new RegExp "^#{path}/|\\.#{ext}$", 'g'
-	httpProxy = require 'http-proxy'
-	proxy = httpProxy.createProxyServer {}
 	fs = require 'fs'
 	
 	grunt.initConfig
