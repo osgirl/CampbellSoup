@@ -34,5 +34,7 @@ def create_application(config=defaults, create_db=False):
         db.create_all(app=app)  # passing application because of context
     migrate.init_app(app, db)
     app.register_blueprint(api, url_prefix='/api')
+    frontend.static_folder = app.config['STATIC_FOLDER']
+    frontend.static_url_path = app.config['STATIC_URL_PATH']
     app.register_blueprint(frontend)
     return app

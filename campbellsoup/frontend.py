@@ -5,8 +5,6 @@ import flask
 frontend = flask.Blueprint(
     'Frontend',
     __name__,
-    static_folder='../.tmp',
-    static_url_path='/static',
 )
 
 
