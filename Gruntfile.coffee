@@ -6,7 +6,11 @@
 
 module.exports = (grunt) ->
 	
-	require('load-grunt-tasks') grunt
+	if grunt.option 'production'
+		require('load-grunt-tasks') grunt, scope: 'dependencies'
+	else
+		jasmineTemplate = require 'grunt-template-jasmine-requirejs'
+		require('load-grunt-tasks') grunt
 	stripRegExp = (path, ext) -> new RegExp "^#{path}/|\\.#{ext}$", 'g'
 	fs = require 'fs'
 	
@@ -149,7 +153,7 @@ module.exports = (grunt) ->
 						'bower_components/jasmine-jquery/lib/jasmine-jquery.js'
 					]
 					# host: 'http://localhost:8000/'
-					template: require 'grunt-template-jasmine-requirejs'
+					template: jasmineTemplate
 					templateOptions:
 						requireConfigFile: '<%= stage %>/<%= script %>/developConfig.js'
 						requireConfig:

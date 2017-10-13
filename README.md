@@ -54,7 +54,7 @@ If you want to verify the optimized assets (see below) during development, you c
 
 Deployment
 ----------
-An optimized version of the static assets can be obtained by running `grunt dist`. The optimized files are put in the `/dist` project subdirectory. In this case, most of the external libraries are fetched from CDNs in their minified forms. You may optionally pass the `-p` option to `bower install` in order to omit some packages that are only needed in development.
+An optimized version of the static assets can be obtained by running `grunt dist`. The optimized files are put in the `/dist` project subdirectory. In this case, most of the external libraries are fetched from CDNs in their minified forms. You may optionally pass the `-p` option to `bower install` in order to omit some packages that are only needed in development. Similarly, you may also pass the `--production` flag to `npm install`. Be aware that in this case, you need to pass the `--production` flag to grunt as well and some grunt commands will not work (but `dist` does work).
 
 You are advised to run the Flask-based backend as a WSGI application from your favourite HTTP server. Create a WSGI file that imports `campbellsoup.create_application` and calls it with the path to your custom settings module.
 
