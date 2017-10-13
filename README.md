@@ -12,11 +12,11 @@ For documentation, see the [Flask documentation][1]. Some clarifications can als
 
 Dependencies
 ------------
-For the Python dependencies, create a Python 3 virtualenv and activate it. `pip install pip-tools` and then run `pip-sync`. For local development purposes, also `pip install pytest`. For the JavaScript dependencies, install NPM and Grunt, then run `npm install`. For local development, also install Bower and run `bower install`.
+For the Python dependencies, create a Python 3 virtualenv and activate it. `pip install pip-tools` and then run `pip-sync`. For the JavaScript dependencies, install NPM and Grunt, then run `npm install`. For local development, also install Bower and run `bower install`.
 
 Database
 --------
-The default configuration in `campbellsoup.defaults` assumes a SQLite database. This is also the only database backend supported by the `requirements.txt`. If you choose a different backend, you will need to install additional libraries. For PostgreSQL, which we recommend, use `pip install psycopg2`. For most backends, including PostgreSQL, you will also need to create a dedicated database and a dedicated user with all privileges on that database. See the [SQLAlchemy documentation][2] for instructions on setting `SQLALCHEMY_DATABASE_URI`.
+The default configuration in `campbellsoup.defaults` assumes a SQLite database. SQLite and PostgreSQL are the only database backends supported by the `requirements.txt`. If you choose a different backend, you will need to install additional libraries. For most backends, including PostgreSQL, you will also need to create a dedicated database and a dedicated user with all privileges on that database. See the [SQLAlchemy documentation][2] for instructions on setting `SQLALCHEMY_DATABASE_URI`.
 
 In order to bootstrap your local database before first running the application, run `python manage.py -c path/to/your/config.py db upgrade`. Run this command again after defining new migrations. In order to define a new migration (after modifying the database schema in campbellsoup.models), run `python manage.py -c path/to/your/config.py db migrate` and edit the generated file. See the [Flask-Migrate documentation][14] for details.
 
@@ -27,7 +27,7 @@ Local development
 Make sure that your virtual environment is activated, then run `grunt`. This will do many things:
 
   - Compile the CoffeeScript, Sass and Mustache sources to browser-ready static assets (these are hidden in `/.tmp` under the project root).
-  - Run all unit tests once (this relies on you having installed `pytest`).
+  - Run all unit tests once.
   - Run the Flask-based backend server on port 5000 (this relies on you having created a `config.py` in the project root directory).
   - Watch all sources for changes, automatically recompiling static assets, re-running unit tests and reloading any open browser tabs where applicable.
   - Recompile and rerun the functional tests when changed. Note that the functional tests are not automatically rerun when you change source files. Functional tests are further discussed below.

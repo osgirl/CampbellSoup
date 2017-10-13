@@ -3,3 +3,5 @@ Flask-SQLAlchemy
 Flask-Script
 Flask-Migrate
 pyparsing
+pytest
+psycopg2
