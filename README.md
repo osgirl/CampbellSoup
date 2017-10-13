@@ -12,7 +12,7 @@ For documentation, see the [Flask documentation][1]. Some clarifications can als
 
 Dependencies
 ------------
-For the Python dependencies, create a Python 3 virtualenv and activate it. `pip install pip-tools` and then run `pip-sync`. For the JavaScript dependencies, install NPM and Grunt, then run `npm install`. For local development, also install Bower and run `bower install`.
+For the Python dependencies, create a Python 3 virtualenv and activate it. `pip install pip-tools` and then run `pip-sync`. For the JavaScript dependencies, install NPM, Bower and Grunt, then run `npm install` and `bower install`.
 
 Database
 --------
@@ -54,7 +54,7 @@ If you want to verify the optimized assets (see below) during development, you c
 
 Deployment
 ----------
-An optimized version of the static assets can be obtained by running `grunt dist`. The optimized files are put in the `/dist` project subdirectory. In this case you do not need the `bower_components`; the external libraries are fetched from CDNs in their minified forms.
+An optimized version of the static assets can be obtained by running `grunt dist`. The optimized files are put in the `/dist` project subdirectory. In this case, most of the external libraries are fetched from CDNs in their minified forms. You may optionally pass the `-p` option to `bower install` in order to omit some packages that are only needed in development.
 
 You are advised to run the Flask-based backend as a WSGI application from your favourite HTTP server. Create a WSGI file that imports `campbellsoup.create_application` and calls it with the path to your custom settings module.
 
@@ -96,7 +96,7 @@ Directory reference
 
 
 (c) 2014 Julian Gonggrijp & Bert Massop
-(c) 2016 Julian Gonggrijp
+(c) 2016, 2017 Julian Gonggrijp
 
 
 [1]: http://flask.pocoo.org/docs/0.11/config/
