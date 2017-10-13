@@ -26,5 +26,8 @@
     "grunt-shell": "^2.0.0",
     "grunt-template-jasmine-requirejs": "^0.2.3",
     "http-proxy": "^1.15.1"
+  },
+  "dependencies": {
+    "bulma": "^0.6.0"
   }
 }

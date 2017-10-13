@@ -86,7 +86,7 @@ module.exports = (grunt) ->
 			compile:
 				options:
 					includePaths: [
-						'bower_components/bootstrap-sass/assets/stylesheets'
+						'node_modules'
 					]
 					sourceComments: true
 				expand: true
