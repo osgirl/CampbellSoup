@@ -6,9 +6,12 @@
 
 module.exports = (grunt) ->
 	
+	if grunt.option 'production'
+		require('load-grunt-tasks') grunt, scope: 'dependencies'
+	else
+		jasmineTemplate = require 'grunt-template-jasmine-requirejs'
+		require('load-grunt-tasks') grunt
 	stripRegExp = (path, ext) -> new RegExp "^#{path}/|\\.#{ext}$", 'g'
-	httpProxy = require 'http-proxy'
-	proxy = httpProxy.createProxyServer {}
 	fs = require 'fs'
 	
 	grunt.initConfig
@@ -44,6 +47,7 @@ module.exports = (grunt) ->
 				compilerOptions:
 					knownHelpers: {}
 					knownHelpersOnly: true
+					compat: true
 			compile:
 				src: [
 					'<%= source %>/<%= template %>/**/*.mustache'
@@ -85,7 +89,7 @@ module.exports = (grunt) ->
 			compile:
 				options:
 					includePaths: [
-						'bower_components/bootstrap-sass/assets/stylesheets'
+						'node_modules'
 					]
 					sourceComments: true
 				expand: true
@@ -125,27 +129,6 @@ module.exports = (grunt) ->
 				]
 				dest: '<%= stage %>'
 		
-		connect:
-			options:
-				hostname: 'localhost'
-				middleware: (connect, options, middlewares) ->
-					middlewares.unshift (req, res, next) ->
-						return next() unless req.url.startsWith '/api/'
-						req.url = req.url.slice 4
-						proxy.web req, res, {
-							target: 'http://localhost:5000'
-						}
-					middlewares
-				open: true
-			develop:
-				options:
-					base: '.tmp'
-					livereload: true
-			dist:
-				options:
-					base: 'dist'
-					port: 8080
-		
 		shell:
 			backend:
 				command: (filename) ->
@@ -170,7 +153,7 @@ module.exports = (grunt) ->
 						'bower_components/jasmine-jquery/lib/jasmine-jquery.js'
 					]
 					# host: 'http://localhost:8000/'
-					template: require 'grunt-template-jasmine-requirejs'
+					template: jasmineTemplate
 					templateOptions:
 						requireConfigFile: '<%= stage %>/<%= script %>/developConfig.js'
 						requireConfig:
@@ -246,28 +229,19 @@ module.exports = (grunt) ->
 		
 		cssmin:
 			dist:
-				expand: true
-				cwd: '<%= stage %>/<%= style %>'
-				src: ['*.css']
-				dest: '<%= dist %>/<%= style %>'
+				src: ['<%= stage %>/<%= style %>/*.css']
+				dest: '<%= dist %>/campbellsoup.css'
 		
 		concurrent:
-			server:
-				tasks: ['shell:backend', 'connect:develop:keepalive']
-				options:
-					logConcurrentOutput: true
-			dist:
-				tasks: ['shell:backend', 'connect:dist:keepalive']
-				options:
-					logConcurrentOutput: true
+			preserver:
+				tasks: ['shell:pytest', 'compile']
 			develop:
 				tasks: [
-					['shell:pytest', 'shell:backend']
+					['concurrent:preserver', 'server']
 					['watch']
-					['compile', 'jasmine:test', 'connect:develop:keepalive']
 				]
-				options:
-					logConcurrentOutput: true
+			options:
+				logConcurrentOutput: true
 		
 		newer:
 			options:
@@ -282,34 +256,17 @@ module.exports = (grunt) ->
 					else
 						include no
 	
-	grunt.loadNpmTasks 'grunt-contrib-clean'
-	grunt.loadNpmTasks 'grunt-contrib-handlebars'
-	grunt.loadNpmTasks 'grunt-contrib-coffee'
-	grunt.loadNpmTasks 'grunt-compile-handlebars'  # compile, not contrib
-	grunt.loadNpmTasks 'grunt-sass'
-	grunt.loadNpmTasks 'grunt-postcss'
-	grunt.loadNpmTasks 'grunt-contrib-symlink'
-	grunt.loadNpmTasks 'grunt-contrib-connect'
-	grunt.loadNpmTasks 'grunt-shell'
-	grunt.loadNpmTasks 'grunt-concurrent'
-	grunt.loadNpmTasks 'grunt-contrib-jasmine'
-	grunt.loadNpmTasks 'grunt-casperjs'
-	grunt.loadNpmTasks 'grunt-contrib-watch'
-	grunt.loadNpmTasks 'grunt-contrib-requirejs'
-	grunt.loadNpmTasks 'grunt-contrib-cssmin'
-	grunt.loadNpmTasks 'grunt-newer'
-	
 	grunt.registerTask 'compile-base', [
 		'handlebars:compile'
 		'newer:coffee:compile'
 		'sass:compile'
 		'postcss:compile'
+		'symlink:compile'
 	]
 	grunt.registerTask 'compile', [
 		'compile-base'
 		'clean:develop'
 		'compile-handlebars:develop'
-		'symlink:compile'
 	]
 	grunt.registerTask 'dist', [
 		'compile-base'
@@ -318,5 +275,5 @@ module.exports = (grunt) ->
 		'requirejs:dist'
 		'cssmin:dist'
 	]
-	grunt.registerTask 'server', ['concurrent:server']
+	grunt.registerTask 'server', ['shell:backend']
 	grunt.registerTask 'default', ['concurrent:develop']
