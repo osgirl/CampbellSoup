@@ -14,7 +14,7 @@ import flask
 from flask_migrate import Migrate
 
 from .models import db
-from .api import api
+from .api import create_api
 from .frontend import frontend
 from . import defaults
 
@@ -33,7 +33,7 @@ def create_application(config=defaults, create_db=False):
     if create_db:
         db.create_all(app=app)  # passing application because of context
     migrate.init_app(app, db)
-    app.register_blueprint(api, url_prefix='/api')
+    create_api(app, db)
     frontend.static_folder = app.config['STATIC_FOLDER']
     frontend.static_url_path = app.config['STATIC_URL_PATH']
     app.register_blueprint(frontend)

@@ -7,19 +7,24 @@
 alembic==0.8.8            # via flask-migrate
 click==6.6                # via flask
 Flask-Migrate==2.0.0
+Flask-Restless==0.17.0
 Flask-Script==2.0.5       # via flask-migrate
 Flask-SQLAlchemy==2.1     # via flask-migrate
-Flask==0.11.1             # via flask-migrate, flask-script, flask-sqlalchemy
+Flask==0.11.1             # via flask-migrate, flask-restless, flask-script, flask-sqlalchemy
 itsdangerous==0.24        # via flask
 Jinja2==2.8               # via flask
 Mako==1.0.4               # via alembic
 MarkupSafe==0.23          # via jinja2, mako
+mimerender==0.6.0         # via flask-restless
 psycopg2==2.7.3.1
 py==1.4.34                # via pytest
 pyparsing==2.1.10
 pytest==3.2.3
+python-dateutil==2.6.1    # via flask-restless
 python-editor==1.0.1      # via alembic
-SQLAlchemy==1.0.15        # via alembic, flask-sqlalchemy
+python-mimeparse==1.6.0   # via mimerender
+six==1.11.0               # via python-dateutil
+SQLAlchemy==1.0.15        # via alembic, flask-restless, flask-sqlalchemy
 Werkzeug==0.11.11         # via flask
 
 # The following packages are commented out because they are

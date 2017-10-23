@@ -1,17 +1,16 @@
-# (c) 2014, 2016 Julian Gonggrijp
+# (c) 2017 Julian Gonggrijp
 
 """
-    Application routes that serve the API.
+    Definition of the API endpoints, based on Flask-Restless.
 """
 
-import flask
+import flask.ext.restless as rest
 
 from .models import *
-from .queries import *
-
-api = flask.Blueprint('API', __name__)
 
 
-@api.route('/')
-def index():
-    return 'TODO: write an API.'
+def create_api(app, db):
+    """ Factory function for the Flask-Restless APIManager. """
+    manager = rest.APIManager(app, flask_sqlalchemy_db=db)
+    manager.create_api(Test, methods=['GET'])
+    return manager
