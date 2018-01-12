@@ -1,4 +1,4 @@
-# (c) 2014, 2016 Julian Gonggrijp
+# (c) 2014, 2016-2018 Julian Gonggrijp
 
 """
     ORM classes for all objects stored in the database.
@@ -10,6 +10,8 @@
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 import flask_sqlalchemy as fsqla
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 
 from .utilities import append_to, un_camelcase
 
@@ -64,17 +66,44 @@ class UserRole(db.Model, Category):
 
 
 @append_to(__all__)
+class Account(UserMixin, db.Model):
+    """ Authentication/authorization details of a Person who can login. """
+    
+    id = _integer_pkey()
+    email_address = db.Column(db.String(254), unique=True)
+    password_hash = db.Column(db.String(128))
+    role_id = db.Column(db.ForeignKey('user_role.id'))
+    person_id = db.Column(
+        db.ForeignKey('person.id'),
+        nullable=False,
+        unique=True,
+    )
+    
+    role = db.relationship('UserRole', backref='users')
+    person = db.relationship(
+        'Person',
+        backref=db.backref('account', uselist=False),
+    )
+    
+    @property
+    def password(self):
+        raise AttributeError('passwords can never be read')
+    
+    @password.setter
+    def password(self, new_password):
+        self.password_hash = generate_password_hash(new_password)
+    
+    def verify_password(self, attempt):
+        return check_password_hash(self.password_hash, attempt)
+
+
+@append_to(__all__)
 class Person(db.Model):
     """ Person, which may be both an application user and a question author. """
     
     id = _integer_pkey()
     short_name = db.Column(db.String(30), nullable=False, unique=True)
     full_name = db.Column(db.String(254), nullable=False)
-    role_id = db.Column(db.ForeignKey('user_role.id'))
-    email_address = db.Column(db.String(254))
-    password_hash = db.Column(db.String(254))
-    
-    role = db.relationship('UserRole', backref='users')
 
 
 @append_to(__all__)

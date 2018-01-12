@@ -1,4 +1,4 @@
-# (c) 2017 Julian Gonggrijp
+# (c) 2017, 2018 Julian Gonggrijp
 
 """
     Definition of the API endpoints, based on Flask-Restless.
