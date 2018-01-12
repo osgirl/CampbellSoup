@@ -4,7 +4,7 @@
     Definition of the API endpoints, based on Flask-Restless.
 """
 
-import flask.ext.restless as rest
+import flask_restless as rest
 
 from .models import *
 
