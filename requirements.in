@@ -3,7 +3,8 @@ Flask-SQLAlchemy
 Flask-Script
 Flask-Migrate
 Flask-Restless
-Flask-User
+Flask-Login
+Flask-Mail
 pyparsing
 pytest
 psycopg2
