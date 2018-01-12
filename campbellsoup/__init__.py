@@ -17,6 +17,7 @@ from .models import db
 from .api import create_api
 from .frontend import frontend
 from . import defaults
+from .login import create_login_manager
 
 
 migrate = Migrate()
@@ -37,4 +38,6 @@ def create_application(config=defaults, create_db=False):
     frontend.static_folder = app.config['STATIC_FOLDER']
     frontend.static_url_path = app.config['STATIC_URL_PATH']
     app.register_blueprint(frontend)
+    login_manager = create_login_manager()
+    login_manager.init_app(app)
     return app
