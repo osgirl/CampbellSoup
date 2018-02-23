@@ -1,8 +1,11 @@
 # (c) 2017 Julian Gonggrijp
 
+import pytest
+
 import pyparsing as pp
 
 from .parsers import *
+from .parsers_regression_cases import REGRESSION_CASES
 
 
 def test_to_int():
@@ -447,7 +450,15 @@ def test_w_is_typed():
     assert not parser5.matches(text4)
 
 
-def test_regressions(regressions_fix):  # from conftest.py
+@pytest.fixture(
+    params=REGRESSION_CASES.values(),
+    ids=list(REGRESSION_CASES.keys()),
+)
+def regressions_fix(request):
+    return request.param
+
+
+def test_regressions(regressions_fix):
     parser, example, result = regressions_fix
     if isinstance(result, dict):
         assert parser.parseString(example, parseAll=True).asDict() == result
