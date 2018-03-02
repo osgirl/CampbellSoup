@@ -43,9 +43,10 @@ def login():
     if account is None or not account.verify_password(password):
         return jsonify(error='User does not exist or password is invalid.'), 401
     login_user(account)
-    return jsonify(account=to_dict(account, include=(
+    return jsonify(to_dict(account, include=(
         'id',
         'email_address',
-        'role',
-        'person',
-    )))
+    ), deep={
+        'role': {},
+        'person': {},
+    }))
