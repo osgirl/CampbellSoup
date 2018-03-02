@@ -2,15 +2,14 @@
 
 import pytest
 
-from .models import Account, Person
+from .models import Account
 
 
 @pytest.fixture
-def account_password_fix():
-    person = Person(short_name='test', full_name='test test')
-    account = Account(person=person)
+def account_password_fix(person_fix):
+    account = Account(person=person_fix)
     password = 'banana'
-    return person, account, password
+    return person_fix, account, password
 
 
 def test_Account_password_storage(account_password_fix):

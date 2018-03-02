@@ -6,6 +6,7 @@ from string import printable
 import pytest
 
 from . import create_application, db, defaults
+from .models import Person
 
 
 def generate_random_passwords(count=None, mean_length=12, seed=None):
@@ -43,7 +44,22 @@ def app_fix():
 
 @pytest.fixture
 def app_db_fix():
-    """ Like app_fix, but with the database fully set up. """
+    """
+        Like app_fix, but with the database fully set up and in context.
+        
+        Functions that use this fixture, inherit the application context in
+        which the contents of the database are available. DO NOT create your
+        own application context when using this fixture.
+    """
     app = create_application(UnittestConfig, True)
     app.testing = True
-    return app, db
+    with app.app_context():
+        db.session.begin(subtransactions=True)
+        yield app, db
+        db.session.rollback()
+
+
+@pytest.fixture
+def person_fix():
+    """ Provides an instance of Person where the contents don't matter. """
+    return Person(short_name='test', full_name='test test')
