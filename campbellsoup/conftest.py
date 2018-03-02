@@ -59,6 +59,49 @@ def app_db_fix():
         db.session.rollback()
 
 
+class Arguments(object):
+    """ A simple class for holding function arguments in a readable way. """
+    def __init__(self, args, kwargs):
+        self.args = args
+        self.kwargs = kwargs
+
+
+class FunctionSpy(object):
+    """ A fake function that keeps track of all calls to itself. """
+    def __init__(self, callthrough=None):
+        self.callthrough = callthrough
+        self.calls = []
+    
+    def __call__(self, *args, **kwargs):
+        self.calls.append(Arguments(args, kwargs))
+        if callable(self.callthrough):
+            return self.callthrough(*args, **kwargs)
+    
+    def __len__(self):
+        return len(self.calls)
+    
+    def __getitem__(self, index):
+        return self.calls[index]
+
+
+@pytest.fixture
+def create_spy(monkeypatch):
+    """ Provide a function to create spies, similar to Jasmine. """
+    def create(target, callthrough=None):
+        """
+            Replace the target callable with a FunctionSpy, return the latter.
+            
+            `target` should be a dotted import path as a string, with the last
+            part being the callable to be spied upon.
+            `callthrough` (optional) may be any callable to replace the
+            spied-upon callable.
+        """
+        spy = FunctionSpy(callthrough)
+        monkeypatch.setattr(target, spy)
+        return spy
+    return create
+
+
 @pytest.fixture
 def person_fix():
     """ Provides an instance of Person where the contents don't matter. """
