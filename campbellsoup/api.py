@@ -4,6 +4,8 @@
     Definition of the API endpoints, based on Flask-Restless.
 """
 
+import http.client as status
+
 from flask import request, jsonify, Blueprint
 import flask_restless as rest
 from flask_restless.helpers import to_dict  # undocumented
@@ -30,18 +32,22 @@ def create_api(app, db):
 @auth.route('/login', methods=('POST',))
 def login():
     if not request.is_json:
-        return jsonify(error='Request must be JSON encoded.'), 400
+        return jsonify(
+            error='Request must be JSON encoded.',
+        ), status.BAD_REQUEST
     try:
         json = request.get_json()
     except:
-        return jsonify(error='JSON data are malformed.'), 400
+        return jsonify(error='JSON data are malformed.'), status.BAD_REQUEST
     try:
         email, password = json['email'], json['password']
     except KeyError as error:
-        return jsonify({error.args[0]: 'Field missing.'}), 400
+        return jsonify({error.args[0]: 'Field missing.'}), status.BAD_REQUEST
     account = Account.query.filter_by(email_address=email).first()
     if account is None or not account.verify_password(password):
-        return jsonify(error='User does not exist or password is invalid.'), 401
+        return jsonify(
+            error='User does not exist or password is invalid.',
+        ), status.UNAUTHORIZED
     login_user(account)
     return jsonify(to_dict(account, include=(
         'id',
@@ -56,4 +62,4 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return '', 205 # Reset Content
+    return '', status.RESET_CONTENT

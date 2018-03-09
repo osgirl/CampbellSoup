@@ -1,5 +1,7 @@
 # (c) 2018 Julian Gonggrijp
 
+import http.client as status
+
 import pytest
 
 from flask import json
@@ -14,21 +16,25 @@ SHORT_NAME = 'test'
 FULL_NAME = 'test test'
 
 LOGIN_CASES = {
-    'nodata': ({}, 400, {'email': 'Field missing.'}),
-    'nopw': ({'email': 'bla@bla.com'}, 400, {'password': 'Field missing.'}),
+    'nodata': ({}, status.BAD_REQUEST, {'email': 'Field missing.'}),
+    'nopw': (
+        {'email': 'bla@bla.com'},
+        status.BAD_REQUEST,
+        {'password': 'Field missing.'},
+    ),
     'unknown': (
         {'email': 'bla' + VALID_EMAIL, 'password': VALID_PASSWORD},
-        401,
+        status.UNAUTHORIZED,
         {'error': 'User does not exist or password is invalid.'},
     ),
     'invalidpw': (
         {'email': VALID_EMAIL, 'password': VALID_PASSWORD + 'oops'},
-        401,
+        status.UNAUTHORIZED,
         {'error': 'User does not exist or password is invalid.'},
     ),
     'success': (
         {'email': VALID_EMAIL, 'password': VALID_PASSWORD},
-        200,
+        status.OK,
         {
             'id': 1,
             'email_address': VALID_EMAIL,
@@ -72,7 +78,7 @@ def test_login(app_db_fix, account_fix, login_fix):
             data=json.dumps(post_data),
             content_type=JSON,
         )
-        if status_code == 200:
+        if status_code == status.OK:
             assert current_user == account_fix
             assert not current_user.is_anonymous
         else:
@@ -95,5 +101,5 @@ def test_logout(app_db_fix, account_fix):
         cookie = login.headers.get('Set-Cookie')
         logout = client.get('/api/logout', headers={'Cookie': cookie})
         assert current_user.is_anonymous
-    assert logout.status_code == 205
+    assert logout.status_code == status.RESET_CONTENT
     assert not getattr(logout, 'data')
