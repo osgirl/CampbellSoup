@@ -9,6 +9,7 @@ def create_login_manager():
     """ Factory function for an instance of LoginManager. """
     manager = LoginManager()
     manager.user_loader(get_account_by_unicode)
+    manager.session_protection = 'strong'
     return manager
 
 
