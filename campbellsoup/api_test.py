@@ -81,3 +81,19 @@ def test_login(app_db_fix, account_fix, login_fix):
     assert response.status_code == status_code
     assert response.mimetype == JSON
     assert json.loads(response.data) == response_data
+
+
+def test_logout(app_db_fix, account_fix):
+    app, db = app_db_fix
+    with app.test_client() as client:
+        login = client.post(
+            '/api/login',
+            data=json.dumps(LOGIN_CASES['success'][0]),
+            content_type=JSON,
+        )
+        assert current_user == account_fix
+        cookie = login.headers.get('Set-Cookie')
+        logout = client.get('/api/logout', headers={'Cookie': cookie})
+        assert current_user.is_anonymous
+    assert logout.status_code == 205
+    assert not getattr(logout, 'data')
