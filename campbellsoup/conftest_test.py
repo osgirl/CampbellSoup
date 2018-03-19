@@ -9,7 +9,7 @@ def example(left, right):
 
 def test_create_spy(create_spy):
     assert example(1, 2) == 3
-    spy = create_spy('campbellsoup.test_conftest.example')
+    spy = create_spy('campbellsoup.conftest_test.example')
     assert example(3, 4) == None
     assert example(5, 6) == None
     assert example(this='suddenly possible') == None
@@ -22,7 +22,7 @@ def test_create_spy(create_spy):
 
 
 def test_create_spy_callthrough(create_spy):
-    spy = create_spy('campbellsoup.test_conftest.example', callthrough=example)
+    spy = create_spy('campbellsoup.conftest_test.example', callthrough=example)
     assert example(3, 4) == 7
     assert len(spy) == 1
     assert spy[0].args == (3, 4)
