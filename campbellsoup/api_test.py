@@ -7,13 +7,9 @@ import pytest
 from flask import json
 from flask_login import current_user
 
-from .models import Account, Person
+from .conftest_constants import JSON, VALID_EMAIL, VALID_PASSWORD, SHORT_NAME, FULL_NAME
 
-JSON = 'application/json'
-VALID_EMAIL = 'bla@bla.com'
-VALID_PASSWORD = '12345'
-SHORT_NAME = 'test'
-FULL_NAME = 'test test'
+VALID_LOGIN = {'email': VALID_EMAIL, 'password': VALID_PASSWORD}
 
 LOGIN_CASES = {
     'nodata': ({}, status.BAD_REQUEST, {'email': 'Field missing.'}),
@@ -33,7 +29,7 @@ LOGIN_CASES = {
         {'error': 'User does not exist or password is invalid.'},
     ),
     'success': (
-        {'email': VALID_EMAIL, 'password': VALID_PASSWORD},
+        VALID_LOGIN,
         status.OK,
         {
             'id': 1,
@@ -49,27 +45,12 @@ LOGIN_CASES = {
 }
 
 
-@pytest.fixture
-def person_fix():
-    return Person(short_name=SHORT_NAME, full_name=FULL_NAME)
-
-
-@pytest.fixture
-def account_fix(app_db_fix, person_fix):
-    app, db = app_db_fix
-    account = Account(person=person_fix, email_address=VALID_EMAIL)
-    account.password = VALID_PASSWORD
-    db.session.add(account)
-    db.session.commit()
-    return account
-
-
 @pytest.fixture(params=LOGIN_CASES.values(), ids=list(LOGIN_CASES.keys()))
 def login_fix(request):
     return request.param
 
 
-def test_login(app_db_fix, account_fix, login_fix):
+def test_login(app_db_fix, account_db_fix, login_fix):
     app, db = app_db_fix
     post_data, status_code, response_data = login_fix
     with app.test_client() as client:
@@ -79,7 +60,7 @@ def test_login(app_db_fix, account_fix, login_fix):
             content_type=JSON,
         )
         if status_code == status.OK:
-            assert current_user == account_fix
+            assert current_user == account_db_fix
             assert not current_user.is_anonymous
         else:
             assert current_user.get_id() == None
@@ -89,15 +70,15 @@ def test_login(app_db_fix, account_fix, login_fix):
     assert json.loads(response.data) == response_data
 
 
-def test_logout(app_db_fix, account_fix):
+def test_logout(app_db_fix, account_db_fix):
     app, db = app_db_fix
     with app.test_client() as client:
         login = client.post(
             '/api/login',
-            data=json.dumps(LOGIN_CASES['success'][0]),
+            data=json.dumps(VALID_LOGIN),
             content_type=JSON,
         )
-        assert current_user == account_fix
+        assert current_user == account_db_fix
         cookie = login.headers.get('Set-Cookie')
         logout = client.get('/api/logout', headers={'Cookie': cookie})
         assert current_user.is_anonymous

@@ -6,7 +6,8 @@ from string import printable
 import pytest
 
 from . import create_application, db, defaults
-from .models import Person
+from .models import Person, Account
+from .conftest_constants import *
 
 
 def generate_random_passwords(count=None, mean_length=12, seed=None):
@@ -46,7 +47,7 @@ def app_fix():
 def app_db_fix():
     """
         Like app_fix, but with the database fully set up and in context.
-        
+
         Functions that use this fixture, inherit the application context in
         which the contents of the database are available. DO NOT create your
         own application context when using this fixture.
@@ -71,15 +72,15 @@ class FunctionSpy(object):
     def __init__(self, callthrough=None):
         self.callthrough = callthrough
         self.calls = []
-    
+
     def __call__(self, *args, **kwargs):
         self.calls.append(Arguments(args, kwargs))
         if callable(self.callthrough):
             return self.callthrough(*args, **kwargs)
-    
+
     def __len__(self):
         return len(self.calls)
-    
+
     def __getitem__(self, index):
         return self.calls[index]
 
@@ -90,7 +91,7 @@ def create_spy(monkeypatch):
     def create(target, callthrough=None):
         """
             Replace the target callable with a FunctionSpy, return the latter.
-            
+
             `target` should be a dotted import path as a string, with the last
             part being the callable to be spied upon.
             `callthrough` (optional) may be any callable to replace the
@@ -104,5 +105,19 @@ def create_spy(monkeypatch):
 
 @pytest.fixture
 def person_fix():
-    """ Provides an instance of Person where the contents don't matter. """
-    return Person(short_name='test', full_name='test test')
+    return Person(short_name=SHORT_NAME, full_name=FULL_NAME)
+
+
+@pytest.fixture
+def account_fix(person_fix):
+    account = Account(person=person_fix, email_address=VALID_EMAIL)
+    account.password = VALID_PASSWORD
+    return account
+
+
+@pytest.fixture
+def account_db_fix(app_db_fix, account_fix):
+    app, db = app_db_fix
+    db.session.add(account_fix)
+    db.session.commit()
+    return account_fix
