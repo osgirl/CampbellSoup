@@ -103,3 +103,10 @@ def test_logout(app_db_fix, account_fix):
         assert current_user.is_anonymous
     assert logout.status_code == status.RESET_CONTENT
     assert not getattr(logout, 'data')
+
+
+def test_logout_unauthorized(app_db_fix):
+    app, db = app_db_fix
+    logout = app.test_client().get('/api/logout')
+    assert logout.status_code == status.UNAUTHORIZED
+    assert json.loads(logout.data) == {'error': 'Login required.'}
