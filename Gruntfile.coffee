@@ -5,7 +5,7 @@
 'use strict'
 
 module.exports = (grunt) ->
-	
+
 	if grunt.option 'production'
 		require('load-grunt-tasks') grunt, scope: 'dependencies'
 	else
@@ -13,7 +13,7 @@ module.exports = (grunt) ->
 		require('load-grunt-tasks') grunt
 	stripRegExp = (path, ext) -> new RegExp "^#{path}/|\\.#{ext}$", 'g'
 	fs = require 'fs'
-	
+
 	grunt.initConfig
 		pypackage: 'campbellsoup'
 		source: 'client'
@@ -24,7 +24,7 @@ module.exports = (grunt) ->
 		functional: 'functional-tests'
 		stage: '.tmp'
 		dist: 'dist'
-		
+
 		clean:
 			develop: ['<%= stage %>/index.html']
 			dist: ['<%= dist %>/index.html']
@@ -36,7 +36,7 @@ module.exports = (grunt) ->
 				'**/__pycache__'
 				'**/*.{pyc,pyo}'
 			]
-		
+
 		handlebars:
 			options:
 				amd: true
@@ -54,7 +54,7 @@ module.exports = (grunt) ->
 					'!<%= source %>/<%= template %>/index.mustache'
 				]
 				dest: '<%= stage %>/<%= script %>/templates.js'
-		
+
 		coffee:
 			options:
 				bare: true
@@ -70,7 +70,7 @@ module.exports = (grunt) ->
 				src: ['**/*.coffee']
 				dest: '.<%= functional %>/'
 				ext: '.js'
-		
+
 		'compile-handlebars':
 			develop:
 				src: '<%= source %>/<%= template %>/index.mustache'
@@ -84,7 +84,7 @@ module.exports = (grunt) ->
 				partials: '<%= stage %>/<%= script %>/*.js'
 				templateData:
 					production: true
-		
+
 		sass:
 			compile:
 				options:
@@ -97,7 +97,7 @@ module.exports = (grunt) ->
 				src: ['*.sass', '*.scss']
 				dest: '<%= stage %>/<%= style %>'
 				ext: '.css.pre'
-		
+
 		postcss:
 			compile:
 				options:
@@ -120,7 +120,7 @@ module.exports = (grunt) ->
 				src: ['*.css.pre']
 				dest: '<%= stage %>/<%= style %>'
 				ext: '.css'
-		
+
 		symlink:
 			compile:
 				expand: true
@@ -128,7 +128,7 @@ module.exports = (grunt) ->
 					'bower_components'
 				]
 				dest: '<%= stage %>'
-		
+
 		shell:
 			backend:
 				command: (filename) ->
@@ -143,7 +143,7 @@ module.exports = (grunt) ->
 					src = [].concat.apply([], files)
 					paths = (grunt.file.expand src).join ' '
 					"py.test #{paths}"
-		
+
 		jasmine:
 			test:
 				options:
@@ -161,13 +161,13 @@ module.exports = (grunt) ->
 					outfile: '<%= stage %>/_SpecRunner.html'
 					display: 'short'
 					summary: true
-		
+
 		casperjs:
 			options:
 				silent: true
 			functional:
 				src: ['.<%= functional %>/**/*.js']
-		
+
 		watch:
 			handlebars:
 				files: '<%= handlebars.compile.src %>'
@@ -212,7 +212,7 @@ module.exports = (grunt) ->
 					cwd:
 						files: '<%= stage %>'
 					livereload: true
-		
+
 		requirejs:
 			dist:
 				options:
@@ -224,14 +224,15 @@ module.exports = (grunt) ->
 						backbone: 'empty:'
 						underscore: 'empty:'
 						'handlebars.runtime': 'empty:'
+						machina: 'empty:'
 					include: ['main.js']
 					out: '<%= dist %>/campbellsoup.js'
-		
+
 		cssmin:
 			dist:
 				src: ['<%= stage %>/<%= style %>/*.css']
 				dest: '<%= dist %>/campbellsoup.css'
-		
+
 		concurrent:
 			preserver:
 				tasks: ['shell:pytest', 'compile']
@@ -242,7 +243,7 @@ module.exports = (grunt) ->
 				]
 			options:
 				logConcurrentOutput: true
-		
+
 		newer:
 			options:
 				override: (info, include) ->
@@ -255,7 +256,7 @@ module.exports = (grunt) ->
 								include no
 					else
 						include no
-	
+
 	grunt.registerTask 'compile-base', [
 		'handlebars:compile'
 		'newer:coffee:compile'
