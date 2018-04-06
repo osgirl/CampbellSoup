@@ -151,6 +151,7 @@ module.exports = (grunt) ->
 					helpers: [
 						'bower_components/jquery/dist/jquery.js'
 						'bower_components/jasmine-jquery/lib/jasmine-jquery.js'
+						'bower_components/jasmine-ajax/lib/mock-ajax.js'
 					]
 					# host: 'http://localhost:8000/'
 					template: jasmineTemplate
