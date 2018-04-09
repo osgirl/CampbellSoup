@@ -16,12 +16,13 @@ define [
 		logout: ->
 			xhr = @sync 'read', @,
 				url: '/api/logout'
+				dataType: 'text'
 				processData: false
 				success: =>
 					delete @person
 					delete @role
 					@clear()
-					@trigger 'logoff'
+					@trigger 'logout'
 		parse: (serverData) ->
 			@role = new bb.Model serverData.role
 			@person = new bb.Model serverData.person
