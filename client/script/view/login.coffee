@@ -7,6 +7,7 @@ define [
 	class LoginView extends bb.View
 
 		tagName: 'article'
+		className: 'card'
 		template: JST.login
 
 		initialize: (options) ->

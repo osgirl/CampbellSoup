@@ -5,3 +5,30 @@
 
 main
 	@extend .content
+
+form
+	fieldset
+		@extend .field
+		border: none
+
+		p
+			@extend .control
+
+	label
+		@extend .label
+
+	input
+		@extend .input
+
+button
+	@extend .button
+
+.card
+	& > header, & > :first-child
+		@extend .card-header
+
+		& > :not(.card-header-icon)
+			@extend .card-header-title
+
+	& > :not(:first-child)
+		@extend .card-content

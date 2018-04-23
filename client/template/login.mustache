@@ -1,12 +1,17 @@
 <header>
-	<h1>Welcome to CampbellSoup<br>
-	<small>Please login to proceed.</small></h1>
+	<p>Please login to proceed.</p>
 </header>
 <form>
-	<label for=login-email>Email address</label>
-	<input type=email id=login-email>
-	<label for=login-password>Password</label>
-	<input type=password id=login-password>
-	<button type=submit>Login</button>
-	<button type=reset>Cancel</button>
+	<fieldset>
+		<label for=login-email>Email address</label>
+		<p><input type=email id=login-email></p>
+	</fieldset>
+	<fieldset>
+		<label for=login-password>Password</label>
+		<p><input type=password id=login-password></p>
+	</fieldset>
+	<fieldset class="is-grouped">
+		<p><button type=submit class="is-primary">Login</button></p>
+		<p><button type=reset class="is-light">Cancel</button></p>
+	</fieldset>
 </form>
