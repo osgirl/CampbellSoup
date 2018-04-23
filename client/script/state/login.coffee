@@ -2,10 +2,9 @@
 
 define [
 	'machina'
-], (machina) ->
+	'lodash'
+], (machina, _) ->
 	'use strict'
-
-	noop = -> undefined
 
 	machina.Fsm.extend
 		namespace: 'login'
@@ -16,7 +15,7 @@ define [
 				'*': -> @deferAndTransition 'attemptLogin'
 			attemptLogin:
 				loginSuccess: 'authenticated'
-				loginFail: noop
+				loginFail: _.noop
 				loginCancel: 'unauthenticated'
 				'*': -> @deferUntilTransition()
 			authenticated:
