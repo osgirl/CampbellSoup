@@ -9,7 +9,7 @@ module.exports = (grunt) ->
 	if grunt.option 'production'
 		require('load-grunt-tasks') grunt, scope: 'dependencies'
 	else
-		jasmineTemplate = require 'grunt-template-jasmine-requirejs'
+		jasmineTemplate = require '@radum/grunt-template-jasmine-requirejs'
 		require('load-grunt-tasks') grunt
 	stripRegExp = (path, ext) -> new RegExp "^#{path}/|\\.#{ext}$", 'g'
 	fs = require 'fs'
