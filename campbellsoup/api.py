@@ -9,7 +9,7 @@ import http.client as status
 from flask import request, jsonify, Blueprint
 import flask_restless as rest
 from flask_restless.helpers import to_dict  # undocumented
-from flask_login import login_user, login_required, logout_user
+from flask_login import login_user, login_required, logout_user, current_user
 
 from .models import *
 
@@ -17,16 +17,40 @@ from .models import *
 # parameter of flask_restless.APIManager.create_api_blueprint.
 REST_API_PREFIX = '/api'
 
+# see http://flask-restless.readthedocs.io/en/stable/customizing.html#request-preprocessors-and-postprocessors
+REST_API_METHODS = [
+    'POST',
+    'GET_SINGLE',
+    'GET_MANY',
+    'PATCH_SINGLE',
+    'PATCH_MANY',
+    'PUT_SINGLE',
+    'PUT_MANY',
+    'DELETE_SINGLE',
+    'DELETE_MANY',
+]
+
 # JSON APIs not based on sqla models need to be created manually.
 auth = Blueprint('API-Auth', __name__, url_prefix=REST_API_PREFIX)
 
 
 def create_api(app, db):
     """ Factory function for the Flask-Restless APIManager. """
-    manager = rest.APIManager(app, flask_sqlalchemy_db=db)
+    manager = rest.APIManager(app, flask_sqlalchemy_db=db, preprocessors={
+        method: [check_authentication] for method in REST_API_METHODS
+    })
     manager.create_api(Test, methods=['GET'])
     app.register_blueprint(auth)
     return manager
+
+
+def check_authentication(**kwargs):
+    """ Stop request processing if the user is not authenticated. """
+    if not current_user.is_authenticated:
+        raise rest.ProcessingException(
+            description='Not authenticated',
+            code=status.UNAUTHORIZED,
+        )
 
 
 @auth.route('/login', methods=('POST',))
