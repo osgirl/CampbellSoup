@@ -1,12 +1,12 @@
 # (c) 2018 Julian Gonggrijp
 
 define [
-	'machina'
 	'lodash'
-], (machina, _) ->
+	'core/fsm'
+], (_, BackboneFsm) ->
 	'use strict'
 
-	machina.Fsm.extend
+	BackboneFsm.extend
 		namespace: 'login'
 		initialState: 'unauthenticated'
 		states:
