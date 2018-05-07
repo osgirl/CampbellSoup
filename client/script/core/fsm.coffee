@@ -10,7 +10,7 @@ define [
 			machina.Fsm.apply this, arguments
 			this.on 'transition', ({fromState, toState, action}) =>
 				this.emit "exit:#{fromState}", this, action
-				this.emit "enter:#{toState}", this
+				this.emit "enter:#{toState}", this, action
 
 	_.extend BackboneFsm.prototype, bb.Events
 	BackboneFsm.prototype.emit = BackboneFsm.prototype.trigger
