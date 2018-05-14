@@ -5,11 +5,10 @@
 require [
 	'jquery'
 	'backbone'
-	'router/main'
-], ($, bb, MainRouter) ->
+	'global/bootstrap'
+], ($, bb) ->
 	'use strict'
 	$ ->
-		new MainRouter()
 		bb.history.start
 			pushState: true
 			hashChange: false

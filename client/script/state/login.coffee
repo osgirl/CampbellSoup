@@ -19,4 +19,4 @@ define [
 				loginCancel: 'unauthenticated'
 				'*': -> @deferUntilTransition()
 			authenticated:
-				logoff: 'unauthenticated'
+				logout: 'unauthenticated'

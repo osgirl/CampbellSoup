@@ -1,16 +1,13 @@
 ###
-	(c) 2016 Julian Gonggrijp
+	(c) 2016, 2018 Julian Gonggrijp
 ###
 
 define [
 	'backbone'
-	'view/home'
-], (bb, HomeView) ->
+], (bb) ->
 	'use strict'
-	
-	homeView = new HomeView
-	
+
 	class MainRouter extends bb.Router
 		routes:
-			'': 'home'
-		home: -> homeView.render()
+			'(home)': 'home'
+			'login': 'login'

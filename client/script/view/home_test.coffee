@@ -1,5 +1,5 @@
 ###
-	(c) 2016 Julian Gonggrijp
+	(c) 2016, 2018 Julian Gonggrijp
 ###
 
 define [
@@ -7,20 +7,19 @@ define [
 	'view/home'
 ], ($, HomeView) ->
 	'use strict'
-	
+
 	# $ = require 'jquery'
 	# HomeView = require 'view/home'
-	
+
 	describe 'HomeView', ->
 		beforeEach ->
 			setFixtures $ '<main>'
 			@home = new HomeView()
-		
+
 		it 'renders a title and some intro text', ->
-			@home.render()
 			main = $ 'main'
-			expect(main.children()).toHaveLength 2
+			@home.$el.appendTo main
 			expect(main).toContainElement 'h1'
 			expect(main).toContainElement 'p'
-			expect(main.children 'h1').toContainText 'CampbellSoup'
-			expect(main.children 'p').toContainText 'Welcome'
+			expect(main.find 'h1').toContainText 'CampbellSoup'
+			expect(main.find 'p').toContainText 'Welcome'
