@@ -1,19 +1,12 @@
 define [
-	'jquery'
-	'model/account'
-	'view/login'
-	'view/home'
-	'router/main'
-	'state/login'
-], ($, Account, LoginView, HomeView, MainRouter, LoginFsm) ->
+	'global/accountModel-instance'
+	'global/loginView-instance'
+	'global/homeView-instance'
+	'global/mainRouter-instance'
+	'global/loginFsm-instance'
+	'global/mainElement'
+], (account, loginView, homeView, mainRouter, loginFsm, mainElement) ->
 	'use strict'
-
-	account = new Account
-	loginView = new LoginView
-	homeView = new HomeView
-	mainRouter = new MainRouter
-	loginFsm = new LoginFsm
-	mainElement = $ 'main'
 
 	account.on 'login:success', -> loginFsm.handle 'loginSuccess'
 	# account.on 'login:error', -> TODO
@@ -34,5 +27,3 @@ define [
 	loginFsm.on 'exit:authenticated', -> homeView.remove()
 	loginFsm.on 'enter:unauthenticated', -> mainRouter.navigate ''
 	# TODO: call account.logout somewhere
-
-	{account, mainRouter, loginFsm}

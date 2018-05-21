@@ -5,7 +5,7 @@
 require [
 	'jquery'
 	'backbone'
-	'global/bootstrap'
+	'global/authentication-aspect'
 ], ($, bb) ->
 	'use strict'
 	$ ->
