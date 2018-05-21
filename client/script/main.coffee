@@ -10,5 +10,5 @@ require [
 	'use strict'
 	domLoaded.then ->
 		bb.history.start
-			pushState: true
-			hashChange: false
+			pushState: false
+			hashChange: true
