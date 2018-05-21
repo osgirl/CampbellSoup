@@ -3,12 +3,12 @@
 ###
 
 require [
-	'jquery'
 	'backbone'
+	'global/domLoadedPromise'
 	'global/authentication-aspect'
-], ($, bb) ->
+], (bb, domLoaded) ->
 	'use strict'
-	$ ->
+	domLoaded.then ->
 		bb.history.start
 			pushState: true
 			hashChange: false
