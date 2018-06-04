@@ -9,6 +9,7 @@
 
 import base64
 import datetime
+import os
 
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
