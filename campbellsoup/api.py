@@ -53,16 +53,26 @@ def check_authentication(**kwargs):
         )
 
 
+def check_proper_json(request):
+    """ Ensure that a POST request is properly JSON encoded. """
+    if not request.is_json:
+        return False, (
+            jsonify(error='Request must be JSON encoded.'),
+            status.BAD_REQUEST,
+        )
+    try:
+        return request.get_json(), None
+    except:
+        return False, (
+            jsonify(error='JSON data are malformed.'),
+            status.BAD_REQUEST,
+        )
+
+
 @auth.route('/login', methods=('POST',))
 def login():
-    if not request.is_json:
-        return jsonify(
-            error='Request must be JSON encoded.',
-        ), status.BAD_REQUEST
-    try:
-        json = request.get_json()
-    except:
-        return jsonify(error='JSON data are malformed.'), status.BAD_REQUEST
+    json, response = check_proper_json(request)
+    if json == False: return response
     try:
         email, password = json['email'], json['password']
     except KeyError as error:
