@@ -100,10 +100,10 @@ class Account(UserMixin, db.Model):
         return check_password_hash(self.password_hash, attempt)
 
 
-def unique_confirmation_token():
+def unique_activation_token():
     while True:
         attempt = base64.b32encode(os.urandom(10)).decode('utf-8')
-        if not Confirmation.query.filter_by(token=attempt).one_or_none(): break
+        if not Activation.query.filter_by(token=attempt).one_or_none(): break
     return attempt
 
 
@@ -111,15 +111,15 @@ def tomorrow():
     return datetime.datetime.now() + datetime.timedelta(days=1)
 
 
-class Confirmation(db.Model):
-    """ Temporary opportunity for an Account holder to confirm credentials. """
+class Activation(db.Model):
+    """ Temporary opportunity to activate an Account. """
 
     id = _integer_pkey()
     token = db.Column(
         db.String(16),
         nullable=False,
         unique=True,
-        default=unique_confirmation_token,
+        default=unique_activation_token,
     )
     account_id = db.Column(db.ForeignKey('account.id'), nullable=False)
     expires = db.Column(db.DateTime, nullable=False, default=tomorrow)
