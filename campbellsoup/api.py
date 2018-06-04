@@ -5,6 +5,7 @@
 """
 
 import http.client as status
+import datetime
 
 from flask import request, jsonify, Blueprint
 import flask_restless as rest
@@ -97,3 +98,14 @@ def login():
 def logout():
     logout_user()
     return '', status.RESET_CONTENT
+
+
+@auth.route('/activate/<token>', methods=('POST',))
+def activate(token):
+    activation = Activation.query.filter_by(token=token).first()
+    now = datetime.datetime.now()
+    if activation is None or activation.expires < now:
+        return jsonify(
+            error='No activation with this token available.',
+        ), status.NOT_FOUND
+
