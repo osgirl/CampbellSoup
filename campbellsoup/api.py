@@ -31,6 +31,10 @@ REST_API_METHODS = [
     'DELETE_MANY',
 ]
 
+ACTIVATION_MISMATCH_RESPONSE = jsonify(
+    error='Credentials do not match previously provided values.',
+), status.UNAUTHORIZED
+
 # JSON APIs not based on sqla models need to be created manually.
 auth = Blueprint('API-Auth', __name__, url_prefix=REST_API_PREFIX)
 
@@ -108,4 +112,29 @@ def activate(token):
         return jsonify(
             error='No activation with this token available.',
         ), status.NOT_FOUND
-
+    json, response = check_proper_json(request)
+    if json == False: return response
+    try:
+        email, password = json['email'], json['password']
+    except KeyError as error:
+        return jsonify({error.args[0]: 'Field missing.'}), status.BAD_REQUEST
+    account = activation.account
+    if account.email_address:
+        if email != account.email_address:
+            return ACTIVATION_MISMATCH_RESPONSE
+    else:
+        account.email_address = email
+    if account.password_hash:
+        if not account.verify_password(password):
+            return ACTIVATION_MISMATCH_RESPONSE
+    else:
+        account.password = password
+    try:
+        activation.expires = now
+        db.session.add(account)
+        db.session.add(activation)
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return jsonify(error='Internal server error.'), status.INTERNAL_SERVER_ERROR
+    return '', status.NO_CONTENT
