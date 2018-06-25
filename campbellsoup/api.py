@@ -31,10 +31,6 @@ REST_API_METHODS = [
     'DELETE_MANY',
 ]
 
-ACTIVATION_MISMATCH_RESPONSE = jsonify(
-    error='Credentials do not match previously provided values.',
-), status.UNAUTHORIZED
-
 # JSON APIs not based on sqla models need to be created manually.
 auth = Blueprint('API-Auth', __name__, url_prefix=REST_API_PREFIX)
 
@@ -104,6 +100,12 @@ def logout():
     return '', status.RESET_CONTENT
 
 
+def activation_mismatch_response():
+    return jsonify(
+        error='Credentials do not match previously provided values.',
+    ), status.UNAUTHORIZED
+
+
 @auth.route('/activate/<token>', methods=('POST',))
 def activate(token):
     activation = Activation.query.filter_by(token=token).first()
@@ -121,12 +123,12 @@ def activate(token):
     account = activation.account
     if account.email_address:
         if email != account.email_address:
-            return ACTIVATION_MISMATCH_RESPONSE
+            return activation_mismatch_response()
     else:
         account.email_address = email
     if account.password_hash:
         if not account.verify_password(password):
-            return ACTIVATION_MISMATCH_RESPONSE
+            return activation_mismatch_response()
     else:
         account.password = password
     try:

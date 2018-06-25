@@ -2,11 +2,12 @@
 
 from random import Random
 from string import printable, ascii_lowercase, digits
+import datetime
 
 import pytest
 
 from . import create_application, db, defaults
-from .models import Person, Account
+from .models import Person, Account, Activation
 from .conftest_constants import *
 
 ALPHANUMERIC = ascii_lowercase + digits
@@ -142,3 +143,24 @@ def account_db_fix(app_db_fix, account_fix):
     db.session.add(account_fix)
     db.session.commit()
     return account_fix
+
+
+@pytest.fixture
+def activation_fix(account_fix):
+    live = Activation(token=LIVE_TOKEN, account=account_fix)
+    expired = Activation(
+        token=EXPIRED_TOKEN,
+        account=account_fix,
+        expires=datetime.datetime.now() - datetime.timedelta(seconds=1),
+    )
+    return live, expired
+
+
+@pytest.fixture
+def activation_db_fix(app_db_fix, account_db_fix, activation_fix):
+    app, db =  app_db_fix
+    live, expired = activation_fix
+    db.session.add(live)
+    db.session.add(expired)
+    db.session.commit()
+    return live, expired
