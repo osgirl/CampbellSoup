@@ -1,13 +1,16 @@
 # (c) 2018 Julian Gonggrijp
 
 from random import Random
-from string import printable
+from string import printable, ascii_lowercase, digits
 
 import pytest
 
 from . import create_application, db, defaults
 from .models import Person, Account
 from .conftest_constants import *
+
+ALPHANUMERIC = ascii_lowercase + digits
+RANDOM_EMAIL_SUFFIX = '.' + VALID_EMAIL
 
 
 def generate_random_passwords(count=None, mean_length=12, seed=None):
@@ -24,6 +27,24 @@ def generate_random_passwords(count=None, mean_length=12, seed=None):
 
 @pytest.fixture(params=generate_random_passwords(15))
 def random_password_fix(request):
+    return request.param
+
+
+def generate_random_emails(count=None, prefix_length=4, seed=None):
+    """ Generate `count` random emails, or infinitely many if None. """
+    prng = Random(seed)
+    if count is None:
+        count = -1
+    while count != 0:
+        count -= 1
+        prefix = ''.join(
+            (prng.choice(ALPHANUMERIC) for i in range(prefix_length))
+        )
+        yield prefix + RANDOM_EMAIL_SUFFIX
+
+
+@pytest.fixture(params=generate_random_emails(15))
+def random_email_fix(request):
     return request.param
 
 
