@@ -13,6 +13,14 @@ define [
 				attrs: credentials
 				success: => @trigger 'login:success'
 				error: => @trigger 'login:error'
+		activate: (token, credentials) ->
+			xhr = @sync 'create', @,
+				url: "/api/activate/#{token}"
+				contentType: 'application/json'
+				data: JSON.stringify credentials
+				processData: false
+				success: => @trigger 'activate:success'
+				error: => @trigger 'activate:error'
 		logout: ->
 			xhr = @sync 'read', @,
 				url: '/api/logout'

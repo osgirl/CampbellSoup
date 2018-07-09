@@ -11,6 +11,8 @@ define [
 		email: 'bla@bla.com'
 		password: 'banana-split'
 
+	activateToken = '12345'
+
 	data =
 		login:
 			success:
@@ -25,6 +27,9 @@ define [
 					full_name: 'blabla'
 			error:
 				error: 'User does not exist or password is invalid.'
+		activate:
+			error:
+				error: 'No activation with this token available.'
 
 	response =
 		login:
@@ -34,6 +39,13 @@ define [
 			error:
 				status: 401
 				responseText: JSON.stringify data.login.error
+		activate:
+			success:
+				status: 204
+				responseText: ''
+			error:
+				status: 404
+				responseText: JSON.stringify data.activate.error
 		logout:
 			success:
 				status: 205
@@ -146,6 +158,90 @@ define [
 					expect(@account.attributes).toEqual {}
 					expect(@account.role).toBeUndefined()
 					expect(@account.person).toBeUndefined()
+
+				it 'emits an error event', ->
+					expect(@successListener).not.toHaveBeenCalled()
+					expect(@errorListener).toHaveBeenCalled()
+
+				it 'rejects the promise', (done) ->
+					expect(@promise.state()).toBe 'rejected'
+					@followUp.then =>
+						expect(@successHandler).not.toHaveBeenCalled()
+						expect(@errorHandler).toHaveBeenCalledWith(
+							jasmine.objectContaining # jqXHR
+								responseJSON: @data
+							jasmine.anything()       # status
+							jasmine.anything()       # errorThrown
+						)
+						done()
+					jasmine.clock().tick(1000)
+
+		describe '.activate', ->
+			beforeEach ->
+				@successHandler = jasmine.createSpy 'successHandler'
+				@errorHandler = jasmine.createSpy 'errorHandler'
+				@successListener = jasmine.createSpy 'successListener'
+				@errorListener = jasmine.createSpy 'errorListener'
+				@account.on 'activate:success', @successListener
+				@account.on 'activate:error', @errorListener
+				spyOn(@account, 'set').and.callThrough()
+				spyOn(@account, 'clear').and.callThrough()
+				@promise = @account.activate activateToken, credentials
+				@followUp = @promise.then(@successHandler, @errorHandler)
+				@request = jasmine.Ajax.requests.mostRecent()
+
+			it 'sends a request', ->
+				expect(@request.url).toBe "/api/activate/#{activateToken}"
+				expect(@request.method).toBe 'POST'
+				expect(@request.data()).toEqual credentials
+
+			it 'does nothing until the response arrives', ->
+				expect(@account.set).not.toHaveBeenCalled()
+				expect(@account.clear).not.toHaveBeenCalled()
+				expect(@successHandler).not.toHaveBeenCalled()
+				expect(@errorHandler).not.toHaveBeenCalled()
+				expect(@successListener).not.toHaveBeenCalled()
+				expect(@errorListener).not.toHaveBeenCalled()
+				expect(@account.role).toBeUndefined()
+				expect(@account.person).toBeUndefined()
+				expect(@account.attributes).toEqual {}
+
+			describe 'on success', ->
+				beforeEach ->
+					# Manipulating time because Promise.then is always async.
+					# https://github.com/jquery/jquery/issues/3325
+					# https://jquery.com/upgrade-guide/3.0/#deferred
+					jasmine.clock().install()
+					@request.respondWith response.activate.success
+
+				afterEach ->
+					jasmine.clock().uninstall()
+
+				it 'emits a success event', ->
+					expect(@successListener).toHaveBeenCalled()
+					expect(@errorListener).not.toHaveBeenCalled()
+
+				it 'resolves the promise', (done) ->
+					expect(@promise.state()).toBe 'resolved'
+					@followUp.then =>
+						expect(@successHandler).toHaveBeenCalledWith(
+							undefined          # data
+							jasmine.anything() # status
+							jasmine.anything() # jqXHR
+						)
+						expect(@errorHandler).not.toHaveBeenCalled()
+						done()
+					jasmine.clock().tick(1000)
+
+			describe 'on error', ->
+				beforeEach ->
+					@data = data.activate.error
+					# Manipulating time for the same reason as with success.
+					jasmine.clock().install()
+					@request.respondWith response.activate.error
+
+				afterEach ->
+					jasmine.clock().uninstall()
 
 				it 'emits an error event', ->
 					expect(@successListener).not.toHaveBeenCalled()
