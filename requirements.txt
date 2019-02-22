@@ -15,7 +15,7 @@ Jinja2==2.10               # via flask
 Mako==1.0.7               # via alembic
 MarkupSafe==1.1.0          # via jinja2, mako
 psycopg2==2.7.7
-py==1.7.0                # via pytest
+py==1.8.0                # via pytest
 pyparsing==2.3.1
 pytest==4.3.0
 python-editor==1.0.4      # via alembic
